@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./frontend/src/*"]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "jsx": "preserve"
+  },
+  "include": ["frontend/**/*.ts", "frontend/**/*.tsx"]
+}

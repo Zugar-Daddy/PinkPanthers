@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Terminal, Check, Play, RefreshCw, Sparkles, ArrowRight } from 'lucide-react';
-import { AgentWalletClient } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
 
 interface InteractiveCliTerminalProps {
     wallet: AgentWalletClient;
@@ -11,11 +11,11 @@ interface InteractiveCliTerminalProps {
 export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ wallet }) => {
     const [commandLog, setCommandLog] = useState<string[]>([
         '# SafeAgent Developer CLI & Onboarding Sequence',
-        '# 1. Principal account established: Yoav K. (P-256 Passkey Active)',
+        '# 1. Principal account established: Madhav B. (P-256 Passkey Active)',
         '# 2. Fleet provisioned: 11 active agents, 1 provisioning',
-        '# 3. Budget allocated: $5,000 USDC / 24h cycle',
+        '# 3. Budget allocated: ₹5,00,000 INR / 24h cycle',
         '# 4. Virtual debit card linked: ···· 1126 (Visa Business)',
-        '# 5. PolicyEngine.sol active: Max per-tx $25.00 | Recipient whitelist enforced',
+        '# 5. PolicyEngine.sol active: Max per-tx ₹2,500 | Recipient whitelist enforced',
         '# 6. Model Context Protocol (MCP) server listening on :3000/api/mcp',
         '✨ Agent ready to autonomously pay and sign within owner constraints.'
     ]);
@@ -27,12 +27,12 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
 
         if (trimmed.includes('fleet')) {
             response = `[AGENT FLEET]\n` +
-                wallet.fleet.map(a => `• ${a.name.padEnd(18)} [${a.category.toUpperCase()}] Spent: $${a.spentToday}/$${a.dailyBudget} | Card: ${a.assignedCard}`).join('\n');
+                wallet.fleet.map(a => `• ${a.name.padEnd(18)} [${a.category.toUpperCase()}] Spent: ${formatINR(a.spentToday)}/${formatINR(a.dailyBudget)} | Card: ${a.assignedCard}`).join('\n');
         } else if (trimmed.includes('card')) {
             response = `[VIRTUAL CARD RESOURCE]\n` +
                 `Number: ${wallet.virtualCard.maskedNumber}\n` +
                 `Status: ${wallet.virtualCard.isFrozen ? 'FROZEN' : 'ACTIVE'}\n` +
-                `Daily Cap: $${wallet.virtualCard.dailyLimit.toFixed(2)}\n` +
+                `Daily Cap: ${formatINR(wallet.virtualCard.dailyLimit)}\n` +
                 `Holder: ${wallet.virtualCard.holder}\n` +
                 `Brand: ${wallet.virtualCard.brand}`;
         } else if (trimmed.includes('mcp')) {
@@ -43,8 +43,8 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
                 `Connected clients: Claude Desktop, Cursor IDE, LangChain`;
         } else if (trimmed.includes('policy')) {
             response = `[POLICY ENGINE]\n` +
-                `Per-Tx Cap: $${wallet.policy.maxPerTx.toFixed(2)} USDC\n` +
-                `24h Rolling Budget: $${wallet.policy.dailyBudget.toFixed(2)} USDC\n` +
+                `Per-Tx Cap: ${formatINR(wallet.policy.maxPerTx)}\n` +
+                `24h Rolling Budget: ${formatINR(wallet.policy.dailyBudget)}\n` +
                 `Session Validity: ${wallet.policy.sessionExpiryHours} hours (validUntil timestamp)\n` +
                 `Whitelisted Contracts: ${wallet.policy.allowedContracts.length} approved targets`;
         } else {

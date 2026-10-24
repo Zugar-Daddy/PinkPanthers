@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { DollarSign, Clock, ShieldCheck, Trash2, Coins, ArrowUpRight } from 'lucide-react';
-import { AgentWalletClient } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
 
 interface WalletBalancesCardProps {
     wallet: AgentWalletClient;
@@ -21,15 +21,15 @@ export const WalletBalancesCard: React.FC<WalletBalancesCardProps> = ({ wallet, 
                 <div className="space-y-2.5">
                     <div className="inline-flex items-center gap-1.5 bg-stone-100 text-stone-700 px-3 py-1 rounded-full text-xs font-mono font-medium border border-stone-200/80">
                         <Coins className="w-3.5 h-3.5 text-stone-600" />
-                        <span>Smart Account Treasury</span>
+                        <span>Smart Account Treasury Vault</span>
                     </div>
 
                     <div className="flex flex-wrap items-baseline gap-3 pt-0.5">
                         <div className="text-4xl sm:text-5xl font-serif font-semibold text-stone-900 tracking-tight">
-                            ${wallet.usdcBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {formatINR(wallet.usdcBalance)}
                         </div>
                         <span className="text-xs font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 px-2.5 py-0.5 rounded-full uppercase tracking-wide">
-                            USDC
+                            INR Vault
                         </span>
                         <span className="text-stone-500 font-mono text-sm font-medium">
                             + {wallet.ethBalance} ETH
@@ -47,7 +47,7 @@ export const WalletBalancesCard: React.FC<WalletBalancesCardProps> = ({ wallet, 
                     <div className="flex justify-between items-center text-xs font-mono">
                         <span className="uppercase text-[10px] font-semibold text-stone-500 tracking-wider">24h Budget Spent:</span>
                         <span className="text-xs font-semibold text-stone-900">
-                            ${wallet.dailySpent.toFixed(2)} <span className="text-stone-400 font-normal">/ ${wallet.policy.dailyBudget.toFixed(2)}</span>
+                            {formatINR(wallet.dailySpent)} <span className="text-stone-400 font-normal">/ {formatINR(wallet.policy.dailyBudget)}</span>
                         </span>
                     </div>
 
@@ -64,7 +64,7 @@ export const WalletBalancesCard: React.FC<WalletBalancesCardProps> = ({ wallet, 
                     <div className="flex justify-between items-center text-xs font-mono">
                         <span className="text-stone-500 text-[11px]">In-Policy Headroom:</span>
                         <span className="bg-white border border-stone-200 px-2.5 py-0.5 rounded-full text-[11px] font-medium text-stone-700 shadow-subtle">
-                            ${remainingBudget.toFixed(2)} USDC
+                            {formatINR(remainingBudget)}
                         </span>
                     </div>
                 </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShieldAlert, Fingerprint, X, Check, AlertTriangle, ShieldCheck } from 'lucide-react';
-import { QueuedApproval } from '../lib/web3/agentWalletClient';
+import { QueuedApproval, formatINR } from '../lib/web3/agentWalletClient';
 
 interface OwnerApprovalModalProps {
     request: QueuedApproval | null;
@@ -80,7 +80,7 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
                     <div className="flex justify-between items-center">
                         <span className="text-stone-500 font-normal">Requested Amount:</span>
                         <span className="text-stone-900 font-semibold text-sm bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">
-                            ${request.amount.toFixed(2)} USDC
+                            {formatINR(request.amount)}
                         </span>
                     </div>
                     <div className="flex justify-between">

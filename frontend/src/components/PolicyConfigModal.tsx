@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Sliders, Key, Fingerprint, Trash2, Check, Shield } from 'lucide-react';
-import { AgentWalletClient } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
 
 interface PolicyConfigModalProps {
     wallet: AgentWalletClient;
@@ -62,20 +62,20 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                     <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
                         <div className="flex justify-between items-center mb-2">
                             <span className="text-stone-600 font-medium font-sans text-xs">Max Per-Transaction Limit:</span>
-                            <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">${maxPerTx.toFixed(2)} USDC</span>
+                            <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">{formatINR(maxPerTx)}</span>
                         </div>
                         <input
                             type="range"
-                            min={5}
-                            max={100}
-                            step={5}
+                            min={500}
+                            max={10000}
+                            step={500}
                             value={maxPerTx}
                             onChange={(e) => setMaxPerTx(parseFloat(e.target.value))}
                             className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
                         <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
-                            <span>$5 (Micro-orders)</span>
-                            <span>$100 (High-tier limit)</span>
+                            <span>₹500 (Micro-orders)</span>
+                            <span>₹10,000 (High-tier limit)</span>
                         </div>
                     </div>
 
@@ -83,20 +83,20 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                     <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
                         <div className="flex justify-between items-center mb-2">
                             <span className="text-stone-600 font-medium font-sans text-xs">24-Hour Rolling Budget:</span>
-                            <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">${dailyBudget.toFixed(2)} USDC</span>
+                            <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">{formatINR(dailyBudget)}</span>
                         </div>
                         <input
                             type="range"
-                            min={25}
-                            max={500}
-                            step={25}
+                            min={2500}
+                            max={50000}
+                            step={2500}
                             value={dailyBudget}
                             onChange={(e) => setDailyBudget(parseFloat(e.target.value))}
                             className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
                         <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
-                            <span>$25/day</span>
-                            <span>$500/day</span>
+                            <span>₹2,500/day</span>
+                            <span>₹50,000/day</span>
                         </div>
                     </div>
 

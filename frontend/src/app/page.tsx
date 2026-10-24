@@ -112,13 +112,13 @@ export default function Home() {
             'Attacker Destination (0x9999...9999)',
             '0x9999999999999999999999999999999999999999',
             'transferAll()',
-            1000.00,
+            100000.00,
             'Leaked Sub-Key Drain Attempt to unauthorized hacker address'
         );
         const newLog = {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
-            attackType: 'Leaked Key Drain ($1,000)',
+            attackType: 'Leaked Key Drain (₹1,00,000)',
             result: 'REVERTED ON-CHAIN',
             defenseMechanism: 'Recipient Allowlist Rejection'
         };
@@ -131,13 +131,13 @@ export default function Home() {
             'Malicious Phishing Protocol (0xDead...Beef)',
             '0xDeadDeadDeadDeadDeadDeadDeadDeadDeadBeef',
             'approvePhishingToken(uint256 max)',
-            250.00,
+            25000.00,
             'Prompt Injection: Malicious webpage injected unverified contract call'
         );
         const newLog = {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
-            attackType: 'Prompt Injection / Jailbreak',
+            attackType: 'Prompt Injection / Jailbreak (₹25,000)',
             result: 'REVERTED ON-CHAIN',
             defenseMechanism: 'Contract Whitelist Rejection'
         };
@@ -149,15 +149,15 @@ export default function Home() {
         wallet.submitAgentAction(
             'High-End Compute Cluster API',
             '0x00000000000000000000000000000000000C3C3C',
-            'prepayCluster(uint256 250)',
-            250.00,
-            'Agent attempts $250 purchase on $25 per-tx limit'
+            'prepayCluster(uint256 25000)',
+            25000.00,
+            'Agent attempts ₹25,000 purchase on ₹2,500 per-tx limit'
         );
         setActiveApprovalRequest(wallet.queuedApprovals[0] || null);
         const newLog = {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
-            attackType: 'Budget Overspend ($250 > $25)',
+            attackType: 'Budget Overspend (₹25,000 > ₹2,500)',
             result: 'HALTED & ESCALATED',
             defenseMechanism: 'Owner TouchID Passkey Gate'
         };
@@ -171,15 +171,15 @@ export default function Home() {
         wallet.submitAgentAction(
             'OpenAI Billing API',
             '0x00000000000000000000000000000000000A1A1A',
-            'payInvoice(uint256 10)',
-            10.00,
+            'payInvoice(uint256 1000)',
+            1000.00,
             'Agent attempts to spend after 6-hour session key expiry'
         );
         wallet.sessionExpiresAt = originalExpires; // Restore
         const newLog = {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
-            attackType: 'Expired Sub-Key Call',
+            attackType: 'Expired Sub-Key Call (₹1,000)',
             result: 'REVERTED ON-CHAIN',
             defenseMechanism: 'validUntil Block Timestamp Check'
         };
@@ -304,7 +304,7 @@ export default function Home() {
 
                 {/* 3. Main Workspace Display */}
                 {activeTab === 'overview' && (
-                    <div className="space-y-6 animate-in fade-in duration-300">
+                    <div key="overview" className="space-y-6 tab-panel-enter">
                         {/* 1. Principal & Fleet Banner */}
                         <PrincipalFleetOverview
                             wallet={wallet}
@@ -345,7 +345,7 @@ export default function Home() {
                 )}
 
                 {activeTab === 'fleet' && (
-                    <div className="space-y-6 animate-in fade-in duration-300">
+                    <div key="fleet" className="space-y-6 tab-panel-enter">
                         <PrincipalFleetOverview
                             wallet={wallet}
                             onSelectAgent={handleSelectAgent}
@@ -357,7 +357,7 @@ export default function Home() {
                 )}
 
                 {activeTab === 'card' && (
-                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+                    <div key="card" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
                         <AgentVirtualCard
                             wallet={wallet}
                             onToggleFreeze={handleToggleCardFreeze}
@@ -371,7 +371,7 @@ export default function Home() {
                 )}
 
                 {activeTab === 'simulator' && (
-                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+                    <div key="simulator" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
                         <AgentActionSimulator
                             wallet={wallet}
                             onExecuteAction={handleExecuteAction}
@@ -384,7 +384,7 @@ export default function Home() {
                 )}
 
                 {activeTab === 'stream' && (
-                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+                    <div key="stream" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
                         <LiveActivityStream
                             wallet={wallet}
                         />
@@ -396,7 +396,7 @@ export default function Home() {
                 )}
 
                 {activeTab === 'cli' && (
-                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+                    <div key="cli" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
                         <InteractiveCliTerminal
                             wallet={wallet}
                         />
@@ -404,7 +404,7 @@ export default function Home() {
                 )}
 
                 {activeTab === 'threats' && (
-                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+                    <div key="threats" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
                         <ThreatDefensePlayground
                             onTriggerDrain={handleTriggerDrain}
                             onTriggerPromptInjection={handleTriggerPromptInjection}

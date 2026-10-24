@@ -1,6 +1,10 @@
+export function formatINR(val: number): string {
+    return '₹' + val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 export interface AgentPolicy {
-    dailyBudget: number;       // in USD
-    maxPerTx: number;          // in USD
+    dailyBudget: number;       // in INR
+    maxPerTx: number;          // in INR
     sessionExpiryHours: number;
     allowedContracts: { name: string; address: string; selector: string; description: string }[];
     allowedRecipients: string[];
@@ -100,15 +104,15 @@ export class AgentWalletClient {
     public paymasterAddress: string = '0x9999000011112222333344445555666677778888';
 
     // 1. Principal Identity (Master Human Admin)
-    public principalName: string = 'Yoav K.';
+    public principalName: string = 'Madhav B.';
     public principalRole: string = 'Chief Executive';
-    public principalInitials: string = 'YK';
+    public principalInitials: string = 'MB';
     public ownerAddress: string = '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4';
     public passkeyEnabled: boolean = true;
     public passkeyCredentialId: string = "credential-p256-apple-secure-enclave";
     public passkeyDeviceName: string = "TouchID / FaceID (WebAuthn P-256)";
     public totalAgentsCount: number = 12;
-    public totalFleetSpendToday: number = 28284.00;
+    public totalFleetSpendToday: number = 2485400.00;
 
     // 2. Active Agent Identity
     public activeAgentId: string = 'finance-07';
@@ -126,11 +130,11 @@ export class AgentWalletClient {
             category: 'finance',
             tag: 'FI',
             address: '0xAgent92F1c30E682cB72a6A20C57aD7858D0aA4481023',
-            dailyBudget: 5000,
-            spentToday: 2990,
+            dailyBudget: 500000,
+            spentToday: 299000,
             status: 'active',
             assignedCard: '4242 0815 ···· 1126',
-            lastAction: 'paid invoice · Datadog ($2,990)'
+            lastAction: 'paid invoice · Datadog (₹2,99,000)'
         },
         {
             id: 'concierge-08',
@@ -139,11 +143,11 @@ export class AgentWalletClient {
             category: 'ops',
             tag: 'CO',
             address: '0xAgent8821bA41c8dF291a82E92aC5718a381920B8821',
-            dailyBudget: 500,
-            spentToday: 146,
+            dailyBudget: 50000,
+            spentToday: 14600,
             status: 'active',
             assignedCard: '4242 0815 ···· 8840',
-            lastAction: 'paid vendor · Zoom ($146)'
+            lastAction: 'paid vendor · Zoom (₹14,600)'
         },
         {
             id: 'media-10',
@@ -152,11 +156,11 @@ export class AgentWalletClient {
             category: 'growth',
             tag: 'ME',
             address: '0xAgent4419eD92cA01f8271a39d891A928bA339124419',
-            dailyBudget: 2500,
-            spentToday: 1086,
+            dailyBudget: 250000,
+            spentToday: 108600,
             status: 'active',
             assignedCard: '4242 0815 ···· 3391',
-            lastAction: 'bought placement · Google Ads ($1,086)'
+            lastAction: 'bought placement · Google Ads (₹1,08,600)'
         },
         {
             id: 'devops-04',
@@ -165,11 +169,11 @@ export class AgentWalletClient {
             category: 'eng',
             tag: 'DE',
             address: '0xAgent7702fB12aC90281bA9281a829188aA910237702',
-            dailyBudget: 1000,
-            spentToday: 220,
+            dailyBudget: 100000,
+            spentToday: 22000,
             status: 'active',
             assignedCard: '4242 0815 ···· 9102',
-            lastAction: 'paid API credit · Replicate ($220)'
+            lastAction: 'paid API credit · Replicate (₹22,000)'
         },
         {
             id: 'qa-11',
@@ -178,11 +182,11 @@ export class AgentWalletClient {
             category: 'eng',
             tag: 'QA',
             address: '0xAgent9923aE11bF99281bA9281a829188aA9923',
-            dailyBudget: 250,
-            spentToday: 90,
+            dailyBudget: 25000,
+            spentToday: 9000,
             status: 'active',
             assignedCard: '4242 0815 ···· 1126',
-            lastAction: 'paid API credit · Replicate ($90)'
+            lastAction: 'paid API credit · BrowserStack (₹9,000)'
         },
         {
             id: 'support-02',
@@ -191,11 +195,11 @@ export class AgentWalletClient {
             category: 'ops',
             tag: 'SU',
             address: '0xAgent3310cB11aA33281bA9281a829188aA3310',
-            dailyBudget: 500,
-            spentToday: 175,
+            dailyBudget: 50000,
+            spentToday: 17500,
             status: 'active',
             assignedCard: '4242 0815 ···· 8840',
-            lastAction: 'approved expense ($175)'
+            lastAction: 'approved expense · Freshworks (₹17,500)'
         }
     ];
 
@@ -205,10 +209,10 @@ export class AgentWalletClient {
         maskedNumber: '4242 0815 ···· 1126',
         expiry: '08/28',
         cvv: '842',
-        holder: 'AGENT-FINANCE-07 / AGENTWALLET',
+        holder: 'AGENT-FINANCE-07 / SAFEAGENT',
         isFrozen: false,
-        dailyLimit: 5000.00,
-        spentToday: 2990.00,
+        dailyLimit: 500000.00,
+        spentToday: 299000.00,
         brand: 'VISA BUSINESS'
     };
 
@@ -219,7 +223,7 @@ export class AgentWalletClient {
             sender: 'Stripe 3DS Security',
             subject: 'One-Time Passcode (OTP)',
             code: '849201',
-            body: 'Use 849201 to authorize $2,990.00 payment to Datadog on card ···· 1126. Valid for 10 minutes.',
+            body: 'Use 849201 to authorize ₹2,99,000.00 payment to Datadog on card ···· 1126. Valid for 10 minutes.',
             timestamp: 'Just now',
             unread: true,
             category: '2fa'
@@ -229,7 +233,7 @@ export class AgentWalletClient {
             sender: 'Datadog Billing',
             subject: 'Invoice #DD-90214 Paid',
             code: undefined,
-            body: 'Payment of $2,990.00 was successfully processed via AgentWallet Smart Account.',
+            body: 'Payment of ₹2,99,000.00 was successfully processed via SafeAgent Smart Account.',
             timestamp: '2m ago',
             unread: false,
             category: 'receipt'
@@ -239,7 +243,7 @@ export class AgentWalletClient {
             sender: 'OpenAI Platform',
             subject: 'API Credit Balance Top-Up',
             code: undefined,
-            body: 'Prepayment of $15.00 completed successfully. Your credit balance is now $65.00.',
+            body: 'Prepayment of ₹1,500.00 completed successfully. Your credit balance is now ₹6,500.00.',
             timestamp: '15m ago',
             unread: false,
             category: 'receipt'
@@ -266,7 +270,7 @@ export class AgentWalletClient {
             tag: 'FI',
             action: 'paid invoice',
             vendor: 'Datadog',
-            amount: 2990.00,
+            amount: 299000.00,
             timeAgo: 'now',
             timestamp: Date.now()
         },
@@ -278,7 +282,7 @@ export class AgentWalletClient {
             tag: 'CO',
             action: 'paid vendor',
             vendor: 'Zoom',
-            amount: 146.00,
+            amount: 14600.00,
             timeAgo: '11s',
             timestamp: Date.now() - 11000
         },
@@ -289,8 +293,8 @@ export class AgentWalletClient {
             category: 'ops',
             tag: 'SU',
             action: 'approved expense',
-            vendor: 'Intercom',
-            amount: 61.00,
+            vendor: 'Freshworks',
+            amount: 6100.00,
             timeAgo: '27s',
             timestamp: Date.now() - 27000
         },
@@ -302,7 +306,7 @@ export class AgentWalletClient {
             tag: 'ME',
             action: 'renewed credit',
             vendor: 'LinkedIn Ads',
-            amount: 794.00,
+            amount: 79400.00,
             timeAgo: '54s',
             timestamp: Date.now() - 54000
         },
@@ -314,7 +318,7 @@ export class AgentWalletClient {
             tag: 'DE',
             action: 'paid API credit',
             vendor: 'Replicate',
-            amount: 220.00,
+            amount: 22000.00,
             timeAgo: '2m',
             timestamp: Date.now() - 120000
         },
@@ -326,25 +330,25 @@ export class AgentWalletClient {
             tag: 'ME',
             action: 'bought placement',
             vendor: 'Google Ads',
-            amount: 1086.00,
+            amount: 108600.00,
             timeAgo: '4m',
             timestamp: Date.now() - 240000
         }
     ];
 
-    // Balances
-    public usdcBalance: number = 1250.00;
+    // Balances (in Indian Rupees)
+    public usdcBalance: number = 1250000.00;
     public ethBalance: number = 0.45;
-    public paymasterGasTankUSD: number = 48.50;
+    public paymasterGasTankUSD: number = 4850.00; // Gas Tank in INR
 
     // 24-Hour Policy Spending Accounting
-    public dailySpent: number = 24.50;
+    public dailySpent: number = 2450.00;
     public lastEpochReset: number = Date.now();
 
-    // The 6-Dimension Policy
+    // The 6-Dimension Policy (Enforced in INR)
     public policy: AgentPolicy = {
-        dailyBudget: 100.00,
-        maxPerTx: 25.00,
+        dailyBudget: 10000.00,
+        maxPerTx: 2500.00,
         sessionExpiryHours: 6,
         allowedContracts: [
             {
@@ -354,16 +358,28 @@ export class AgentWalletClient {
                 description: 'Prepay API inference credits for autonomous research'
             },
             {
-                name: 'Grocery & Delivery Service (Instacart/Blinkit)',
+                name: 'Grocery & Delivery Service (Blinkit/Zepto/Instamart)',
                 address: '0x00000000000000000000000000000000000B2B2B',
                 selector: '0x87654321 (orderCheckout)',
-                description: 'Weekly grocery purchases and automated re-orders'
+                description: 'Weekly grocery purchases and automated pantry restocking'
             },
             {
-                name: 'Travel & Ticket Booking API',
+                name: 'Travel & Ticket Booking API (IRCTC/Metro/IndiGo)',
                 address: '0x00000000000000000000000000000000000C3C3C',
-                selector: '0x99887766 (bookTicket)',
+                selector: '0xabcdef12 (bookTicket)',
                 description: 'Metro, train, and flight ticket reservations'
+            },
+            {
+                name: 'Cloud Infrastructure API (AWS/Cloudflare)',
+                address: '0x00000000000000000000000000000000000D4D4D',
+                selector: '0x4321fedc (topUpCompute)',
+                description: 'Serverless compute & edge workers balance top-up'
+            },
+            {
+                name: 'Corporate Catering (Swiggy/Zomato)',
+                address: '0x00000000000000000000000000000000000E5E5E',
+                selector: '0x99887766 (orderCatering)',
+                description: 'Automated team meal & pantry orders'
             },
             {
                 name: 'Uniswap V3 Swap Router',
@@ -376,6 +392,8 @@ export class AgentWalletClient {
             '0x00000000000000000000000000000000000A1A1A',
             '0x00000000000000000000000000000000000B2B2B',
             '0x00000000000000000000000000000000000C3C3C',
+            '0x00000000000000000000000000000000000D4D4D',
+            '0x00000000000000000000000000000000000E5E5E',
             '0xE592427A0AEce92De3Edee1F18E0157C05861564'
         ]
     };
@@ -388,17 +406,17 @@ export class AgentWalletClient {
             timestamp: new Date(Date.now() - 1800000).toLocaleTimeString(),
             targetName: 'OpenAI Billing API',
             targetAddress: '0x0000...A1A1',
-            functionCalled: 'payInvoice(amount: 15)',
-            amount: 15.00,
+            functionCalled: 'payInvoice(amount: 1500)',
+            amount: 1500.00,
             gasSponsored: true,
-            gasCostUSD: 0.12,
+            gasCostUSD: 10.00,
             status: 'EXECUTED',
             validationResult: 'IN_POLICY',
-            reason: 'Autonomous top-up of API credits ($15 < $25 limit). Verified on-chain.',
+            reason: 'Autonomous top-up of API credits (₹1,500 < ₹2,500 limit). Verified on-chain.',
             rawUserOp: {
                 sender: '0x884337bA94D25Ac2c488b394B7f8D44e1D328C39',
                 nonce: 1,
-                callData: '0x12345678000000000000000000000000000000000000000000000000000000000000000f',
+                callData: '0x1234567800000000000000000000000000000000000000000000000000000000000005dc',
                 callGasLimit: '0x186a0',
                 verificationGasLimit: '0x249f0',
                 paymasterAndData: '0x9999000011112222333344445555666677778888...',
@@ -409,19 +427,19 @@ export class AgentWalletClient {
             id: 'op-init-2',
             userOpHash: '0x8b321a0f...77d1',
             timestamp: new Date(Date.now() - 900000).toLocaleTimeString(),
-            targetName: 'Grocery Delivery Service',
+            targetName: 'Blinkit Grocery Delivery',
             targetAddress: '0x0000...B2B2',
-            functionCalled: 'orderCheckout(cartId: 4421, amount: 9.5)',
-            amount: 9.50,
+            functionCalled: 'orderCheckout(cartId: 4421, amount: 950)',
+            amount: 950.00,
             gasSponsored: true,
-            gasCostUSD: 0.08,
+            gasCostUSD: 8.00,
             status: 'EXECUTED',
             validationResult: 'IN_POLICY',
-            reason: 'Daily grocery re-order ($9.50 < $25 limit). Verified on-chain.',
+            reason: 'Daily grocery re-order (₹950 < ₹2,500 limit). Verified on-chain.',
             rawUserOp: {
                 sender: '0x884337bA94D25Ac2c488b394B7f8D44e1D328C39',
                 nonce: 2,
-                callData: '0x876543210000000000000000000000000000000000000000000000000000000000000009',
+                callData: '0x8765432100000000000000000000000000000000000000000000000000000000000003b6',
                 callGasLimit: '0x186a0',
                 verificationGasLimit: '0x249f0',
                 paymasterAndData: '0x9999000011112222333344445555666677778888...',
@@ -519,7 +537,7 @@ export class AgentWalletClient {
 
         // Check 2: Per-Transaction Limit
         if (amount > this.policy.maxPerTx) {
-            const reason = `Amount ($${amount.toFixed(2)}) exceeds Per-Transaction Limit ($${this.policy.maxPerTx.toFixed(2)})`;
+            const reason = `Amount (₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}) exceeds Per-Transaction Limit (₹${this.policy.maxPerTx.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`;
             this._queueForApproval(targetName, targetAddress, functionCalled, amount, reason);
             return { status: 'QUEUED', reason };
         }
@@ -527,7 +545,7 @@ export class AgentWalletClient {
         // Check 3: Daily Rolling Budget
         if (this.dailySpent + amount > this.policy.dailyBudget) {
             const remaining = Math.max(0, this.policy.dailyBudget - this.dailySpent);
-            const reason = `Amount ($${amount.toFixed(2)}) exceeds 24-Hour Remaining Budget ($${remaining.toFixed(2)} remaining of $${this.policy.dailyBudget.toFixed(2)})`;
+            const reason = `Amount (₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}) exceeds 24-Hour Remaining Budget (₹${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} remaining of ₹${this.policy.dailyBudget.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`;
             this._queueForApproval(targetName, targetAddress, functionCalled, amount, reason);
             return { status: 'QUEUED', reason };
         }
@@ -541,7 +559,7 @@ export class AgentWalletClient {
         const activeAg = this.fleet.find(a => a.id === this.activeAgentId);
         if (activeAg) {
             activeAg.spentToday += amount;
-            activeAg.lastAction = `${functionCalled} · ${targetName} ($${amount.toFixed(2)})`;
+            activeAg.lastAction = `${functionCalled} · ${targetName} (₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`;
         }
 
         const opHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
@@ -554,7 +572,7 @@ export class AgentWalletClient {
             functionCalled,
             amount,
             gasSponsored: true,
-            gasCostUSD: 0.10,
+            gasCostUSD: 10.00,
             status: 'EXECUTED',
             validationResult: 'IN_POLICY',
             reason: `Autonomous in-policy payment: ${actionDescription}`,
@@ -587,8 +605,8 @@ export class AgentWalletClient {
         this.inboxMessages.unshift({
             id: `msg-${Date.now()}`,
             sender: `${targetName} System`,
-            subject: `Payment Receipt: $${amount.toFixed(2)}`,
-            body: `Agent ${this.agentName} completed autonomous payment of $${amount.toFixed(2)} for ${actionDescription}.`,
+            subject: `Payment Receipt: ₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+            body: `Agent ${this.agentName} completed autonomous payment of ₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} for ${actionDescription}.`,
             timestamp: 'Just now',
             unread: true,
             category: 'receipt'
@@ -646,8 +664,8 @@ export class AgentWalletClient {
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
         this.inboxMessages.unshift({
             id: `msg-otp-${Date.now()}`,
-            sender: 'AgentWallet Guardrail Service',
-            subject: `TouchID Passkey Required: $${amount.toFixed(2)} to ${targetName}`,
+            sender: 'SafeAgent Guardrail Service',
+            subject: `TouchID Passkey Required: ₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} to ${targetName}`,
             code: otpCode,
             body: `Transaction exceeds spending cap: ${reason}. Request staged (#${queued.id}). Owner biometric authorization required.`,
             timestamp: 'Just now',
@@ -711,10 +729,10 @@ export class AgentWalletClient {
             functionCalled: req.actionName,
             amount: req.amount,
             gasSponsored: false,
-            gasCostUSD: 0.15,
+            gasCostUSD: 12.00,
             status: 'EXECUTED',
             validationResult: 'IN_POLICY',
-            reason: `Owner Biometric TouchID Passkey Override executed for request ${id} ($${req.amount.toFixed(2)})`,
+            reason: `Owner Biometric TouchID Passkey Override executed for request ${id} (₹${req.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`,
             rawUserOp: {
                 sender: this.smartAccountAddress,
                 nonce: this.userOps.length + 1,
@@ -731,7 +749,7 @@ export class AgentWalletClient {
             id: `msg-appr-${Date.now()}`,
             sender: 'Principal Passkey Authenticator',
             subject: `Out-of-Policy Request ${id} APPROVED`,
-            body: `Biometric TouchID approved $${req.amount.toFixed(2)} to ${req.targetName}. Funds executed on-chain.`,
+            body: `Biometric TouchID approved ₹${req.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} to ${req.targetName}. Funds executed on-chain.`,
             timestamp: 'Just now',
             unread: true,
             category: 'receipt'

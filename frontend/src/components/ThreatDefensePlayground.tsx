@@ -84,7 +84,7 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
                             <AlertOctagon className="w-4 h-4 text-amber-600 transition-transform group-hover:scale-105" />
                             <span>Budget Overspend</span>
                         </div>
-                        <p className="text-[11px] text-stone-500 font-sans">Agent attempts $250 purchase on $25 limit.</p>
+                        <p className="text-[11px] text-stone-500 font-sans">Agent attempts ₹25,000 purchase on ₹2,500 limit.</p>
                     </div>
                     <span className="text-[10px] font-mono font-medium text-stone-600 bg-white px-2 py-0.5 rounded-full border border-stone-200/70 mt-3 w-fit shadow-subtle">
                         Defense: TouchID Escalation

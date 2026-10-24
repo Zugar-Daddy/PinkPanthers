@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { CreditCard, Lock, Unlock, Eye, EyeOff, ShieldCheck, Copy, Check, Sliders, AlertTriangle, Zap } from 'lucide-react';
-import { AgentWalletClient } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
 
 interface AgentVirtualCardProps {
     wallet: AgentWalletClient;
@@ -46,43 +46,45 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="flex flex-col gap-6">
                 
-                {/* 1. Physical / 3D Virtual Card Representation (6 cols) */}
-                <div className="lg:col-span-6 flex justify-center">
-                    <div className="w-full max-w-md aspect-[1.58] rounded-2xl bg-gradient-to-br from-stone-900 via-zinc-900 to-black text-white p-6 sm:p-7 flex flex-col justify-between border border-stone-800/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] relative overflow-hidden group select-none">
+                {/* 1. Physical / 3D Virtual Card Representation */}
+                <div className="flex justify-center w-full">
+                    <div className="w-full max-w-[420px] aspect-[1.586] rounded-2xl bg-gradient-to-br from-stone-900 via-zinc-900 to-black text-white p-5 sm:p-6 flex flex-col justify-between border border-stone-800/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)] relative overflow-hidden group select-none">
                         
                         {/* Decorative background ambient highlight */}
                         <div className="absolute -top-10 -right-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
                         {/* Top Bar of the Card */}
-                        <div className="flex justify-between items-start z-10">
+                        <div className="flex justify-between items-start gap-4 z-10">
                             <div>
-                                <span className="text-xs font-mono font-semibold tracking-widest text-stone-300">SAFEAGENT</span>
-                                <div className="text-[10px] text-stone-500 font-mono tracking-wider">CORPORATE PLATINUM</div>
+                                <span className="text-xs font-mono font-semibold tracking-widest text-stone-300 uppercase block">SAFEAGENT</span>
+                                <div className="text-[10px] text-stone-400 font-mono tracking-wider uppercase whitespace-nowrap mt-0.5">CORPORATE PLATINUM</div>
                             </div>
-                            <span className="font-sans font-bold italic tracking-wider text-sm bg-white/10 px-2.5 py-0.5 rounded border border-white/20 text-stone-100">
+                            <span className="font-sans font-bold italic tracking-wider text-xs sm:text-sm bg-white/10 px-2.5 py-1 rounded border border-white/20 text-stone-100 whitespace-nowrap shrink-0 leading-tight">
                                 {card.brand}
                             </span>
                         </div>
 
                         {/* EMV Chip & Contactless */}
-                        <div className="flex items-center gap-3.5 z-10 my-2">
-                            <div className="w-10 h-7 rounded bg-gradient-to-br from-amber-300 to-amber-500 border border-amber-200/80 shadow-sm flex items-center justify-center">
+                        <div className="flex items-center gap-3 z-10">
+                            <div className="w-10 h-7 rounded bg-gradient-to-br from-amber-300 to-amber-500 border border-amber-200/80 shadow-xs flex items-center justify-center">
                                 <div className="w-7 h-4 border border-amber-800/40 rounded-sm"></div>
                             </div>
-                            <div className="text-stone-400 text-xs font-mono rotate-90">
+                            <div className="text-stone-400 text-xs font-mono rotate-90 select-none">
                                 ))))
                             </div>
                         </div>
 
                         {/* Card Number */}
-                        <div className="z-10 space-y-1">
-                            <div className="text-xl sm:text-2xl font-mono font-medium tracking-widest text-stone-100 flex items-center justify-between">
-                                <span>{revealDetails ? card.cardNumber : card.maskedNumber}</span>
+                        <div className="z-10">
+                            <div className="flex items-center justify-between gap-2 text-stone-100">
+                                <span className="text-base sm:text-lg lg:text-xl font-mono font-medium tracking-wider sm:tracking-widest whitespace-nowrap select-all">
+                                    {revealDetails ? card.cardNumber : card.maskedNumber}
+                                </span>
                                 <button
                                     onClick={() => setRevealDetails(!revealDetails)}
-                                    className="p-1.5 text-stone-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                                    className="p-1.5 text-stone-400 hover:text-white transition-colors rounded-lg hover:bg-white/10 shrink-0"
                                     title={revealDetails ? 'Hide details' : 'Reveal full card number'}
                                 >
                                     {revealDetails ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -91,20 +93,22 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                         </div>
 
                         {/* Bottom Row: Expiry, CVV, Cardholder */}
-                        <div className="flex items-end justify-between z-10 font-mono text-xs pt-2 border-t border-stone-800/80">
-                            <div>
-                                <div className="text-[9px] text-stone-400 uppercase tracking-widest">Cardholder</div>
-                                <div className="font-medium text-stone-200 text-xs truncate max-w-[200px]">{card.holder}</div>
+                        <div className="flex items-end justify-between gap-3 z-10 font-mono text-xs pt-1.5 border-t border-stone-800/80">
+                            <div className="min-w-0 flex-1 pr-2">
+                                <div className="text-[9px] text-stone-400 uppercase tracking-widest leading-none mb-0.5 whitespace-nowrap">Cardholder</div>
+                                <div className="font-medium text-stone-200 text-[11px] sm:text-xs truncate tracking-wide" title={card.holder}>
+                                    {card.holder}
+                                </div>
                             </div>
 
-                            <div className="flex items-center gap-4 text-right">
+                            <div className="shrink-0 flex items-center gap-3 sm:gap-4 text-right">
                                 <div>
-                                    <div className="text-[9px] text-stone-400 uppercase tracking-widest">Expires</div>
-                                    <div className="font-medium text-stone-200">{card.expiry}</div>
+                                    <div className="text-[9px] text-stone-400 uppercase tracking-widest leading-none mb-0.5 whitespace-nowrap">Expires</div>
+                                    <div className="font-medium text-stone-200 text-[11px] sm:text-xs whitespace-nowrap">{card.expiry}</div>
                                 </div>
                                 <div>
-                                    <div className="text-[9px] text-stone-400 uppercase tracking-widest">CVV</div>
-                                    <div className="font-medium text-stone-200">{revealDetails ? card.cvv : '•••'}</div>
+                                    <div className="text-[9px] text-stone-400 uppercase tracking-widest leading-none mb-0.5 whitespace-nowrap">CVV</div>
+                                    <div className="font-medium text-stone-200 text-[11px] sm:text-xs whitespace-nowrap">{revealDetails ? card.cvv : '•••'}</div>
                                 </div>
                             </div>
                         </div>
@@ -120,8 +124,8 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                     </div>
                 </div>
 
-                {/* 2. Interactive Card Controls (6 cols) */}
-                <div className="lg:col-span-6 space-y-4">
+                {/* 2. Interactive Card Controls */}
+                <div className="w-full max-w-[420px] mx-auto space-y-4">
                     
                     {/* Action buttons */}
                     <div className="flex items-center gap-3">
@@ -151,21 +155,21 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                         <div className="flex justify-between items-center">
                             <span className="text-stone-600 font-medium">Virtual Card Daily Cap:</span>
                             <span className="text-stone-900 font-semibold bg-white px-2.5 py-0.5 rounded-full border border-stone-200 text-sm shadow-subtle">
-                                ${card.dailyLimit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                {formatINR(card.dailyLimit)}
                             </span>
                         </div>
                         <input
                             type="range"
-                            min={500}
-                            max={10000}
-                            step={500}
+                            min={50000}
+                            max={1000000}
+                            step={25000}
                             value={card.dailyLimit}
                             onChange={(e) => onUpdateLimit(parseFloat(e.target.value))}
                             className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
                         <div className="flex justify-between text-[10px] text-stone-400 font-mono">
-                            <span>$500 (Strict)</span>
-                            <span>$10,000 (Enterprise)</span>
+                            <span>₹50,000 (Strict)</span>
+                            <span>₹10,00,000 (Enterprise)</span>
                         </div>
                     </div>
 

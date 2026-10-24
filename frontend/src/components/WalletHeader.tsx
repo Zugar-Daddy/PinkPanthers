@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Shield, Fingerprint, Copy, Check, Fuel, Key, Sparkles, ExternalLink } from 'lucide-react';
-import { AgentWalletClient } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
 
 interface WalletHeaderProps {
     wallet: AgentWalletClient;
@@ -72,7 +72,7 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({
                     <div className="hidden xl:flex items-center gap-1.5 bg-amber-50/70 border border-amber-200/80 px-3 py-1.5 rounded-xl font-mono text-xs text-amber-900">
                         <Fuel className="w-3.5 h-3.5 text-amber-600" />
                         <span className="font-sans font-medium text-amber-700/80">Gas Tank:</span>
-                        <span className="font-semibold text-amber-950">${wallet.paymasterGasTankUSD.toFixed(2)}</span>
+                        <span className="font-semibold text-amber-950">{formatINR(wallet.paymasterGasTankUSD)}</span>
                     </div>
 
                     {/* Agent Inbox (2FA OTP) Button */}

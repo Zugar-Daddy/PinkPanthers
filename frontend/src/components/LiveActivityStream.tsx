@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Activity, Fuel, CheckCircle2, ArrowRight, ShieldCheck, Filter } from 'lucide-react';
-import { AgentWalletClient, FleetCategory } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, FleetCategory, formatINR } from '../lib/web3/agentWalletClient';
 
 interface LiveActivityStreamProps {
     wallet: AgentWalletClient;
@@ -89,7 +89,7 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
 
                         <div className="text-right shrink-0">
                             <div className="font-mono font-medium text-xs text-stone-900">
-                                ${event.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                {formatINR(event.amount)}
                             </div>
                             <div className="text-[10px] font-mono text-stone-400">
                                 {event.timeAgo}

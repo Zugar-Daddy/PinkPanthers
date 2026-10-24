@@ -13,13 +13,13 @@ AI agents increasingly buy real goods and services for users: **OpenAI inference
 3. **Runaway Overspending**: Buggy or looped agent workflows can rapidly drain funds.
 
 **AgentSafe** solves this through full-stack financial infrastructure for AI agents backed on-chain by **ERC-4337 Account Abstraction**:
-- **Human Principal (Master Admin)**: The verified owner (`Yoav K. · Chief Executive`) holding hardware-backed WebAuthn Biometric Passkeys (TouchID / Apple Secure Enclave / P-256 curve).
+- **Human Principal (Master Admin)**: The verified owner (`Madhav B. · Chief Executive`) holding hardware-backed WebAuthn Biometric Passkeys (TouchID / Apple Secure Enclave / P-256 curve).
 - **Multi-Agent Fleet**: Scoped sub-keys for specialized autonomous agents (`finance-agent-07`, `concierge-08`, `media-buyer-10`, `devops-bot-04`).
 - **On-Chain Policy Engine (`PolicyEngine.sol`)**: Non-bypassable Solidity guardrails check every `UserOperation` before execution:
   1. **Allowed Contracts Whitelist** (OpenAI Billing, Instacart/Blinkit, Ticket Booking only)
   2. **Allowed Function Selectors** (only `payInvoice`, `orderCheckout`, `bookTicket`)
-  3. **Max Per-Transaction Limit** ($25.00 cap)
-  4. **Rolling 24-Hour Daily Budget** with automatic epoch resets ($100.00 default cap)
+  3. **Max Per-Transaction Limit** (₹2,500 cap)
+  4. **Rolling 24-Hour Daily Budget** with automatic epoch resets (₹10,000 default cap)
   5. **Allowed Recipient Whitelist** (blocks unauthorized external transfers)
   6. **Session Key Expiration** (`validUntil` block timestamp enforcement)
 - **Agent-Linked Virtual Cards**: Tokenized Visa Business cards (`4242 0815 ···· 1126`) with programmable daily limits and instant freeze/unfreeze controls.

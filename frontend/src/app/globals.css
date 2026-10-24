@@ -105,3 +105,44 @@ body {
   background: #A1A1AA;
 }
 
+/* Tab Switching Transitions */
+@keyframes tabFadeIn {
+  from {
+    opacity: 0.1;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-panel-enter {
+  animation: tabFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Terminal Typewriter & Blinking Cursor */
+@keyframes terminalBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background-color: #10B981;
+  vertical-align: middle;
+  margin-left: 3px;
+  animation: terminalBlink 0.8s steps(2, start) infinite;
+}
+
+/* Subtle Interactive Glow */
+.tab-glow {
+  box-shadow: 0 4px 14px 0 rgba(24, 24, 27, 0.08);
+}
+

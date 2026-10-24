@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { UserCheck, Shield, Sparkles, CheckCircle2, ChevronRight, Zap, ArrowRight, Bot } from 'lucide-react';
-import { AgentWalletClient, FleetAgent, FleetCategory } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, FleetAgent, FleetCategory, formatINR } from '../lib/web3/agentWalletClient';
 
 interface PrincipalFleetOverviewProps {
     wallet: AgentWalletClient;
@@ -36,12 +36,12 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                         11 Active Agents
                     </span>
                     <span className="flex items-center gap-1.5 bg-stone-100 text-stone-700 border border-stone-200 px-3 py-1 rounded-full font-medium">
-                        Fleet Spend: ${wallet.totalFleetSpendToday.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        Fleet Spend: {formatINR(wallet.totalFleetSpendToday)}
                     </span>
                 </div>
             </div>
 
-            {/* Main Grid: Left is Principal Card (YK), Right is Fleet Grid */}
+            {/* Main Grid: Left is Principal Card (MB), Right is Fleet Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
                 {/* 1. Left Principal Card (4 cols) */}
@@ -79,7 +79,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                             </span>
                         </div>
                         <div className="text-3xl font-serif font-semibold text-stone-900 tracking-tight">
-                            ${wallet.totalFleetSpendToday.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            {formatINR(wallet.totalFleetSpendToday)}
                         </div>
 
                         {/* Visual SVG Mini Trend */}
@@ -180,7 +180,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                                         <div className="space-y-1">
                                             <div className="flex justify-between text-[10px] font-mono">
                                                 <span className="text-stone-500">Daily Spend:</span>
-                                                <span className="text-stone-900 font-medium">${agent.spentToday.toFixed(2)} / ${agent.dailyBudget.toFixed(2)}</span>
+                                                <span className="text-stone-900 font-medium">{formatINR(agent.spentToday)} / {formatINR(agent.dailyBudget)}</span>
                                             </div>
                                             <div className="w-full h-1.5 bg-stone-200/80 rounded-full overflow-hidden">
                                                 <div

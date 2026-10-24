@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Sliders, CheckCircle2, Shield, Lock, FileCode, Check, ExternalLink, ArrowRight } from 'lucide-react';
-import { AgentWalletClient } from '../lib/web3/agentWalletClient';
+import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
 
 interface AgentKeyPolicyCardProps {
     wallet: AgentWalletClient;
@@ -38,7 +38,7 @@ export const AgentKeyPolicyCard: React.FC<AgentKeyPolicyCardProps> = ({ wallet, 
                 <div className="bg-stone-50/70 border border-stone-200/80 p-4 rounded-xl space-y-1">
                     <div className="text-stone-500 text-[10px] uppercase font-medium tracking-wider">Per-Transaction Cap</div>
                     <div className="text-2xl font-serif font-semibold text-stone-900 tracking-tight">
-                        ${wallet.policy.maxPerTx.toFixed(2)} <span className="text-xs font-normal text-stone-400">USDC</span>
+                        {formatINR(wallet.policy.maxPerTx)}
                     </div>
                     <p className="text-[10px] text-stone-500 font-sans">Exceeding this requires Passkey approval</p>
                 </div>
@@ -46,7 +46,7 @@ export const AgentKeyPolicyCard: React.FC<AgentKeyPolicyCardProps> = ({ wallet, 
                 <div className="bg-stone-50/70 border border-stone-200/80 p-4 rounded-xl space-y-1">
                     <div className="text-stone-500 text-[10px] uppercase font-medium tracking-wider">24h Rolling Budget</div>
                     <div className="text-2xl font-serif font-semibold text-stone-900 tracking-tight">
-                        ${wallet.policy.dailyBudget.toFixed(2)} <span className="text-xs font-normal text-stone-400">USDC</span>
+                        {formatINR(wallet.policy.dailyBudget)}
                     </div>
                     <p className="text-[10px] text-stone-500 font-sans">Resets automatically every 24h window</p>
                 </div>
