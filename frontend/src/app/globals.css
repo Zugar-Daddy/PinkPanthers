@@ -3,58 +3,88 @@
 @tailwind utilities;
 
 :root {
-  --background: #FDFBF7;
-  --foreground: #09090B;
+  --background: #FAF8F5;
+  --foreground: #18181B;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
   letter-spacing: -0.015em;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* EdVR Neo-Brutalist Clay Button Styles */
-.brutal-btn {
-  border: 2px solid #09090B;
-  box-shadow: 3px 3px 0px #09090B;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+/* Elegant Editorial Serif Font */
+.font-editorial {
+  font-family: "Newsreader", "Fraunces", "Georgia", "Cambria", "Times New Roman", serif;
+  letter-spacing: -0.02em;
 }
 
-.brutal-btn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px #09090B;
+/* Sophisticated Modern Fintech Cards */
+.card-elevated {
+  background: #FFFFFF;
+  border: 1px solid rgba(229, 226, 220, 0.9);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.brutal-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px #09090B;
+.card-elevated:hover {
+  border-color: rgba(212, 208, 199, 1);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.05);
 }
 
-.brutal-card {
-  border: 2px solid #09090B;
-  box-shadow: 4px 4px 0px #09090B;
+/* Sleek Button Styles */
+.btn-primary {
+  background-color: #18181B;
+  color: #FFFFFF;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease-in-out;
 }
 
-.brutal-card-lg {
-  border: 3px solid #09090B;
-  box-shadow: 6px 6px 0px #09090B;
+.btn-primary:hover {
+  background-color: #27272A;
+  box-shadow: 0 2px 8px -2px rgba(24, 24, 27, 0.2);
 }
 
-/* Custom Scrollbars */
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: #27272A;
+  border: 1px solid rgba(229, 226, 220, 0.9);
+  font-weight: 500;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: #F7F5F0;
+  border-color: rgba(212, 208, 199, 1);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Subtle Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #FDFBF7;
-  border-left: 2px solid #09090B;
+  background: #FAF8F5;
 }
 ::-webkit-scrollbar-thumb {
-  background: #09090B;
-  border-radius: 4px;
+  background: #D4D4D8;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #27272a;
+  background: #A1A1AA;
 }
+

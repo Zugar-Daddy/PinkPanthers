@@ -34,7 +34,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             amount: 15.00,
             icon: CreditCard,
             badge: 'In-Policy ($15 < $25)',
-            badgeColor: 'text-black bg-neoMint border border-black',
+            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
             description: 'Autonomous research agent replenishes token inference credits'
         },
         {
@@ -46,7 +46,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             amount: 18.50,
             icon: ShoppingCart,
             badge: 'In-Policy ($18.50 < $25)',
-            badgeColor: 'text-black bg-neoMint border border-black',
+            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
             description: 'Automated weekly pantry restocking from smart fridge'
         },
         {
@@ -58,7 +58,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             amount: 8.00,
             icon: Ticket,
             badge: 'In-Policy ($8.00 < $25)',
-            badgeColor: 'text-black bg-neoMint border border-black',
+            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
             description: 'Agent reserves daily commute train ticket'
         },
         {
@@ -70,7 +70,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             amount: 145.00,
             icon: Plane,
             badge: 'Out-of-Policy ($145 > $25 Cap)',
-            badgeColor: 'text-black bg-neoRose border border-black',
+            badgeColor: 'text-amber-800 bg-amber-50 border border-amber-200/80',
             description: 'Agent tries to book conference flight exceeding per-tx cap'
         }
     ];
@@ -110,22 +110,22 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
     };
 
     return (
-        <div className="bg-white border-2 border-black rounded-2xl p-6 shadow-brutal space-y-5">
-            <div className="flex items-center justify-between pb-3.5 border-b-2 border-black">
+        <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover space-y-5 transition-all duration-200">
+            <div className="flex items-center justify-between pb-3.5 border-b border-stone-200/80">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-neoMint border-2 border-black flex items-center justify-center text-black shadow-brutal-sm">
-                        <Bot className="w-5 h-5 stroke-[2.5]" />
+                    <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
+                        <Bot className="w-5 h-5 text-stone-700" />
                     </div>
                     <div>
-                        <h2 className="text-base font-black text-black tracking-tight font-sans">
+                        <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
                             AI Agent Action Simulator
                         </h2>
-                        <p className="text-xs text-zinc-600 font-mono">Trigger real-world spending requests from autonomous agents</p>
+                        <p className="text-xs text-stone-500 font-sans">Trigger real-world spending requests from autonomous agents</p>
                     </div>
                 </div>
 
-                <span className="text-[11px] font-mono font-bold text-black bg-neoPurple border-2 border-black px-3 py-1 rounded-full flex items-center gap-1.5 shadow-brutal-sm">
-                    <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" /> Interactive Sandbox
+                <span className="text-[11px] font-mono font-medium text-stone-700 bg-stone-100 border border-stone-200/80 px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-700" /> Interactive Sandbox
                 </span>
             </div>
 
@@ -136,36 +136,36 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
                     return (
                         <div
                             key={p.id}
-                            className="bg-[#FFFDF8] border-2 border-black rounded-xl p-4 flex flex-col justify-between transition-all group shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5"
+                            className="bg-stone-50/40 hover:bg-white border border-stone-200/80 hover:border-stone-300 rounded-xl p-4 flex flex-col justify-between transition-all group shadow-subtle"
                         >
                             <div className="space-y-2 mb-3">
                                 <div className="flex items-start justify-between gap-2">
-                                    <div className="flex items-center gap-2.5 font-black text-xs text-black font-sans">
-                                        <div className="w-8 h-8 rounded-lg bg-zinc-100 border border-black flex items-center justify-center text-black shrink-0 group-hover:bg-neoYellow transition-colors">
-                                            <Icon className="w-4 h-4 stroke-[2.5]" />
+                                    <div className="flex items-center gap-2 font-medium text-xs text-stone-900 font-sans">
+                                        <div className="w-7 h-7 rounded-lg bg-stone-100 border border-stone-200/80 flex items-center justify-center text-stone-700 shrink-0 group-hover:bg-stone-200 transition-colors">
+                                            <Icon className="w-3.5 h-3.5" />
                                         </div>
                                         <span>{p.title}</span>
                                     </div>
-                                    <span className="text-sm font-mono font-black text-black bg-zinc-100 px-2 py-0.5 rounded border border-black">
+                                    <span className="text-xs font-mono font-semibold text-stone-900 bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">
                                         ${p.amount.toFixed(2)}
                                     </span>
                                 </div>
 
-                                <p className="text-[11px] text-zinc-600 font-sans font-medium">{p.description}</p>
+                                <p className="text-[11px] text-stone-500 font-sans">{p.description}</p>
                             </div>
 
-                            <div className="flex items-center justify-between pt-3 border-t border-black/10">
-                                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${p.badgeColor}`}>
+                            <div className="flex items-center justify-between pt-3 border-t border-stone-200/60">
+                                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-medium ${p.badgeColor}`}>
                                     {p.badge}
                                 </span>
 
                                 <button
                                     onClick={() => runPreset(p)}
                                     disabled={isExecuting}
-                                    className="px-3.5 py-1.5 rounded-xl bg-black hover:bg-neoRed text-white hover:text-white border-2 border-black text-xs font-mono font-bold flex items-center gap-1.5 brutal-btn shadow-brutal-xs disabled:opacity-50"
+                                    className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-xs font-mono font-medium flex items-center gap-1.5 transition shadow-subtle disabled:opacity-50"
                                 >
-                                    <span>Dispatch UserOp</span>
-                                    <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
+                                    <span>Dispatch</span>
+                                    <ArrowRight className="w-3.5 h-3.5" />
                                 </button>
                             </div>
                         </div>
@@ -173,18 +173,22 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
                 })}
             </div>
 
-            {/* Execution Terminal */}
-            <div className="bg-zinc-950 border-2 border-black rounded-xl p-4 font-mono text-[11px] space-y-2 shadow-brutal">
-                <div className="text-zinc-400 text-[10px] font-bold uppercase tracking-wider pb-1.5 border-b border-zinc-800 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                        <Terminal className="w-3.5 h-3.5 text-neoMint" />
-                        <span>ERC-4337 PROTOCOL EXECUTION TRACE</span>
+            {/* Execution Terminal (macOS code style) */}
+            <div className="bg-stone-950 border border-stone-800 rounded-xl p-4 font-mono text-[11px] space-y-2.5 shadow-inner">
+                <div className="text-stone-400 text-[10px] font-medium uppercase tracking-wider pb-2 border-b border-stone-800/80 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                        </div>
+                        <span className="ml-2 text-stone-300">ERC-4337 PROTOCOL EXECUTION TRACE</span>
                     </div>
-                    <span className="text-[9px] text-zinc-500 font-mono">v0.7 EntryPoint</span>
+                    <span className="text-[10px] text-stone-500 font-mono">v0.7 EntryPoint</span>
                 </div>
-                <div className="space-y-1.5 text-zinc-300 max-h-36 overflow-y-auto">
+                <div className="space-y-1.5 text-stone-300 max-h-36 overflow-y-auto pr-1">
                     {terminalOutput.map((line, idx) => (
-                        <div key={idx} className={line.includes('INTERCEPT') || line.includes('ALERT') ? 'text-amber-400 font-bold' : line.includes('PASSED') || line.includes('CONFIRMED') ? 'text-emerald-400 font-bold' : ''}>
+                        <div key={idx} className={line.includes('INTERCEPT') || line.includes('ALERT') ? 'text-amber-400 font-medium' : line.includes('PASSED') || line.includes('CONFIRMED') ? 'text-emerald-400 font-medium' : ''}>
                             {line}
                         </div>
                     ))}

@@ -11,22 +11,22 @@ interface UserOpActivityTableProps {
 
 export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOps, onInspectUserOp }) => {
     return (
-        <div className="bg-white border-2 border-black rounded-2xl p-6 shadow-brutal space-y-4">
-            <div className="flex items-center justify-between pb-3.5 border-b-2 border-black">
+        <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover space-y-4 transition-all duration-200">
+            <div className="flex items-center justify-between pb-3.5 border-b border-stone-200/80">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-neoSky border-2 border-black flex items-center justify-center text-black shadow-brutal-sm">
-                        <Activity className="w-5 h-5 stroke-[2.5]" />
+                    <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
+                        <Activity className="w-5 h-5 text-stone-700" />
                     </div>
                     <div>
-                        <h2 className="text-base font-black text-black tracking-tight font-sans">
+                        <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
                             ERC-4337 UserOperation Log
                         </h2>
-                        <p className="text-xs text-zinc-600 font-mono">On-chain validation and bundler execution history</p>
+                        <p className="text-xs text-stone-500 font-sans">On-chain validation and bundler execution history</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-black bg-neoMint border-2 border-black px-3 py-1 rounded-full shadow-brutal-sm">
-                    <Fuel className="w-3.5 h-3.5 stroke-[2.5]" />
+                <div className="flex items-center gap-1.5 text-xs font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-full">
+                    <Fuel className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Gasless via Paymaster</span>
                 </div>
             </div>
@@ -41,58 +41,58 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                     return (
                         <div
                             key={op.id}
-                            className={`p-4 rounded-xl border-2 border-black shadow-brutal-sm transition-all ${
+                            className={`p-4 rounded-xl border transition-all shadow-subtle ${
                                 isReverted
-                                    ? 'bg-[#FFF0F2]'
+                                    ? 'bg-rose-50/30 border-rose-200/80'
                                     : isQueued
-                                    ? 'bg-[#FEF9C3]'
-                                    : 'bg-white'
+                                    ? 'bg-amber-50/30 border-amber-200/80'
+                                    : 'bg-stone-50/40 hover:bg-white border-stone-200/80'
                             }`}
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <span
-                                        className={`px-2 py-0.5 rounded text-[10px] font-black border border-black ${
+                                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium border ${
                                             isExecuted
-                                                ? 'bg-neoMint text-black'
+                                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                                 : isReverted
-                                                ? 'bg-neoRose text-black'
-                                                : 'bg-neoYellow text-black'
+                                                ? 'bg-rose-50 text-rose-800 border-rose-200'
+                                                : 'bg-amber-50 text-amber-800 border-amber-200'
                                         }`}
                                     >
                                         {op.status}
                                     </span>
-                                    <span className="font-black text-black text-xs font-sans">{op.targetName}</span>
-                                    <span className="text-[11px] text-zinc-600 font-mono">({op.functionCalled})</span>
+                                    <span className="font-semibold text-stone-900 text-xs font-sans">{op.targetName}</span>
+                                    <span className="text-[11px] text-stone-500 font-mono">({op.functionCalled})</span>
                                 </div>
 
                                 <div className="flex items-center gap-3 text-[11px]">
                                     {op.amount > 0 && (
-                                        <span className="font-black text-black font-mono bg-zinc-100 px-2 py-0.5 rounded border border-black">
+                                        <span className="font-medium text-stone-900 font-mono bg-white px-2 py-0.5 rounded-md border border-stone-200 shadow-subtle">
                                             ${op.amount.toFixed(2)} USDC
                                         </span>
                                     )}
-                                    <span className="text-zinc-500 font-mono text-[10px]">{op.timestamp}</span>
+                                    <span className="text-stone-400 font-mono text-[10px]">{op.timestamp}</span>
                                 </div>
                             </div>
 
-                            <p className="text-[11px] text-zinc-700 mb-2.5 font-sans font-medium">{op.reason}</p>
+                            <p className="text-[11px] text-stone-600 mb-2.5 font-sans">{op.reason}</p>
 
-                            <div className="flex items-center justify-between text-[10px] text-zinc-600 pt-2 border-t border-black/10">
+                            <div className="flex items-center justify-between text-[10px] text-stone-500 pt-2 border-t border-stone-200/60">
                                 <div className="flex items-center gap-3">
-                                    <span>UserOp: <span className="font-bold text-black">{op.userOpHash}</span></span>
+                                    <span>UserOp: <span className="font-mono text-stone-800 font-medium">{op.userOpHash}</span></span>
                                     {op.gasSponsored && (
-                                        <span className="text-emerald-800 font-bold flex items-center gap-1">
-                                            <Fuel className="w-3 h-3 stroke-[2.5]" /> Gas Sponsored ($0.10)
+                                        <span className="text-emerald-700 font-medium flex items-center gap-1">
+                                            <Fuel className="w-3 h-3 text-emerald-600" /> Gas Sponsored ($0.10)
                                         </span>
                                     )}
                                 </div>
 
                                 <button
                                     onClick={() => onInspectUserOp(op)}
-                                    className="flex items-center gap-1.5 text-black hover:text-neoRed font-bold font-mono transition-colors"
+                                    className="flex items-center gap-1.5 text-stone-700 hover:text-stone-900 font-medium font-mono transition-colors"
                                 >
-                                    <Code className="w-3.5 h-3.5 stroke-[2.5]" />
+                                    <Code className="w-3.5 h-3.5 text-stone-500" />
                                     <span>Inspect Raw UserOp</span>
                                 </button>
                             </div>

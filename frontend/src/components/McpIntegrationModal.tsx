@@ -21,11 +21,11 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
 
     const claudeConfig = JSON.stringify({
         mcpServers: {
-            "agentwallet": {
+            "safeagent": {
                 "command": "npx",
                 "args": [
                     "-y",
-                    "@agentwallet/mcp-server",
+                    "@safeagent/mcp-server",
                     "--endpoint",
                     "http://localhost:3000/api/mcp",
                     "--agent-id",
@@ -36,7 +36,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
     }, null, 2);
 
     const cursorConfig = JSON.stringify({
-        name: "AgentWallet MCP",
+        name: "SafeAgent Treasury MCP",
         type: "command",
         command: "curl -X POST http://localhost:3000/api/mcp -H 'Content-Type: application/json'",
         description: "Enables autonomous agent payments, virtual cards and policy checks"
@@ -101,31 +101,31 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white border-3 border-black rounded-2xl max-w-2xl w-full p-6 shadow-brutal-xl relative overflow-hidden font-mono">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white border border-stone-200/90 rounded-2xl max-w-2xl w-full p-6 shadow-modal relative overflow-hidden font-mono">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between pb-3.5 mb-4 border-b-2 border-black">
+                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-stone-200/80">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-neoPurple border-2 border-black flex items-center justify-center text-black shadow-brutal-sm">
-                            <Terminal className="w-5 h-5 stroke-[2.5]" />
+                        <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
+                            <Terminal className="w-5 h-5 text-stone-700" />
                         </div>
                         <div>
-                            <h2 className="text-base font-black text-black tracking-tight font-sans flex items-center gap-2">
+                            <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight flex items-center gap-2">
                                 <span>Model Context Protocol (MCP) Hub</span>
-                                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neoMint border border-black font-black">
+                                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">
                                     MCP READY
                                 </span>
                             </h2>
-                            <p className="text-xs text-zinc-600 font-mono">One MCP endpoint connecting Claude, Cursor, Devin, GPT & LangChain</p>
+                            <p className="text-xs text-stone-500 font-sans">One MCP endpoint connecting Claude, Cursor, Devin, GPT & LangChain</p>
                         </div>
                     </div>
 
                     <button
                         onClick={onClose}
-                        className="p-1.5 rounded-lg border-2 border-black bg-white hover:bg-zinc-100 text-black brutal-btn shadow-brutal-xs"
+                        className="p-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-500 hover:text-stone-800 transition"
                     >
-                        <X className="w-4 h-4 stroke-[2.5]" />
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
 
@@ -133,40 +133,40 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                 <div className="flex items-center gap-1.5 mb-4 flex-wrap">
                     <button
                         onClick={() => setActiveTab('claude')}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all brutal-btn ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all ${
                             activeTab === 'claude'
-                                ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                : 'bg-zinc-100 text-black hover:bg-zinc-200 border border-black'
+                                ? 'bg-stone-900 text-white font-medium shadow-xs'
+                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                         }`}
                     >
                         Claude Desktop
                     </button>
                     <button
                         onClick={() => setActiveTab('cursor')}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all brutal-btn ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all ${
                             activeTab === 'cursor'
-                                ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                : 'bg-zinc-100 text-black hover:bg-zinc-200 border border-black'
+                                ? 'bg-stone-900 text-white font-medium shadow-xs'
+                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                         }`}
                     >
                         Cursor IDE
                     </button>
                     <button
                         onClick={() => setActiveTab('curl')}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all brutal-btn ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all ${
                             activeTab === 'curl'
-                                ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                : 'bg-zinc-100 text-black hover:bg-zinc-200 border border-black'
+                                ? 'bg-stone-900 text-white font-medium shadow-xs'
+                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                         }`}
                     >
                         cURL / API
                     </button>
                     <button
                         onClick={() => setActiveTab('tester')}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all brutal-btn ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all ${
                             activeTab === 'tester'
-                                ? 'bg-neoRed text-white border-2 border-black shadow-brutal-xs'
-                                : 'bg-neoYellow text-black border-2 border-black font-black'
+                                ? 'bg-emerald-800 text-white font-medium shadow-xs'
+                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-medium'
                         }`}
                     >
                         ⚡ Live Tool Tester
@@ -176,7 +176,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                 {/* Content based on tab */}
                 {activeTab !== 'tester' ? (
                     <div className="space-y-3">
-                        <div className="flex justify-between items-center text-xs text-zinc-600">
+                        <div className="flex justify-between items-center text-xs text-stone-500 font-sans">
                             <span>
                                 {activeTab === 'claude' ? 'Paste into claude_desktop_config.json:' : activeTab === 'cursor' ? 'Add as MCP Server in Cursor Settings:' : 'Direct REST JSON-RPC 2.0 invocation:'}
                             </span>
@@ -185,26 +185,26 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                                     activeTab === 'claude' ? claudeConfig : activeTab === 'cursor' ? cursorConfig : curlSnippet,
                                     activeTab
                                 )}
-                                className="px-3 py-1 rounded-lg border-2 border-black bg-white hover:bg-neoYellow text-black text-xs font-bold flex items-center gap-1 brutal-btn shadow-brutal-xs"
+                                className="px-3 py-1 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-800 text-xs font-mono font-medium flex items-center gap-1 shadow-subtle transition"
                             >
-                                {copiedTab === activeTab ? <Check className="w-3.5 h-3.5 text-emerald-800" /> : <Copy className="w-3.5 h-3.5" />}
+                                {copiedTab === activeTab ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-stone-400" />}
                                 <span>{copiedTab === activeTab ? 'Copied' : 'Copy Config'}</span>
                             </button>
                         </div>
 
-                        <div className="bg-zinc-950 border-2 border-black rounded-xl p-4 overflow-x-auto max-h-64 text-xs text-emerald-400 leading-relaxed shadow-brutal">
+                        <div className="bg-stone-950 border border-stone-800 rounded-xl p-4 overflow-x-auto max-h-64 text-xs text-stone-300 leading-relaxed shadow-inner">
                             <pre>{activeTab === 'claude' ? claudeConfig : activeTab === 'cursor' ? cursorConfig : curlSnippet}</pre>
                         </div>
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        <div className="bg-[#FFFDF8] border-2 border-black rounded-xl p-3.5 shadow-brutal-xs flex items-center justify-between gap-3 flex-wrap">
+                        <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 flex-wrap">
                             <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-zinc-700">Select MCP Tool:</span>
+                                <span className="text-xs font-sans text-stone-600">Select MCP Tool:</span>
                                 <select
                                     value={selectedTool}
                                     onChange={(e: any) => setSelectedTool(e.target.value)}
-                                    className="bg-white border-2 border-black rounded-lg px-2.5 py-1 text-xs font-bold text-black"
+                                    className="bg-white border border-stone-200 rounded-lg px-2.5 py-1 text-xs text-stone-900 outline-none shadow-subtle"
                                 >
                                     <option value="wallet_get_balance">wallet_get_balance</option>
                                     <option value="wallet_pay">wallet_pay ($15.00 to OpenAI)</option>
@@ -215,7 +215,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                             <button
                                 onClick={runLiveTool}
                                 disabled={isExecuting}
-                                className="px-4 py-1.5 rounded-xl bg-black hover:bg-neoRed text-white text-xs font-bold flex items-center gap-1.5 brutal-btn shadow-brutal-xs disabled:opacity-50"
+                                className="px-4 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium flex items-center gap-1.5 shadow-subtle transition disabled:opacity-50"
                             >
                                 <Play className="w-3.5 h-3.5 fill-current" />
                                 <span>{isExecuting ? 'Calling MCP...' : 'Execute Tool Call'}</span>
@@ -223,8 +223,8 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                         </div>
 
                         {/* Result Output */}
-                        <div className="bg-zinc-950 border-2 border-black rounded-xl p-4 overflow-x-auto max-h-52 text-xs text-emerald-400 leading-relaxed shadow-brutal">
-                            <div className="text-[10px] text-zinc-500 uppercase tracking-widest pb-1 mb-2 border-b border-zinc-800 flex justify-between">
+                        <div className="bg-stone-950 border border-stone-800 rounded-xl p-4 overflow-x-auto max-h-52 text-xs text-emerald-400 leading-relaxed shadow-inner">
+                            <div className="text-[10px] text-stone-500 uppercase tracking-widest pb-1 mb-2 border-b border-stone-800/80 flex justify-between">
                                 <span>JSON-RPC 2.0 RESPONSE</span>
                                 <span>Endpoint: /api/mcp</span>
                             </div>
@@ -233,13 +233,13 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                     </div>
                 )}
 
-                <div className="mt-4 pt-3 border-t-2 border-black flex items-center justify-between text-xs text-zinc-600 font-sans">
-                    <span className="font-mono text-[11px] text-black font-bold flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-neoRed" /> Standard Anthropic MCP Specification v2024-11-05
+                <div className="mt-4 pt-3 border-t border-stone-200/60 flex items-center justify-between text-xs text-stone-500 font-sans">
+                    <span className="font-mono text-[11px] text-stone-600 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-700" /> Standard Anthropic MCP Specification v2024-11-05
                     </span>
                     <button
                         onClick={onClose}
-                        className="px-4 py-1.5 rounded-xl bg-black hover:bg-neoRed text-white font-mono font-bold text-xs border-2 border-black brutal-btn shadow-brutal-xs transition-colors"
+                        className="px-4 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-mono text-xs shadow-subtle transition"
                     >
                         Close
                     </button>

@@ -9,41 +9,36 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Neo-Brutalist edvr.vercel.app palette
-        canvas: '#FDFBF7',         // Warm off-white / ivory canvas
-        neoBlack: '#09090B',       // Deep ink black
-        neoCard: '#FFFFFF',        // Pure white card surfaces
-        neoMint: '#A7F3D0',        // Pastel mint green
-        neoMintDark: '#059669',
-        neoYellow: '#FEF08A',      // Sunflower pastel yellow
-        neoYellowDark: '#CA8A04',
-        neoSky: '#BAE6FD',         // Pastel sky blue
-        neoSkyDark: '#0284C7',
-        neoPurple: '#DDD6FE',      // Pastel lavender purple
-        neoPurpleDark: '#7C3AED',
-        neoRose: '#FECDD3',        // Pastel rose
-        neoRed: '#E11D48',         // EdVR signature crimson red
-        neoCrimson: '#BE123C',
-        neoOrange: '#FED7AA',      // Pastel peach orange
+        canvas: '#FAF8F5',         // Soft warm stone canvas
+        canvasSubtle: '#F4F1EA',   // Muted stone canvas accent
+        card: '#FFFFFF',           // Crisp white card surface
+        surfaceSubtle: '#F7F5F0',  // Warm ivory surface tint
+        borderSubtle: '#E5E2DC',   // Delicate hairline border
+        borderFocus: '#D4D0C7',    // Refined active border
+        brand: {
+          emerald: '#065F46',      // British racing green / deep pine
+          emeraldDark: '#044E39',
+          emeraldLight: '#ECFDF5',
+          amber: '#D97706',        // Burnished amber / warm copper
+          amberLight: '#FFFBEB',
+          navy: '#0F172A',
+          charcoal: '#18181B',
+        }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Newsreader', 'Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
-        display: ['system-ui', '-apple-system', 'sans-serif'],
-      },
-      borderWidth: {
-        '3': '3px',
       },
       boxShadow: {
-        'brutal': '4px 4px 0px #09090B',
-        'brutal-sm': '2px 2px 0px #09090B',
-        'brutal-lg': '6px 6px 0px #09090B',
-        'brutal-xl': '8px 8px 0px #09090B',
-        'brutal-red': '4px 4px 0px #E11D48',
-        'brutal-mint': '4px 4px 0px #059669',
-        'brutal-yellow': '4px 4px 0px #CA8A04',
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.03)',
+        'card-hover': '0 8px 24px -4px rgba(0, 0, 0, 0.05)',
+        'float': '0 12px 36px -8px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03)',
+        'modal': '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
       }
     },
   },
   plugins: [],
 }
+

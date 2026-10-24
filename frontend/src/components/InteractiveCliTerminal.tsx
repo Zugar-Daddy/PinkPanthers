@@ -10,7 +10,7 @@ interface InteractiveCliTerminalProps {
 
 export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ wallet }) => {
     const [commandLog, setCommandLog] = useState<string[]>([
-        '# AgentWallet Developer CLI & Onboarding Sequence',
+        '# SafeAgent Developer CLI & Onboarding Sequence',
         '# 1. Principal account established: Yoav K. (P-256 Passkey Active)',
         '# 2. Fleet provisioned: 11 active agents, 1 provisioning',
         '# 3. Budget allocated: $5,000 USDC / 24h cycle',
@@ -60,43 +60,43 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
     };
 
     return (
-        <div className="bg-white border-3 border-black rounded-2xl p-6 shadow-brutal space-y-4 font-mono">
+        <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover space-y-4 font-mono transition-all duration-200">
             
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-black">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200/80">
                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center border border-black shadow-brutal-xs">
+                    <div className="w-8 h-8 rounded-lg bg-stone-900 text-white flex items-center justify-center shadow-subtle">
                         <Terminal className="w-4 h-4" />
                     </div>
                     <div>
-                        <div className="text-xs font-black text-black">~/agentwallet — bash</div>
-                        <div className="text-[10px] text-zinc-600">Developer CLI & Automated Integration Sequence</div>
+                        <div className="text-xs font-semibold text-stone-900">~/safeagent — zsh</div>
+                        <div className="text-[10px] text-stone-500 font-sans">Developer CLI & Automated Integration Sequence</div>
                     </div>
                 </div>
 
                 {/* Quick command buttons */}
                 <div className="flex items-center gap-1.5 flex-wrap">
                     <button
-                        onClick={() => runCliCommand('agentwallet fleet --list')}
-                        className="px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-neoYellow text-black text-xs font-bold border border-black brutal-btn"
+                        onClick={() => runCliCommand('safeagent fleet --list')}
+                        className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition"
                     >
                         fleet --list
                     </button>
                     <button
-                        onClick={() => runCliCommand('agentwallet card --status')}
-                        className="px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-neoMint text-black text-xs font-bold border border-black brutal-btn"
+                        onClick={() => runCliCommand('safeagent card --status')}
+                        className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition"
                     >
                         card --status
                     </button>
                     <button
-                        onClick={() => runCliCommand('agentwallet mcp --ping')}
-                        className="px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-neoPurple text-black text-xs font-bold border border-black brutal-btn"
+                        onClick={() => runCliCommand('safeagent mcp --ping')}
+                        className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition"
                     >
                         mcp --ping
                     </button>
                     <button
-                        onClick={() => runCliCommand('agentwallet policy --check')}
-                        className="px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-neoSky text-black text-xs font-bold border border-black brutal-btn"
+                        onClick={() => runCliCommand('safeagent policy --check')}
+                        className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition"
                     >
                         policy --check
                     </button>
@@ -104,18 +104,24 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
             </div>
 
             {/* Inky Black Terminal Box */}
-            <div className="bg-zinc-950 border-2 border-black rounded-xl p-4 text-xs text-zinc-300 space-y-1.5 max-h-72 overflow-y-auto shadow-brutal leading-relaxed">
+            <div className="bg-stone-950 border border-stone-800 rounded-xl p-4 text-xs text-stone-300 space-y-1.5 max-h-72 overflow-y-auto shadow-inner leading-relaxed">
+                <div className="flex items-center gap-1.5 pb-2 border-b border-stone-800/80 mb-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                    <span className="text-[10px] text-stone-500 ml-2">safeagent session</span>
+                </div>
                 {commandLog.map((line, idx) => (
                     <div
                         key={idx}
                         className={
                             line.startsWith('$')
-                                ? 'text-neoYellow font-black'
+                                ? 'text-amber-300 font-semibold'
                                 : line.startsWith('✨')
-                                ? 'text-neoMint font-bold'
+                                ? 'text-emerald-400 font-medium'
                                 : line.startsWith('#')
-                                ? 'text-zinc-500'
-                                : 'text-emerald-400'
+                                ? 'text-stone-500'
+                                : 'text-stone-300'
                         }
                     >
                         <pre className="whitespace-pre-wrap font-mono">{line}</pre>
@@ -131,22 +137,22 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
                 }}
                 className="flex items-center gap-2 pt-1"
             >
-                <div className="flex-1 flex items-center gap-2 bg-[#FFFDF8] border-2 border-black rounded-xl px-3 py-2 shadow-brutal-xs">
-                    <span className="text-zinc-500 font-bold">$</span>
+                <div className="flex-1 flex items-center gap-2 bg-stone-50/80 border border-stone-200 rounded-xl px-3 py-2 shadow-subtle focus-within:border-stone-400 transition">
+                    <span className="text-stone-400 font-mono font-medium">$</span>
                     <input
                         type="text"
                         value={customCmd}
                         onChange={(e) => setCustomCmd(e.target.value)}
-                        placeholder="Type agentwallet command (e.g. agentwallet balance, fleet, mcp)..."
-                        className="bg-transparent w-full text-xs font-mono text-black outline-none placeholder:text-zinc-400 font-bold"
+                        placeholder="Type safeagent command (e.g. safeagent balance, fleet, mcp)..."
+                        className="bg-transparent w-full text-xs font-mono text-stone-900 outline-none placeholder:text-stone-400"
                     />
                 </div>
                 <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl bg-black hover:bg-neoRed text-white text-xs font-bold flex items-center gap-1.5 border-2 border-black brutal-btn shadow-brutal-xs transition-colors"
+                    className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium flex items-center gap-1.5 shadow-subtle transition"
                 >
-                    <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
                     <span>Run</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                 </button>
             </form>
 

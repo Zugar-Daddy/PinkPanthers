@@ -188,7 +188,7 @@ export default function Home() {
     };
 
     return (
-        <main className="min-h-screen flex flex-col bg-canvas text-black selection:bg-neoRed selection:text-white">
+        <main className="min-h-screen flex flex-col bg-[#FAF8F5] text-stone-900 selection:bg-emerald-600 selection:text-white">
             {/* Top Navigation */}
             <WalletHeader
                 wallet={wallet}
@@ -208,96 +208,96 @@ export default function Home() {
 
                 {/* 2. Interactive View Switcher / Tab Bar */}
                 <div className="flex items-center justify-between pb-1 gap-3 flex-wrap">
-                    <div className="flex items-center bg-white border-2 border-black rounded-2xl p-1.5 gap-1.5 shadow-brutal-sm flex-wrap">
+                    <div className="flex items-center bg-white/80 backdrop-blur-md border border-stone-200/80 rounded-2xl p-1.5 gap-1 shadow-subtle flex-wrap">
                         
                         <button
                             onClick={() => setActiveTab('overview')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
                                 activeTab === 'overview'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <LayoutGrid className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <LayoutGrid className="w-3.5 h-3.5" />
                             <span>Workspace</span>
                         </button>
 
                         <button
                             onClick={() => setActiveTab('fleet')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
                                 activeTab === 'fleet'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <Users className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <Users className="w-3.5 h-3.5" />
                             <span>Agent Fleet</span>
                         </button>
 
                         <button
                             onClick={() => setActiveTab('card')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
                                 activeTab === 'card'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <CreditCard className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <CreditCard className="w-3.5 h-3.5" />
                             <span>Virtual Card</span>
                         </button>
 
                         <button
                             onClick={() => setActiveTab('simulator')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
                                 activeTab === 'simulator'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <Bot className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <Bot className="w-3.5 h-3.5" />
                             <span>Action Simulator</span>
                         </button>
 
                         <button
                             onClick={() => setActiveTab('stream')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
                                 activeTab === 'stream'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <Activity className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <Activity className="w-3.5 h-3.5" />
                             <span>Live Activity</span>
                         </button>
 
                         <button
                             onClick={() => setActiveTab('cli')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
                                 activeTab === 'cli'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <Terminal className="w-3.5 h-3.5" />
                             <span>CLI Terminal</span>
                         </button>
 
                         <button
                             onClick={() => setActiveTab('threats')}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
                                 activeTab === 'threats'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <ShieldAlert className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <ShieldAlert className="w-3.5 h-3.5" />
                             <span>Threat Defense</span>
                         </button>
 
                     </div>
 
-                    <div className="hidden sm:flex items-center gap-2 text-xs font-mono font-bold text-black bg-neoYellow border-2 border-black px-3.5 py-2 rounded-xl shadow-brutal-sm">
-                        <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <div className="hidden sm:flex items-center gap-2 text-xs font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3.5 py-2 rounded-xl shadow-xs">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                         <span>MCP + PolicyEngine.sol Active</span>
                     </div>
                 </div>
@@ -415,26 +415,26 @@ export default function Home() {
                     </div>
                 )}
 
-                {/* Neo-Brutalist Footer Banner */}
-                <footer className="mt-12 pt-6 border-t-2 border-black flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs text-zinc-600 pb-8">
+                {/* Sleek Editorial Footer */}
+                <footer className="mt-12 pt-6 border-t border-stone-200/80 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs text-stone-500 pb-8">
                     <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-neoMint border border-black inline-block"></span>
-                        <span className="font-black text-black font-sans">AgentSafe</span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                        <span className="font-serif font-bold text-stone-900 tracking-tight">SafeAgent Treasury</span>
                         <span>•</span>
-                        <span>Financial Infrastructure for AI Agents (AgentWallet.ai Compatible)</span>
+                        <span>Autonomous Agent Financial Infrastructure</span>
                     </div>
 
-                    <div className="flex items-center gap-2.5 text-[11px] flex-wrap justify-center">
-                        <span className="bg-white px-2.5 py-1 rounded-md border-2 border-black font-bold text-black shadow-brutal-xs">
+                    <div className="flex items-center gap-2 text-[11px] flex-wrap justify-center">
+                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
                             ERC-4337 v0.7
                         </span>
-                        <span className="bg-white px-2.5 py-1 rounded-md border-2 border-black font-bold text-black shadow-brutal-xs">
+                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
                             MCP Protocol
                         </span>
-                        <span className="bg-white px-2.5 py-1 rounded-md border-2 border-black font-bold text-black shadow-brutal-xs">
+                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
                             WebAuthn P-256
                         </span>
-                        <span className="bg-white px-2.5 py-1 rounded-md border-2 border-black font-bold text-black shadow-brutal-xs">
+                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
                             PolicyEngine.sol
                         </span>
                     </div>

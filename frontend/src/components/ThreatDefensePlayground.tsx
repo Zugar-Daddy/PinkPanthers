@@ -19,22 +19,22 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
     threatLogs
 }) => {
     return (
-        <div className="bg-white border-2 border-black rounded-2xl p-6 shadow-brutal space-y-5">
-            <div className="flex items-center justify-between pb-3.5 border-b-2 border-black">
+        <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover space-y-5 transition-all duration-200">
+            <div className="flex items-center justify-between pb-3.5 border-b border-stone-200/80">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-neoRose border-2 border-black flex items-center justify-center text-black shadow-brutal-sm">
-                        <Bug className="w-5 h-5 stroke-[2.5]" />
+                    <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
+                        <Bug className="w-5 h-5 text-stone-700" />
                     </div>
                     <div>
-                        <h2 className="text-base font-black text-black tracking-tight font-sans">
+                        <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
                             Security Threat & Misbehavior Sandbox
                         </h2>
-                        <p className="text-xs text-zinc-600 font-mono">Prove smart-contract defense against leaked keys & jailbreaks</p>
+                        <p className="text-xs text-stone-500 font-sans">Prove smart-contract defense against leaked keys & jailbreaks</p>
                     </div>
                 </div>
 
-                <span className="text-[11px] font-mono font-bold text-black bg-neoMint border-2 border-black px-3 py-1 rounded-full flex items-center gap-1.5 shadow-brutal-sm">
-                    <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" /> 100% Defense Verified
+                <span className="text-[11px] font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> 100% Defense Verified
                 </span>
             </div>
 
@@ -43,16 +43,16 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
                 {/* 1. Stolen Key */}
                 <button
                     onClick={onTriggerDrain}
-                    className="p-4 rounded-xl border-2 border-black bg-[#FFF0F2] text-left transition-all shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 flex flex-col justify-between brutal-btn group"
+                    className="p-4 rounded-xl border border-stone-200/80 bg-stone-50/50 hover:bg-rose-50/40 hover:border-rose-200 text-left transition-all shadow-subtle flex flex-col justify-between group"
                 >
                     <div>
-                        <div className="flex items-center gap-2 text-xs font-black text-black mb-1.5">
-                            <Skull className="w-4 h-4 text-neoRed stroke-[2.5] group-hover:scale-110 transition-transform" />
+                        <div className="flex items-center gap-2 text-xs font-semibold text-stone-900 mb-1.5 font-sans">
+                            <Skull className="w-4 h-4 text-rose-600 transition-transform group-hover:scale-105" />
                             <span>Leaked Key Drain</span>
                         </div>
-                        <p className="text-[11px] text-zinc-700 font-sans font-medium">Hacker steals sub-key and attempts full wallet drain.</p>
+                        <p className="text-[11px] text-stone-500 font-sans">Hacker steals sub-key and attempts full wallet drain.</p>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-black bg-white px-2 py-0.5 rounded border border-black mt-3 w-fit">
+                    <span className="text-[10px] font-mono font-medium text-stone-600 bg-white px-2 py-0.5 rounded-full border border-stone-200/70 mt-3 w-fit shadow-subtle">
                         Defense: Recipient Allowlist
                     </span>
                 </button>
@@ -60,16 +60,16 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
                 {/* 2. Prompt Injection */}
                 <button
                     onClick={onTriggerPromptInjection}
-                    className="p-4 rounded-xl border-2 border-black bg-[#F3F0FF] text-left transition-all shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 flex flex-col justify-between brutal-btn group"
+                    className="p-4 rounded-xl border border-stone-200/80 bg-stone-50/50 hover:bg-purple-50/40 hover:border-purple-200 text-left transition-all shadow-subtle flex flex-col justify-between group"
                 >
                     <div>
-                        <div className="flex items-center gap-2 text-xs font-black text-black mb-1.5">
-                            <Terminal className="w-4 h-4 text-purple-700 stroke-[2.5] group-hover:scale-110 transition-transform" />
+                        <div className="flex items-center gap-2 text-xs font-semibold text-stone-900 mb-1.5 font-sans">
+                            <Terminal className="w-4 h-4 text-purple-600 transition-transform group-hover:scale-105" />
                             <span>Prompt Injection</span>
                         </div>
-                        <p className="text-[11px] text-zinc-700 font-sans font-medium">Jailbreak prompts agent to call malicious contract.</p>
+                        <p className="text-[11px] text-stone-500 font-sans">Jailbreak prompts agent to call malicious contract.</p>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-black bg-white px-2 py-0.5 rounded border border-black mt-3 w-fit">
+                    <span className="text-[10px] font-mono font-medium text-stone-600 bg-white px-2 py-0.5 rounded-full border border-stone-200/70 mt-3 w-fit shadow-subtle">
                         Defense: Target Allowlist
                     </span>
                 </button>
@@ -77,16 +77,16 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
                 {/* 3. Overspend */}
                 <button
                     onClick={onTriggerOverspend}
-                    className="p-4 rounded-xl border-2 border-black bg-[#FEF9C3] text-left transition-all shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 flex flex-col justify-between brutal-btn group"
+                    className="p-4 rounded-xl border border-stone-200/80 bg-stone-50/50 hover:bg-amber-50/40 hover:border-amber-200 text-left transition-all shadow-subtle flex flex-col justify-between group"
                 >
                     <div>
-                        <div className="flex items-center gap-2 text-xs font-black text-black mb-1.5">
-                            <AlertOctagon className="w-4 h-4 text-amber-700 stroke-[2.5] group-hover:scale-110 transition-transform" />
+                        <div className="flex items-center gap-2 text-xs font-semibold text-stone-900 mb-1.5 font-sans">
+                            <AlertOctagon className="w-4 h-4 text-amber-600 transition-transform group-hover:scale-105" />
                             <span>Budget Overspend</span>
                         </div>
-                        <p className="text-[11px] text-zinc-700 font-sans font-medium">Agent attempts $250 purchase on $25 limit.</p>
+                        <p className="text-[11px] text-stone-500 font-sans">Agent attempts $250 purchase on $25 limit.</p>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-black bg-white px-2 py-0.5 rounded border border-black mt-3 w-fit">
+                    <span className="text-[10px] font-mono font-medium text-stone-600 bg-white px-2 py-0.5 rounded-full border border-stone-200/70 mt-3 w-fit shadow-subtle">
                         Defense: TouchID Escalation
                     </span>
                 </button>
@@ -94,42 +94,42 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
                 {/* 4. Expired Key */}
                 <button
                     onClick={onTriggerExpired}
-                    className="p-4 rounded-xl border-2 border-black bg-[#F0FDF4] text-left transition-all shadow-brutal-sm hover:translate-x-0.5 hover:translate-y-0.5 flex flex-col justify-between brutal-btn group"
+                    className="p-4 rounded-xl border border-stone-200/80 bg-stone-50/50 hover:bg-emerald-50/40 hover:border-emerald-200 text-left transition-all shadow-subtle flex flex-col justify-between group"
                 >
                     <div>
-                        <div className="flex items-center gap-2 text-xs font-black text-black mb-1.5">
-                            <ZapOff className="w-4 h-4 text-emerald-800 stroke-[2.5] group-hover:scale-110 transition-transform" />
+                        <div className="flex items-center gap-2 text-xs font-semibold text-stone-900 mb-1.5 font-sans">
+                            <ZapOff className="w-4 h-4 text-emerald-700 transition-transform group-hover:scale-105" />
                             <span>Expired Session Call</span>
                         </div>
-                        <p className="text-[11px] text-zinc-700 font-sans font-medium">Agent calls smart account after validity period.</p>
+                        <p className="text-[11px] text-stone-500 font-sans">Agent calls smart account after validity period.</p>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-black bg-white px-2 py-0.5 rounded border border-black mt-3 w-fit">
+                    <span className="text-[10px] font-mono font-medium text-stone-600 bg-white px-2 py-0.5 rounded-full border border-stone-200/70 mt-3 w-fit shadow-subtle">
                         Defense: Time Bounds
                     </span>
                 </button>
             </div>
 
             {/* Audit Trail Log */}
-            <div className="bg-[#FFFDF8] border-2 border-black rounded-xl p-4 shadow-brutal-sm">
-                <div className="flex items-center justify-between text-xs font-mono font-black text-black mb-2.5 pb-2 border-b-2 border-black">
-                    <span>SECURITY EVENT AUDIT TRAIL</span>
-                    <span className="text-zinc-600 font-medium">ON-CHAIN VERIFIED</span>
+            <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-4 space-y-2.5">
+                <div className="flex items-center justify-between text-xs font-mono font-medium text-stone-700 pb-2 border-b border-stone-200/60">
+                    <span className="uppercase text-[10px] tracking-wider text-stone-500">SECURITY EVENT AUDIT TRAIL</span>
+                    <span className="text-emerald-800 text-[10px] font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">ON-CHAIN VERIFIED</span>
                 </div>
 
                 <div className="space-y-2 max-h-40 overflow-y-auto font-mono text-xs">
                     {threatLogs.length === 0 ? (
-                        <div className="text-zinc-500 py-3 text-center text-xs font-sans">Click any scenario above to verify on-chain smart wallet defenses</div>
+                        <div className="text-stone-400 py-3 text-center text-xs font-sans">Click any scenario above to verify on-chain smart wallet defenses</div>
                     ) : (
                         threatLogs.map((log) => (
-                            <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-2 px-3 rounded-lg bg-white border-2 border-black gap-2 shadow-brutal-xs">
+                            <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-2 px-3 rounded-lg bg-white border border-stone-200/80 gap-2 shadow-subtle">
                                 <div className="flex items-center gap-2.5">
-                                    <span className="text-zinc-500 text-[10px]">{log.time}</span>
-                                    <span className="font-black text-black font-sans">{log.attackType}</span>
-                                    <span className="text-zinc-600 text-[11px]">→ {log.defenseMechanism}</span>
+                                    <span className="text-stone-400 text-[10px]">{log.time}</span>
+                                    <span className="font-semibold text-stone-900 font-sans text-xs">{log.attackType}</span>
+                                    <span className="text-stone-500 text-[11px]">→ {log.defenseMechanism}</span>
                                 </div>
                                 <div className="flex items-center gap-2 self-end sm:self-auto">
-                                    <span className="text-rose-700 font-bold text-[11px]">{log.result}</span>
-                                    <span className="px-2 py-0.5 rounded text-[10px] bg-neoRose border border-black text-black font-black">
+                                    <span className="text-rose-700 font-medium text-[11px]">{log.result}</span>
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-50 border border-rose-200 text-rose-800 font-medium font-mono">
                                         BLOCKED
                                     </span>
                                 </div>

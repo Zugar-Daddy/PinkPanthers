@@ -17,22 +17,22 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
     });
 
     return (
-        <div className="bg-white border-3 border-black rounded-2xl p-6 shadow-brutal space-y-4">
+        <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover space-y-4 transition-all duration-200">
             
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b-2 border-black">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-stone-200/80">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-neoSky border-2 border-black flex items-center justify-center text-black shadow-brutal-sm">
-                        <Activity className="w-5 h-5 stroke-[2.5]" />
+                    <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
+                        <Activity className="w-5 h-5 text-stone-700" />
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h2 className="text-base font-black text-black tracking-tight font-sans">
+                            <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
                                 Real-Time Activity Stream
                             </h2>
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         </div>
-                        <p className="text-xs text-zinc-600 font-mono">Autonomous payment execution trace across all agent fleet members</p>
+                        <p className="text-xs text-stone-500 font-sans">Autonomous payment execution trace across all agent fleet members</p>
                     </div>
                 </div>
 
@@ -42,10 +42,10 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
                         <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold uppercase transition-all ${
+                            className={`px-3 py-1 rounded-full text-xs font-mono uppercase transition-all ${
                                 selectedCategory === cat
-                                    ? 'bg-black text-white border border-black shadow-brutal-xs'
-                                    : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
+                                    ? 'bg-stone-900 text-white font-medium shadow-xs'
+                                    : 'bg-stone-100 hover:bg-stone-200 text-stone-600 font-normal'
                             }`}
                         >
                             {cat}
@@ -55,43 +55,43 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
             </div>
 
             {/* Event List */}
-            <div className="divide-y-2 divide-black/10 max-h-96 overflow-y-auto pr-1">
+            <div className="divide-y divide-stone-200/60 max-h-96 overflow-y-auto pr-1">
                 {filteredEvents.map(event => (
-                    <div key={event.id} className="py-3 px-2 flex items-center justify-between gap-3 hover:bg-[#FFFDF8] transition-colors rounded-lg">
+                    <div key={event.id} className="py-3 px-2 flex items-center justify-between gap-3 hover:bg-stone-50/70 transition-colors rounded-xl">
                         <div className="flex items-center gap-3 min-w-0">
                             {/* Avatar tag */}
-                            <div className="w-8 h-8 rounded-lg bg-black text-white font-mono font-black text-xs flex items-center justify-center border border-black shrink-0 shadow-brutal-xs">
+                            <div className="w-7 h-7 rounded-lg bg-stone-900 text-white font-mono text-xs flex items-center justify-center shrink-0">
                                 {event.tag}
                             </div>
 
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-mono text-xs font-black text-black truncate">
+                                    <span className="font-mono text-xs font-semibold text-stone-900 truncate">
                                         {event.agentName}
                                     </span>
-                                    <span className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 rounded border border-black ${
+                                    <span className={`text-[10px] font-mono font-medium uppercase px-2 py-0.5 rounded-full border ${
                                         event.category === 'finance'
-                                            ? 'bg-neoMint text-black'
+                                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                             : event.category === 'growth'
-                                            ? 'bg-neoYellow text-black'
+                                            ? 'bg-amber-50 text-amber-800 border-amber-200'
                                             : event.category === 'eng'
-                                            ? 'bg-neoPurple text-black'
-                                            : 'bg-neoRose text-black'
+                                            ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                                            : 'bg-stone-100 text-stone-700 border-stone-200'
                                     }`}>
                                         {event.category}
                                     </span>
                                 </div>
-                                <div className="text-[11px] text-zinc-600 font-sans truncate">
-                                    {event.action} <span className="font-bold text-black">• {event.vendor}</span>
+                                <div className="text-[11px] text-stone-500 font-sans truncate">
+                                    {event.action} <span className="font-medium text-stone-700">• {event.vendor}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="text-right shrink-0">
-                            <div className="font-mono font-black text-xs text-black">
+                            <div className="font-mono font-medium text-xs text-stone-900">
                                 ${event.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                             </div>
-                            <div className="text-[10px] font-mono text-zinc-500">
+                            <div className="text-[10px] font-mono text-stone-400">
                                 {event.timeAgo}
                             </div>
                         </div>
@@ -100,12 +100,12 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
             </div>
 
             {/* Rails footer */}
-            <div className="pt-3 border-t-2 border-black flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+            <div className="pt-3 border-t border-stone-200/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono text-stone-400 uppercase tracking-widest">
                 <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     rails · ach · card · sepa · pix · usdc
                 </span>
-                <span className="bg-neoMint px-2 py-0.5 rounded border border-black font-bold text-black">
+                <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-medium">
                     streaming · all groups
                 </span>
             </div>

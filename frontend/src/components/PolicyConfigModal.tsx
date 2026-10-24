@@ -36,33 +36,33 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white border-3 border-black rounded-2xl max-w-lg w-full p-6 shadow-brutal-xl relative">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white border border-stone-200/90 rounded-2xl max-w-lg w-full p-6 shadow-modal relative">
                 
-                <div className="flex items-center justify-between pb-3.5 mb-5 border-b-2 border-black">
+                <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-stone-200/80">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-neoYellow border-2 border-black flex items-center justify-center text-black shadow-brutal-sm">
-                            <Sliders className="w-5 h-5 stroke-[2.5]" />
+                        <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
+                            <Sliders className="w-5 h-5 text-stone-700" />
                         </div>
                         <div>
-                            <h2 className="text-base font-black text-black tracking-tight font-sans">Agent Policy Controls</h2>
-                            <p className="text-xs text-zinc-600 font-mono">Owner-enforced on-chain spending guardrails</p>
+                            <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">Agent Policy Controls</h2>
+                            <p className="text-xs text-stone-500 font-sans">Owner-enforced on-chain spending guardrails</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1 rounded-lg border-2 border-black bg-white hover:bg-zinc-100 text-black brutal-btn shadow-brutal-xs"
+                        className="p-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-500 hover:text-stone-800 transition"
                     >
-                        <X className="w-4 h-4 stroke-[2.5]" />
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
 
                 <div className="space-y-4 mb-6 text-xs font-mono">
                     {/* Per-Transaction Limit Slider */}
-                    <div className="bg-[#FFFDF8] border-2 border-black p-3.5 rounded-xl shadow-brutal-xs">
+                    <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-zinc-700 font-bold">Max Per-Transaction Limit:</span>
-                            <span className="text-black font-black bg-neoSky px-2 py-0.5 rounded border border-black">${maxPerTx.toFixed(2)} USDC</span>
+                            <span className="text-stone-600 font-medium font-sans text-xs">Max Per-Transaction Limit:</span>
+                            <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">${maxPerTx.toFixed(2)} USDC</span>
                         </div>
                         <input
                             type="range"
@@ -71,19 +71,19 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                             step={5}
                             value={maxPerTx}
                             onChange={(e) => setMaxPerTx(parseFloat(e.target.value))}
-                            className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black"
+                            className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
-                        <div className="flex justify-between text-[10px] text-zinc-600 font-bold mt-1.5">
+                        <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
                             <span>$5 (Micro-orders)</span>
                             <span>$100 (High-tier limit)</span>
                         </div>
                     </div>
 
                     {/* Daily Budget Slider */}
-                    <div className="bg-[#FFFDF8] border-2 border-black p-3.5 rounded-xl shadow-brutal-xs">
+                    <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-zinc-700 font-bold">24-Hour Rolling Budget:</span>
-                            <span className="text-black font-black bg-neoMint px-2 py-0.5 rounded border border-black">${dailyBudget.toFixed(2)} USDC</span>
+                            <span className="text-stone-600 font-medium font-sans text-xs">24-Hour Rolling Budget:</span>
+                            <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">${dailyBudget.toFixed(2)} USDC</span>
                         </div>
                         <input
                             type="range"
@@ -92,19 +92,19 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                             step={25}
                             value={dailyBudget}
                             onChange={(e) => setDailyBudget(parseFloat(e.target.value))}
-                            className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black"
+                            className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
-                        <div className="flex justify-between text-[10px] text-zinc-600 font-bold mt-1.5">
+                        <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
                             <span>$25/day</span>
                             <span>$500/day</span>
                         </div>
                     </div>
 
                     {/* Session Expiry Hours */}
-                    <div className="bg-[#FFFDF8] border-2 border-black p-3.5 rounded-xl shadow-brutal-xs">
+                    <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-zinc-700 font-bold">Session Sub-Key Validity:</span>
-                            <span className="text-black font-black bg-neoYellow px-2 py-0.5 rounded border border-black">{durationHours} Hours</span>
+                            <span className="text-stone-600 font-medium font-sans text-xs">Session Sub-Key Validity:</span>
+                            <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">{durationHours} Hours</span>
                         </div>
                         <div className="grid grid-cols-4 gap-2 pt-1">
                             {[1, 6, 12, 24].map((h) => (
@@ -112,10 +112,10 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                                     key={h}
                                     type="button"
                                     onClick={() => setDurationHours(h)}
-                                    className={`py-2 rounded-xl border-2 border-black font-mono font-bold text-xs transition-all brutal-btn ${
+                                    className={`py-1.5 rounded-lg border font-mono text-xs transition ${
                                         durationHours === h
-                                            ? 'bg-neoYellow text-black shadow-brutal-xs'
-                                            : 'bg-white text-zinc-700 hover:bg-zinc-50'
+                                            ? 'bg-stone-900 text-white border-stone-900 font-semibold'
+                                            : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50 font-medium'
                                     }`}
                                 >
                                     {h}h
@@ -126,25 +126,25 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                 </div>
 
                 {/* Whitelist Display */}
-                <div className="bg-[#FFFDF8] border-2 border-black rounded-xl p-3.5 mb-5 text-[11px] font-mono space-y-1.5 shadow-brutal-xs">
-                    <div className="text-black font-black mb-1">ACTIVE CONTRACT WHITELIST RULES</div>
-                    <div className="text-zinc-800 flex items-center gap-2">
-                        <span className="w-4 h-4 rounded bg-neoMint border border-black flex items-center justify-center text-black">
-                            <Check className="w-3 h-3 stroke-[3]" />
+                <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-3.5 mb-5 text-[11px] font-mono space-y-1.5">
+                    <div className="text-stone-800 font-medium text-xs font-sans mb-1">Active Contract Whitelist Rules</div>
+                    <div className="text-stone-600 flex items-center gap-2">
+                        <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[9px]">
+                            <Check className="w-2.5 h-2.5" />
                         </span>
-                        <span>OpenAI Billing API: <span className="font-bold text-black">0x0000...A1A1</span></span>
+                        <span>OpenAI Billing API: <span className="font-semibold text-stone-900">0x0000...A1A1</span></span>
                     </div>
-                    <div className="text-zinc-800 flex items-center gap-2">
-                        <span className="w-4 h-4 rounded bg-neoMint border border-black flex items-center justify-center text-black">
-                            <Check className="w-3 h-3 stroke-[3]" />
+                    <div className="text-stone-600 flex items-center gap-2">
+                        <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[9px]">
+                            <Check className="w-2.5 h-2.5" />
                         </span>
-                        <span>Grocery Delivery: <span className="font-bold text-black">0x0000...B2B2</span></span>
+                        <span>Grocery Delivery: <span className="font-semibold text-stone-900">0x0000...B2B2</span></span>
                     </div>
-                    <div className="text-zinc-800 flex items-center gap-2">
-                        <span className="w-4 h-4 rounded bg-neoMint border border-black flex items-center justify-center text-black">
-                            <Check className="w-3 h-3 stroke-[3]" />
+                    <div className="text-stone-600 flex items-center gap-2">
+                        <span className="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[9px]">
+                            <Check className="w-2.5 h-2.5" />
                         </span>
-                        <span>Travel / Tickets API: <span className="font-bold text-black">0x0000...C3C3</span></span>
+                        <span>Travel / Tickets API: <span className="font-semibold text-stone-900">0x0000...C3C3</span></span>
                     </div>
                 </div>
 
@@ -155,17 +155,17 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                             onRevokeKey();
                             onClose();
                         }}
-                        className="px-4 py-2.5 rounded-xl border-2 border-black hover:bg-neoRose text-black text-xs font-mono font-bold flex items-center gap-1.5 brutal-btn shadow-brutal-xs transition-all"
+                        className="px-3.5 py-2.5 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-medium flex items-center gap-1.5 transition"
                     >
-                        <Trash2 className="w-4 h-4 stroke-[2.5]" />
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
                         <span>Revoke Sub-Key</span>
                     </button>
 
                     <button
                         onClick={handleSave}
-                        className="flex-1 py-2.5 rounded-xl bg-black hover:bg-neoRed text-white font-mono font-black text-xs flex items-center justify-center gap-2 border-2 border-black brutal-btn shadow-brutal-sm transition-all"
+                        className="flex-1 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition"
                     >
-                        {isSaved ? <Check className="w-4 h-4 stroke-[3]" /> : <Fingerprint className="w-4 h-4 stroke-[2.5]" />}
+                        {isSaved ? <Check className="w-4 h-4 text-emerald-300" /> : <Fingerprint className="w-4 h-4 text-stone-300" />}
                         <span>{isSaved ? 'Updated on Chain!' : 'Sign & Update with TouchID'}</span>
                     </button>
                 </div>

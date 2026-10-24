@@ -36,81 +36,81 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white border-3 border-black rounded-2xl max-w-md w-full p-6 shadow-brutal-xl relative">
-                <div className="flex items-start justify-between mb-4 pb-3 border-b-2 border-black">
+        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white border border-stone-200/90 rounded-2xl max-w-md w-full p-6 shadow-modal relative">
+                <div className="flex items-start justify-between mb-4 pb-3 border-b border-stone-200/80">
                     <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-neoYellow border-2 border-black flex items-center justify-center text-black shadow-brutal-sm">
-                            <ShieldAlert className="w-6 h-6 stroke-[2.5]" />
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shadow-subtle">
+                            <ShieldAlert className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-base font-black text-black tracking-tight font-sans">
+                            <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
                                 Out-of-Policy Escalation
                             </h2>
-                            <p className="text-xs text-zinc-600 font-mono">Agent sub-key exceeded owner constraints</p>
+                            <p className="text-xs text-stone-500 font-sans">Agent sub-key exceeded owner constraints</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1 rounded-lg border-2 border-black bg-white hover:bg-zinc-100 text-black brutal-btn shadow-brutal-xs"
+                        className="p-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-500 hover:text-stone-800 transition"
                     >
-                        <X className="w-4 h-4 stroke-[2.5]" />
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
 
                 {/* Violation Reason Banner */}
-                <div className="bg-[#FFF0F2] border-2 border-black rounded-xl p-3.5 mb-4 flex items-start gap-2.5 shadow-brutal-xs">
-                    <AlertTriangle className="w-4 h-4 text-neoRed stroke-[2.5] shrink-0 mt-0.5" />
-                    <div className="text-xs font-mono text-zinc-900 font-medium">
-                        <span className="text-neoRed font-black">Policy Intercept: </span>
+                <div className="bg-rose-50/70 border border-rose-200/80 rounded-xl p-3.5 mb-4 flex items-start gap-2.5">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <div className="text-xs font-sans text-rose-950 font-normal">
+                        <span className="text-rose-700 font-semibold font-mono">Policy Intercept: </span>
                         {request.reason}
                     </div>
                 </div>
 
                 {/* Staged Transaction Details */}
-                <div className="bg-[#FFFDF8] border-2 border-black rounded-xl p-4 mb-5 space-y-2 text-xs font-mono shadow-brutal-xs">
+                <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-4 mb-5 space-y-2 text-xs font-mono">
                     <div className="flex justify-between">
-                        <span className="text-zinc-600 font-bold">Action:</span>
-                        <span className="text-black font-black">{request.actionName}</span>
+                        <span className="text-stone-500 font-normal">Action:</span>
+                        <span className="text-stone-900 font-semibold">{request.actionName}</span>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-zinc-600 font-bold">Target Protocol:</span>
-                        <span className="text-black font-black">{request.targetName}</span>
+                        <span className="text-stone-500 font-normal">Target Protocol:</span>
+                        <span className="text-stone-900 font-semibold">{request.targetName}</span>
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-zinc-600 font-bold">Requested Amount:</span>
-                        <span className="text-black font-black text-sm bg-neoYellow px-2 py-0.5 rounded border border-black">
+                    <div className="flex justify-between items-center">
+                        <span className="text-stone-500 font-normal">Requested Amount:</span>
+                        <span className="text-stone-900 font-semibold text-sm bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">
                             ${request.amount.toFixed(2)} USDC
                         </span>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-zinc-600 font-bold">Agent Sub-Key:</span>
-                        <span className="text-zinc-700 font-bold">{request.agent.slice(0, 10)}...{request.agent.slice(-4)}</span>
+                        <span className="text-stone-500 font-normal">Agent Sub-Key:</span>
+                        <span className="text-stone-700 font-medium">{request.agent.slice(0, 10)}...{request.agent.slice(-4)}</span>
                     </div>
                 </div>
 
                 {/* Passkey Biometric Button */}
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                     <button
                         onClick={handlePasskeyAuth}
                         disabled={isAuthenticating || authSuccess}
-                        className={`w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-black shadow-brutal brutal-btn transition-all ${
+                        className={`w-full py-3 rounded-xl font-medium text-xs tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all ${
                             authSuccess
-                                ? 'bg-neoMint text-black'
-                                : 'bg-neoRed hover:bg-neoCrimson text-white'
+                                ? 'bg-emerald-800 text-white'
+                                : 'bg-stone-900 hover:bg-stone-800 text-white'
                         }`}
                     >
                         {authSuccess ? (
                             <>
-                                <Check className="w-4 h-4 stroke-[3]" /> TouchID Verified! Executed on-chain
+                                <Check className="w-4 h-4 text-emerald-300" /> TouchID Verified! Executed on-chain
                             </>
                         ) : isAuthenticating ? (
                             <>
-                                <Fingerprint className="w-4 h-4 animate-spin text-white stroke-[2.5]" /> Verifying TouchID / FaceID...
+                                <Fingerprint className="w-4 h-4 animate-spin text-stone-300" /> Verifying TouchID / FaceID...
                             </>
                         ) : (
                             <>
-                                <Fingerprint className="w-4 h-4 text-white stroke-[2.5]" /> Authorize via Biometric Passkey
+                                <Fingerprint className="w-4 h-4 text-stone-300" /> Authorize via Biometric Passkey
                             </>
                         )}
                     </button>
@@ -120,7 +120,7 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
                             onReject(request.id);
                             onClose();
                         }}
-                        className="w-full py-2.5 rounded-xl border-2 border-black bg-white hover:bg-zinc-100 text-xs text-black font-bold brutal-btn shadow-brutal-xs transition-all font-mono"
+                        className="w-full py-2.5 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-xs text-stone-700 font-medium transition-all font-sans"
                     >
                         Reject & Cancel Transaction
                     </button>
