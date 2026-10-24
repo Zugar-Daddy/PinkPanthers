@@ -11,10 +11,10 @@
     "passkeyCredentialId": "credential-p256-apple-secure-enclave",
     "passkeyDeviceName": "TouchID / FaceID (WebAuthn P-256)",
     "totalAgentsCount": 12,
-    "totalFleetSpendToday": 2641950
+    "totalFleetSpendToday": 2644750
   },
   "balances": {
-    "usdc": 1093450,
+    "usdc": 1090650,
     "eth": 0.45,
     "paymasterGasTankINR": 4850
   },
@@ -83,7 +83,7 @@
       "0x00000000000000000000000000000000000F6F6F"
     ]
   },
-  "dailySpent": 26500,
+  "dailySpent": 29300,
   "lastEpochReset": 1729792800000,
   "virtualCard": {
     "cardNumber": "4242 0815 3390 8840",
@@ -93,7 +93,7 @@
     "holder": "CONCIERGE-08 / SAFEAGENT",
     "isFrozen": false,
     "dailyLimit": 50000,
-    "spentToday": 26500,
+    "spentToday": 29300,
     "brand": "VISA BUSINESS"
   },
   "fleet": [
@@ -131,7 +131,7 @@
       "address": "0xAgent8821bA41c8dF291a82E92aC5718a381920B8821",
       "dailyBudget": 50000,
       "maxPerTx": 20000,
-      "spentToday": 26500,
+      "spentToday": 29300,
       "status": "active",
       "assignedCard": "4242 0815 ···· 8840",
       "lastAction": "bookBusTicket(uint256 1850) · RedBus Intercity Mobility (₹1,850)",
@@ -143,7 +143,7 @@
         "holder": "CONCIERGE-08 / SAFEAGENT",
         "isFrozen": false,
         "dailyLimit": 50000,
-        "spentToday": 26500,
+        "spentToday": 29300,
         "brand": "VISA BUSINESS"
       }
     },
@@ -307,6 +307,30 @@
   ],
   "activityStream": [
     {
+      "id": "stream-1792864906440",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "bookBusTicket",
+      "vendor": "RedBus Intercity Mobility",
+      "amount": 1850,
+      "timeAgo": "now",
+      "timestamp": 1792864906440
+    },
+    {
+      "id": "stream-1792864863534",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "orderCheckout",
+      "vendor": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "amount": 950,
+      "timeAgo": "now",
+      "timestamp": 1792864863534
+    },
+    {
       "id": "stream-1792864538942",
       "agentId": "concierge-08",
       "agentName": "concierge-08",
@@ -453,6 +477,52 @@
     }
   ],
   "userOps": [
+    {
+      "id": "op-1792864906440",
+      "userOpHash": "0x285451...47e8a0",
+      "timestamp": "11:31:46 pm",
+      "targetName": "RedBus Intercity Mobility",
+      "targetAddress": "0x00000000000000000000000000000000000F6F6F",
+      "functionCalled": "bookBusTicket(uint256 1850)",
+      "amount": 1850,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Intercity luxury sleeper bus booking on RedBus",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 12,
+        "callData": "0xbookBusT...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792864863510",
+      "userOpHash": "0xe3f403...b57487",
+      "timestamp": "11:31:03 pm",
+      "targetName": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "targetAddress": "0x00000000000000000000000000000000000B2B2B",
+      "functionCalled": "orderCheckout(uint256 950)",
+      "amount": 950,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: 10-minute office pantry groceries restock on Blinkit",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 11,
+        "callData": "0xorderChe...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
     {
       "id": "op-1792864538942",
       "userOpHash": "0x38e4d3...7755f8",

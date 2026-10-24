@@ -37,21 +37,33 @@ export const OmniAgentCopilot: React.FC<OmniAgentCopilotProps> = ({ wallet, onEx
     // Realistic Quick-Prompt Chips
     const promptChips = [
         {
+            label: '🍌 Buy Bananas (₹60)',
+            amount: '₹60',
+            prompt: 'I want bananas',
+            type: 'in-policy'
+        },
+        {
+            label: '🚌 Jaipur to Chandigarh Bus',
+            amount: '₹1,250',
+            prompt: 'Book bus tickets from Jaipur to Chandigarh',
+            type: 'in-policy'
+        },
+        {
             label: '🚌 RedBus to Hyderabad',
             amount: '₹1,850',
             prompt: 'Book 2 seats on RedBus from Bangalore to Hyderabad for ₹1,850',
             type: 'in-policy'
         },
         {
-            label: '🛒 Blinkit Office Pantry',
+            label: '🛒 Blinkit Pantry Restock',
             amount: '₹950',
             prompt: 'Restock milk and coffee beans on Blinkit for ₹950',
             type: 'in-policy'
         },
         {
-            label: '✈️ IndiGo Executive Flight',
-            amount: '₹14,500',
-            prompt: 'Book IndiGo flight ticket from Delhi to Bangalore for ₹14,500',
+            label: '✈️ IndiGo Flight to Mumbai',
+            amount: '₹12,500',
+            prompt: 'Book IndiGo flight ticket from Delhi to Mumbai',
             type: 'in-policy'
         },
         {
@@ -152,8 +164,85 @@ export const OmniAgentCopilot: React.FC<OmniAgentCopilotProps> = ({ wallet, onEx
         }
 
         // -------------------------------------------------------------
-        // SCENARIOS C, D, E, F: Legitimate Real-World Tasks
+        // SCENARIOS C, D, E, F: Intelligent NLP Domain & Entity Parsing
         // -------------------------------------------------------------
+        
+        // 1. Explicit amount extraction
+        const extractExplicitAmount = (text: string): number | null => {
+            const m = text.match(/(?:₹|rs\.?|inr|\$|\sfor|\sworth)\s*([\d,]+(?:\.\d+)?)/i) || 
+                      text.match(/([\d,]+(?:\.\d+)?)\s*(?:₹|rs\.?|inr|rupees)/i);
+            if (m) {
+                const num = parseFloat(m[1].replace(/,/g, ''));
+                if (!isNaN(num) && num > 0) return num;
+            }
+            return null;
+        };
+        const explicitAmount = extractExplicitAmount(query);
+
+        // 2. City extraction helper for Buses and Flights
+        const extractCities = (text: string, defaultSrc = 'Bengaluru', defaultDest = 'Hyderabad') => {
+            const formatCity = (name: string) => {
+                const c = name.trim().toLowerCase();
+                if (c === 'bangalore' || c === 'bengaluru' || c === 'blr') return 'Bengaluru';
+                if (c === 'hyderabad' || c === 'hyd') return 'Hyderabad';
+                if (c === 'jaipur' || c === 'jai') return 'Jaipur';
+                if (c === 'chandigarh' || c === 'ixc') return 'Chandigarh';
+                if (c === 'delhi' || c === 'new delhi' || c === 'del') return 'Delhi';
+                if (c === 'mumbai' || c === 'bombay' || c === 'bom') return 'Mumbai';
+                if (c === 'pune' || c === 'pnq') return 'Pune';
+                if (c === 'chennai' || c === 'madras' || c === 'maa') return 'Chennai';
+                if (c === 'kolkata' || c === 'calcutta' || c === 'ccu') return 'Kolkata';
+                if (c === 'goa' || c === 'gox') return 'Goa';
+                if (c === 'ahmedabad' || c === 'amd') return 'Ahmedabad';
+                return name.trim().charAt(0).toUpperCase() + name.trim().slice(1);
+            };
+
+            const fromToMatch = text.match(/from\s+([a-zA-Z\s]+?)\s+to\s+([a-zA-Z\s]+?)(?:\s+(?:for|on|at|with|via|worth|in|date|\d+)|$|\.|\,)/i);
+            if (fromToMatch) {
+                return {
+                    source: formatCity(fromToMatch[1]),
+                    destination: formatCity(fromToMatch[2])
+                };
+            }
+
+            const toMatch = text.match(/([a-zA-Z]+)\s+to\s+([a-zA-Z]+)(?:\s+(?:bus|flight|plane|tickets?))?/i);
+            if (toMatch) {
+                return {
+                    source: formatCity(toMatch[1]),
+                    destination: formatCity(toMatch[2])
+                };
+            }
+
+            return { source: defaultSrc, destination: defaultDest };
+        };
+
+        // 3. Grocery item recognition database
+        const GROCERY_CATALOG = [
+            { keywords: ['banana', 'bananas', 'kela'], name: 'Fresh Cavendish Bananas (Robusta 1 Dozen / ~1kg)', price: 60.00 },
+            { keywords: ['milk', 'doodh'], name: 'Amul Taaza Homogenised Toned Milk (1L)', price: 75.00 },
+            { keywords: ['coffee', 'nescafe', 'blue tokai'], name: 'Blue Tokai Silver Oak Blend Ground Coffee (250g)', price: 470.00 },
+            { keywords: ['bread', 'toast'], name: 'Harvest Gold Artisanal Brown Bread (400g)', price: 50.00 },
+            { keywords: ['egg', 'eggs', 'anda'], name: 'Farm Fresh White Eggs (Pack of 6)', price: 65.00 },
+            { keywords: ['apple', 'apples', 'seb'], name: 'Fresh Shimla Royal Apples (500g)', price: 120.00 },
+            { keywords: ['tea', 'chai'], name: 'Tata Tea Gold Leaf (500g)', price: 280.00 },
+            { keywords: ['chips', 'lays', 'kurkure', 'nachos'], name: "Lay's American Style Cream & Onion (85g)", price: 40.00 },
+            { keywords: ['biscuit', 'biscuits', 'cookie', 'cookies'], name: 'Parle-G Gold / Hide & Seek (Pack of 2)', price: 60.00 },
+            { keywords: ['coke', 'soda', 'pepsi', 'cold drink'], name: 'Coca-Cola Zero Can (330ml x 2)', price: 80.00 },
+            { keywords: ['water', 'bisleri'], name: 'Bisleri Mineral Water Pack (1L x 4)', price: 80.00 },
+            { keywords: ['butter', 'makhan'], name: 'Amul Pasteurised Butter (100g)', price: 60.00 },
+            { keywords: ['cheese'], name: 'Amul Processed Cheese Slices (200g)', price: 145.00 },
+            { keywords: ['napkin', 'napkins', 'tissue'], name: 'Paper Napkins & Wooden Stirrers Pack', price: 90.00 }
+        ];
+
+        const matchedGroceryItems: { name: string; quantity: number; price: number }[] = [];
+        for (const item of GROCERY_CATALOG) {
+            if (item.keywords.some(k => lower.includes(k))) {
+                matchedGroceryItems.push({ name: item.name, quantity: 1, price: item.price });
+            }
+        }
+        const isGrocery = matchedGroceryItems.length > 0 || 
+                          ['blinkit', 'zepto', 'instamart', 'grocery', 'groceries', 'pantry', 'snack', 'snacks', 'fruit', 'fruits'].some(k => lower.includes(k));
+
         let targetVendor = 'RedBus Intercity Mobility';
         let targetAddress = '0x00000000000000000000000000000000000F6F6F';
         let functionCalled = 'bookBusTicket(uint256 1850)';
@@ -162,45 +251,80 @@ export const OmniAgentCopilot: React.FC<OmniAgentCopilotProps> = ({ wallet, onEx
         let actionDesc = 'Intercity luxury sleeper bus booking on RedBus';
         let artifactGenerator: () => RealWorldArtifact = () => RealWorldApiGateway.generateRedBusTicket();
 
-        if (lower.includes('indigo') || lower.includes('flight') || lower.includes('plane')) {
-            targetVendor = 'Travel & Ticket Booking API (IndiGo)';
-            targetAddress = '0x00000000000000000000000000000000000C3C3C';
-            delegatedAgentId = 'concierge-08';
-            if (lower.includes('35000') || lower.includes('35,000')) {
-                amount = 35000.00;
-                functionCalled = 'bookFlight(uint256 35000)';
-                actionDesc = 'Executive international conference flight on IndiGo';
-                artifactGenerator = () => RealWorldApiGateway.generateIndigoTicket('Delhi (DEL)', 'Bengaluru (BLR)', 35000.00);
-            } else {
-                amount = 14500.00;
-                functionCalled = 'bookFlight(uint256 14500)';
-                actionDesc = 'Corporate domestic flight reservation on IndiGo';
-                artifactGenerator = () => RealWorldApiGateway.generateIndigoTicket('Delhi (DEL)', 'Bengaluru (BLR)', 14500.00);
-            }
-        } else if (lower.includes('blinkit') || lower.includes('grocery') || lower.includes('milk') || lower.includes('coffee') || lower.includes('pantry')) {
+        if (isGrocery) {
             targetVendor = 'Grocery & Delivery Service (Blinkit/Zepto)';
             targetAddress = '0x00000000000000000000000000000000000B2B2B';
             delegatedAgentId = 'concierge-08';
-            amount = 950.00;
-            functionCalled = 'orderCheckout(uint256 950)';
-            actionDesc = '10-minute office pantry groceries restock on Blinkit';
-            artifactGenerator = () => RealWorldApiGateway.generateBlinkitOrder(950.00);
-        } else if (lower.includes('aws') || lower.includes('compute') || lower.includes('cloud') || lower.includes('server')) {
+            
+            const items = matchedGroceryItems.length > 0 ? matchedGroceryItems : [
+                { name: 'Amul Taaza Homogenised Toned Milk (1L x 4)', quantity: 4, price: 300.00 },
+                { name: 'Blue Tokai Silver Oak Blend Ground Coffee (250g)', quantity: 1, price: 470.00 },
+                { name: 'Fresh Cavendish Bananas (Robusta 1kg)', quantity: 1, price: 90.00 },
+                { name: 'Paper Napkins & Wooden Stirrers Pack', quantity: 1, price: 90.00 }
+            ];
+
+            const calculatedTotal = items.reduce((acc, it) => acc + (it.price * (it.quantity || 1)), 0);
+            amount = explicitAmount !== null ? explicitAmount : calculatedTotal;
+            functionCalled = `orderCheckout(uint256 ${amount})`;
+
+            const itemSummary = items.map(it => it.name.split(' (')[0]).join(', ');
+            actionDesc = `10-minute quick delivery on Blinkit (${itemSummary})`;
+            artifactGenerator = () => RealWorldApiGateway.generateBlinkitOrder(amount, items);
+        } else if (lower.includes('indigo') || lower.includes('flight') || lower.includes('plane') || lower.includes('fly') || lower.includes('airline')) {
+            targetVendor = 'Travel & Ticket Booking API (IndiGo)';
+            targetAddress = '0x00000000000000000000000000000000000C3C3C';
+            delegatedAgentId = 'concierge-08';
+
+            const { source: fromCity, destination: toCity } = extractCities(query, 'Delhi', 'Bengaluru');
+            if (explicitAmount !== null && explicitAmount >= 25000 || lower.includes('35000') || lower.includes('35,000')) {
+                amount = explicitAmount || 35000.00;
+                functionCalled = `bookFlight(uint256 ${amount})`;
+                actionDesc = `Executive conference flight on IndiGo (${fromCity} → ${toCity})`;
+                artifactGenerator = () => RealWorldApiGateway.generateIndigoTicket(fromCity, toCity, amount);
+            } else {
+                amount = explicitAmount || 14500.00;
+                functionCalled = `bookFlight(uint256 ${amount})`;
+                actionDesc = `Corporate domestic flight reservation on IndiGo (${fromCity} → ${toCity})`;
+                artifactGenerator = () => RealWorldApiGateway.generateIndigoTicket(fromCity, toCity, amount);
+            }
+        } else if (lower.includes('bus') || lower.includes('redbus') || lower.includes('volvo') || lower.includes('sleeper')) {
+            targetVendor = 'RedBus Intercity Mobility';
+            targetAddress = '0x00000000000000000000000000000000000F6F6F';
+            delegatedAgentId = 'concierge-08';
+
+            const { source, destination } = extractCities(query, 'Bengaluru', 'Hyderabad');
+            amount = explicitAmount || 1250.00;
+            functionCalled = `bookBusTicket(uint256 ${amount})`;
+            actionDesc = `Intercity luxury sleeper bus booking on RedBus (${source} → ${destination})`;
+            artifactGenerator = () => RealWorldApiGateway.generateRedBusTicket(source, destination, amount);
+        } else if (lower.includes('aws') || lower.includes('compute') || lower.includes('cloud') || lower.includes('server') || lower.includes('lambda')) {
             targetVendor = 'Cloud Infrastructure API (AWS/Cloudflare)';
             targetAddress = '0x00000000000000000000000000000000000D4D4D';
             delegatedAgentId = 'devops-04';
-            amount = 2200.00;
-            functionCalled = 'topUpCompute(uint256 2200)';
+            amount = explicitAmount || 2200.00;
+            functionCalled = `topUpCompute(uint256 ${amount})`;
             actionDesc = 'Serverless compute edge worker credit recharge on AWS';
-            artifactGenerator = () => RealWorldApiGateway.generateAwsInvoice(2200.00);
-        } else if (lower.includes('openai') || lower.includes('gpt') || lower.includes('inference') || lower.includes('token')) {
+            artifactGenerator = () => RealWorldApiGateway.generateAwsInvoice(amount);
+        } else if (lower.includes('openai') || lower.includes('gpt') || lower.includes('inference') || lower.includes('token') || lower.includes('claude')) {
             targetVendor = 'OpenAI Billing API';
             targetAddress = '0x00000000000000000000000000000000000A1A1A';
             delegatedAgentId = 'devops-04';
-            amount = 1500.00;
-            functionCalled = 'payInvoice(uint256 1500)';
-            actionDesc = 'Prepaid GPT-4 & Claude inference queries on OpenAI';
-            artifactGenerator = () => RealWorldApiGateway.generateOpenAiInvoice(1500.00);
+            amount = explicitAmount || 1500.00;
+            functionCalled = `payInvoice(uint256 ${amount})`;
+            actionDesc = 'Prepaid AI model inference queries on OpenAI';
+            artifactGenerator = () => RealWorldApiGateway.generateOpenAiInvoice(amount);
+        } else {
+            // Smart general intent fallback - check if cities are mentioned for bus travel
+            const { source, destination } = extractCities(query, 'Bengaluru', 'Hyderabad');
+            if (query.toLowerCase().includes('to')) {
+                targetVendor = 'RedBus Intercity Mobility';
+                targetAddress = '0x00000000000000000000000000000000000F6F6F';
+                delegatedAgentId = 'concierge-08';
+                amount = explicitAmount || 1850.00;
+                functionCalled = `bookBusTicket(uint256 ${amount})`;
+                actionDesc = `Intercity mobility trip (${source} → ${destination})`;
+                artifactGenerator = () => RealWorldApiGateway.generateRedBusTicket(source, destination, amount);
+            }
         }
 
         // Switch active agent dynamically if needed
