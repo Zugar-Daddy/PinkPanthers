@@ -7,6 +7,10 @@
   --foreground: #18181B;
 }
 
+html {
+  font-size: 17px;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -14,6 +18,19 @@ body {
   overflow-x: hidden;
   letter-spacing: -0.015em;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Micro text legibility bump */
+[class*="text-[9px]"] {
+  font-size: 10.5px !important;
+}
+
+[class*="text-[10px]"] {
+  font-size: 11.5px !important;
+}
+
+[class*="text-[11px]"] {
+  font-size: 12.5px !important;
 }
 
 /* Elegant Editorial Serif Font */
