@@ -20,6 +20,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Allow content columns and long dynamic values to shrink inside cards. */
+:where(main .grid > *, main .flex > *) { min-width: 0; }
+main .flex > svg { flex-shrink: 0; }
+main :where(input, select, textarea, pre) { max-width: 100%; }
+main :where(p, span, strong, small, h1, h2, h3, h4, button, label) {
+  overflow-wrap: anywhere;
+}
+main :where(.font-mono) { overflow-wrap: anywhere; }
+main > .fixed.inset-0 { overflow-y: auto; }
+main > .fixed.inset-0 > * {
+  min-width: 0;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 :focus-visible { outline: 2px solid #087657; outline-offset: 3px; }

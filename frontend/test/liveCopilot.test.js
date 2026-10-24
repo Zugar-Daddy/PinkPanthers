@@ -18,6 +18,7 @@ function routeWith(fetch, options = {}) {
         process: { env: { AZURE_OPENAI_API_KEY: 'test-key', AZURE_OPENAI_BASE_URL: 'https://example.openai.azure.com/openai/v1', AZURE_OPENAI_MODEL: 'gpt-6-test' } },
         require(name) {
             if (name === 'next/server') return { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } };
+            if (name.endsWith('/copilotTransactions')) return { commandId: () => true, transferPlan: () => null, attachPurchaseQuotes: plan => plan };
             if (name.endsWith('/walletStore')) return { readWalletState: () => ({ activeAgent: { id: 'concierge-08' }, fleet: [{ id: 'concierge-08', name: 'Concierge' }] }) };
             throw new Error(`Unexpected import ${name}`);
         }

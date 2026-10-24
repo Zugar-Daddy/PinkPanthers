@@ -40,22 +40,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ wallet, on
             <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Account summary">
                 <div className="dashboard-kpi dashboard-kpi-primary">
                     <div className="flex items-center justify-between"><span className="dashboard-kpi-label text-white/70">Treasury balance</span><Wallet className="h-5 w-5 text-white/65" /></div>
-                    <div className="mt-6 text-[34px] font-semibold leading-none tracking-[-0.05em] sm:text-[38px]">{compactINR(wallet.usdcBalance)}</div>
+                    <div className="mt-6 text-[clamp(1.65rem,3vw,2.375rem)] font-semibold leading-none tracking-[-0.05em] tabular-nums">{compactINR(wallet.usdcBalance)}</div>
                     <p className="mt-3 text-xs text-white/65">Simulated account funds</p>
                 </div>
                 <div className="dashboard-kpi">
                     <div className="flex items-center justify-between"><span className="dashboard-kpi-label">Agent spend today</span><ArrowUpRight className="h-5 w-5 text-stone-400" /></div>
-                    <div className="mt-6 text-[34px] font-semibold leading-none tracking-[-0.05em] text-stone-950 sm:text-[38px]">{compactINR(fleetSpend)}</div>
+                    <div className="mt-6 text-[clamp(1.65rem,3vw,2.375rem)] font-semibold leading-none tracking-[-0.05em] tabular-nums text-stone-950">{compactINR(fleetSpend)}</div>
                     <p className="mt-3 text-xs text-stone-500">Across {agents.length} visible agents</p>
                 </div>
                 <div className="dashboard-kpi">
                     <div className="flex items-center justify-between"><span className="dashboard-kpi-label">Active agents</span><Bot className="h-5 w-5 text-stone-400" /></div>
-                    <div className="mt-6 text-[34px] font-semibold leading-none tracking-[-0.05em] text-stone-950 sm:text-[38px]">{activeAgents}<span className="ml-1 text-lg font-normal text-stone-400">/ {agents.length}</span></div>
+                    <div className="mt-6 text-[clamp(1.65rem,3vw,2.375rem)] font-semibold leading-none tracking-[-0.05em] text-stone-950">{activeAgents}<span className="ml-1 text-lg font-normal text-stone-400">/ {agents.length}</span></div>
                     <p className="mt-3 text-xs text-stone-500">In the visible fleet</p>
                 </div>
                 <div className="dashboard-kpi">
                     <div className="flex items-center justify-between"><span className="dashboard-kpi-label">Needs approval</span><CircleAlert className="h-5 w-5 text-stone-400" /></div>
-                    <div className="mt-6 text-[34px] font-semibold leading-none tracking-[-0.05em] text-stone-950 sm:text-[38px]">{pendingApprovals}</div>
+                    <div className="mt-6 text-[clamp(1.65rem,3vw,2.375rem)] font-semibold leading-none tracking-[-0.05em] text-stone-950">{pendingApprovals}</div>
                     <p className="mt-3 text-xs text-stone-500">Pending requests</p>
                 </div>
             </section>

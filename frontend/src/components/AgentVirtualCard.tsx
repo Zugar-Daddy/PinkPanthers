@@ -50,7 +50,7 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                 
                 {/* 1. Physical / 3D Virtual Card Representation */}
                 <div className="flex justify-center w-full">
-                    <div className="w-full max-w-[420px] aspect-[1.586] rounded-2xl bg-gradient-to-br from-stone-900 via-zinc-900 to-black text-white p-5 sm:p-6 flex flex-col justify-between border border-stone-800/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)] relative overflow-hidden group select-none">
+                    <div className="w-full min-w-0 max-w-[420px] aspect-[1.586] rounded-2xl bg-gradient-to-br from-stone-900 via-zinc-900 to-black text-white p-4 sm:p-6 flex flex-col justify-between border border-stone-800/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)] relative overflow-hidden group select-none">
                         
                         {/* Decorative background ambient highlight */}
                         <div className="absolute -top-10 -right-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -79,7 +79,7 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                         {/* Card Number */}
                         <div className="z-10">
                             <div className="flex items-center justify-between gap-2 text-stone-100">
-                                <span className="text-base sm:text-lg lg:text-xl font-mono font-medium tracking-wider sm:tracking-widest whitespace-nowrap select-all">
+                                <span className="min-w-0 text-[clamp(10px,2.6vw,18px)] font-mono font-medium tracking-normal sm:tracking-wider whitespace-nowrap select-all">
                                     {revealDetails ? card.cardNumber : card.maskedNumber}
                                 </span>
                                 <button
@@ -128,10 +128,10 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                 <div className="w-full max-w-[420px] mx-auto space-y-4">
                     
                     {/* Action buttons */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <button
                             onClick={onToggleFreeze}
-                            className={`flex-1 py-2.5 rounded-xl font-mono text-xs font-medium uppercase flex items-center justify-center gap-2 transition-all shadow-sm ${
+                            className={`min-w-[170px] flex-1 py-2.5 rounded-xl font-mono text-xs font-medium uppercase flex items-center justify-center gap-2 transition-all shadow-sm ${
                                 card.isFrozen
                                     ? 'bg-emerald-800 hover:bg-emerald-900 text-white'
                                     : 'bg-white hover:bg-stone-50 text-stone-800 border border-stone-200'
@@ -143,7 +143,7 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
 
                         <button
                             onClick={handleCopy}
-                            className="px-4 py-2.5 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-stone-800 font-mono text-xs font-medium flex items-center gap-2 shadow-subtle transition"
+                            className="flex-1 justify-center px-4 py-2.5 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-stone-800 font-mono text-xs font-medium flex items-center gap-2 shadow-subtle transition"
                         >
                             {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-stone-400" />}
                             <span>{copied ? 'Copied' : 'Copy Number'}</span>
@@ -152,7 +152,7 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
 
                     {/* Daily Card Limit Slider */}
                     <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-4 space-y-2 font-mono text-xs">
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-wrap justify-between items-center gap-2">
                             <span className="text-stone-600 font-medium">Virtual Card Daily Cap:</span>
                             <span className="text-stone-900 font-semibold bg-white px-2.5 py-0.5 rounded-full border border-stone-200 text-sm shadow-subtle">
                                 {formatINR(card.dailyLimit)}
@@ -167,7 +167,7 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                             onChange={(e) => onUpdateLimit(parseFloat(e.target.value))}
                             className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
-                        <div className="flex justify-between text-[10px] text-stone-400 font-mono">
+                        <div className="flex flex-wrap justify-between gap-2 text-[10px] text-stone-400 font-mono">
                             <span>₹50,000 (Strict)</span>
                             <span>₹10,00,000 (Enterprise)</span>
                         </div>

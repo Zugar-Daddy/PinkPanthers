@@ -43,10 +43,10 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
             </div>
 
             {/* Main Grid: Left is Principal Card (MB), Right is Fleet Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
                 
                 {/* 1. Left Principal Card (4 cols) */}
-                <div className="lg:col-span-4 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-200 space-y-5 relative">
+                <div className="xl:col-span-4 min-w-0 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-200 space-y-5 relative">
                     <div className="flex items-start justify-between">
                         <div className="text-[10px] font-mono font-medium uppercase tracking-wider text-stone-600 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200/70">
                             Account owner
@@ -100,7 +100,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                 </div>
 
                 {/* 2. Right Fleet Directory (8 cols) */}
-                <div className="lg:col-span-8 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
+                <div className="xl:col-span-8 min-w-0 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                             <Bot className="w-4 h-4 text-stone-700" />
@@ -128,7 +128,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                     </div>
 
                     {/* Agent Cards Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div className="grid grid-cols-1 2xl:grid-cols-2 gap-3.5">
                         {filteredFleet.map(agent => {
                             const isSelected = wallet.activeAgentId === agent.id;
                             const pct = Math.min(100, (agent.spentToday / agent.dailyBudget) * 100);
@@ -143,12 +143,12 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                                     }`}
                                 >
                                     <div className="space-y-2 mb-3">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div className="flex items-center gap-2.5">
+                                        <div className="flex flex-wrap items-start justify-between gap-2">
+                                            <div className="flex min-w-0 items-center gap-2.5">
                                                 <div className="w-8 h-8 rounded-lg bg-stone-900 text-white font-mono text-xs flex items-center justify-center shrink-0">
                                                     {agent.tag}
                                                 </div>
-                                                <div>
+                                                <div className="min-w-0">
                                                     <div className="text-xs font-semibold text-stone-900 font-sans flex items-center gap-1.5">
                                                         <span>{agent.name}</span>
                                                         {isSelected && (
@@ -170,7 +170,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
 
                                         {/* Spend bar */}
                                         <div className="space-y-1">
-                                            <div className="flex justify-between text-[10px] font-mono">
+                                            <div className="flex flex-wrap justify-between gap-1 text-[10px] font-mono">
                                                 <span className="text-stone-500">Daily Spend:</span>
                                                 <span className="text-stone-900 font-medium">{formatINR(agent.spentToday)} / {formatINR(agent.dailyBudget)}</span>
                                             </div>
@@ -187,7 +187,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                                         </p>
                                     </div>
 
-                                    <div className="flex items-center justify-between pt-2.5 border-t border-stone-200/60">
+                                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-stone-200/60">
                                         <div className="flex items-center gap-1.5 text-[10px] font-mono text-stone-400">
                                             <span>Card: {agent.assignedCard}</span>
                                             {agent.cardDetails?.isFrozen && (

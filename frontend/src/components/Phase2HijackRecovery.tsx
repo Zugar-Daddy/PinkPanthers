@@ -387,7 +387,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                 </div>
 
                 {/* 6 Hijack Buttons Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-3">
                     
                     {/* Attack 1 */}
                     <button
@@ -541,10 +541,10 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
             </div>
 
             {/* SECTION 2: AUTOMATIC FREEZING ON UNUSUAL SPENDING */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 2xl:grid-cols-12 gap-6">
                 
                 {/* 2A: Anomaly Engine & Tuning (7 cols) */}
-                <div className="lg:col-span-7 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
+                <div className="2xl:col-span-7 min-w-0 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
                     <div className="flex items-center justify-between pb-3 border-b border-stone-200/80">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shadow-subtle">
@@ -622,7 +622,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                 </div>
 
                 {/* 2B: Detection Rate & False Freeze Dashboard (5 cols) */}
-                <div className="lg:col-span-5 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-4 font-mono text-xs">
+                <div className="2xl:col-span-5 min-w-0 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-4 font-mono text-xs">
                     <div className="text-sm font-serif font-semibold text-stone-900 pb-2 border-b border-stone-200">
                         Containment Metrics & False Freeze Report
                     </div>
@@ -710,7 +710,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                 </div>
 
                 {/* 5 Guardians Checkbox Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 font-mono text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-3 font-mono text-xs">
                     {guardiansList.map((g) => {
                         const voted = guardianVotes[g.id];
                         return (
@@ -803,10 +803,10 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
             </div>
 
             {/* SECTION 4 & 5: ANTI-SPAM PAYMASTER & INVARIANT FUZZING */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 2xl:grid-cols-12 gap-6">
                 
                 {/* 4. Anti-Spam Paymaster Gas Quota (6 cols) */}
-                <div className="lg:col-span-6 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
+                <div className="2xl:col-span-6 min-w-0 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
                     <div className="flex items-center justify-between pb-3 border-b border-stone-200/80">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/80 flex items-center justify-center shadow-subtle">
@@ -872,7 +872,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                 </div>
 
                 {/* 5. Invariant Fuzzing Engine (6 cols) */}
-                <div className="lg:col-span-6 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
+                <div className="2xl:col-span-6 min-w-0 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card space-y-5">
                     <div className="flex items-center justify-between pb-3 border-b border-stone-200/80">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 border border-blue-200/80 flex items-center justify-center shadow-subtle">

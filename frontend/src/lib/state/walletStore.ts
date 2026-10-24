@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import type { SimulationReceipt } from './copilotTransactions';
 
 export interface CardDetails {
     cardNumber: string;
@@ -31,6 +32,7 @@ export interface FleetAgentState {
 }
 
 export interface WalletState {
+    simulatedTransactions?: SimulationReceipt[];
     smartAccountAddress: string;
     entryPointAddress: string;
     paymasterAddress: string;

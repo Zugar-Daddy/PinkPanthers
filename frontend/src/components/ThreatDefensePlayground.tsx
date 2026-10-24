@@ -39,7 +39,7 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
             </div>
 
             {/* 4 Threat Trigger Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-3">
                 {/* 1. Stolen Key */}
                 <button
                     onClick={onTriggerDrain}

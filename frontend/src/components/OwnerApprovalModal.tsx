@@ -42,12 +42,12 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
     return (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
             <div className="bg-white border border-stone-200/90 rounded-2xl max-w-md w-full p-6 shadow-modal relative">
-                <div className="flex items-start justify-between mb-4 pb-3 border-b border-stone-200/80">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-start justify-between gap-3 mb-4 pb-3 border-b border-stone-200/80">
+                    <div className="flex min-w-0 items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shadow-subtle">
                             <ShieldAlert className="w-5 h-5" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
                                 Out-of-Policy Escalation
                             </h2>
@@ -73,21 +73,21 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
 
                 {/* Staged Transaction Details */}
                 <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-4 mb-5 space-y-2 text-xs font-mono">
-                    <div className="flex justify-between">
+                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] gap-2">
                         <span className="text-stone-500 font-normal">Action:</span>
-                        <span className="text-stone-900 font-semibold">{request.actionName}</span>
+                        <span className="min-w-0 break-all text-right text-stone-900 font-semibold">{request.actionName}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] gap-2">
                         <span className="text-stone-500 font-normal">Target Protocol:</span>
-                        <span className="text-stone-900 font-semibold">{request.targetName}</span>
+                        <span className="min-w-0 text-right text-stone-900 font-semibold">{request.targetName}</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-wrap justify-between items-center gap-2">
                         <span className="text-stone-500 font-normal">Requested Amount:</span>
                         <span className="text-stone-900 font-semibold text-sm bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">
                             {formatINR(request.amount)}
                         </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex flex-wrap justify-between gap-2">
                         <span className="text-stone-500 font-normal">Agent Sub-Key:</span>
                         <span className="text-stone-700 font-medium">{request.agent.slice(0, 10)}...{request.agent.slice(-4)}</span>
                     </div>

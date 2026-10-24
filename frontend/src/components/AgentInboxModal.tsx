@@ -33,12 +33,12 @@ export const AgentInboxModal: React.FC<AgentInboxModalProps> = ({ wallet, isOpen
             <div className="bg-white border border-stone-200/90 rounded-2xl max-w-xl w-full p-6 shadow-modal relative overflow-hidden">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-stone-200/80">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-3 pb-3.5 mb-4 border-b border-stone-200/80">
+                    <div className="flex min-w-0 items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
                             <Mail className="w-5 h-5 text-stone-700" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight flex items-center gap-2">
                                 <span>Agent inbox</span>
                                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">
@@ -59,7 +59,7 @@ export const AgentInboxModal: React.FC<AgentInboxModalProps> = ({ wallet, isOpen
 
                 {/* Filter and Mark Read */}
                 <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
                         {(['all', '2fa', 'receipt', 'alert'] as const).map(f => (
                             <button
                                 key={f}

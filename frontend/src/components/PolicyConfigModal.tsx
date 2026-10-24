@@ -51,12 +51,12 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
             <div className="bg-white border border-stone-200/90 rounded-2xl max-w-lg w-full p-6 shadow-modal relative">
                 
-                <div className="flex items-center justify-between pb-3.5 mb-5 border-b border-stone-200/80">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-3 pb-3.5 mb-5 border-b border-stone-200/80">
+                    <div className="flex min-w-0 items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
                             <Sliders className="w-5 h-5 text-stone-700" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">Agent Policy Controls</h2>
                             <p className="text-xs text-stone-500 font-sans">Owner-enforced in local simulation spending guardrails for <span className="font-semibold text-stone-700">{wallet.agentName}</span></p>
                         </div>
@@ -72,7 +72,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                 <div className="space-y-4 mb-6 text-xs font-mono">
                     {/* Per-Transaction Limit Slider */}
                     <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                             <span className="text-stone-600 font-medium font-sans text-xs">Max Per-Transaction Limit:</span>
                             <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">{formatINR(maxPerTx)}</span>
                         </div>
@@ -85,7 +85,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                             onChange={(e) => setMaxPerTx(parseFloat(e.target.value))}
                             className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
-                        <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
+                        <div className="flex flex-wrap justify-between gap-2 text-[10px] text-stone-400 mt-1.5 font-mono">
                             <span>₹500 (Micro-orders)</span>
                             <span>{formatINR(maxSliderPerTx)} (Tier limit)</span>
                         </div>
@@ -93,7 +93,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
 
                     {/* Daily Budget Slider */}
                     <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                             <span className="text-stone-600 font-medium font-sans text-xs">24-Hour Rolling Budget:</span>
                             <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">{formatINR(dailyBudget)}</span>
                         </div>
@@ -106,7 +106,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                             onChange={(e) => setDailyBudget(parseFloat(e.target.value))}
                             className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-900"
                         />
-                        <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
+                        <div className="flex flex-wrap justify-between gap-2 text-[10px] text-stone-400 mt-1.5 font-mono">
                             <span>₹2,500/day</span>
                             <span>{formatINR(maxSliderDailyBudget)}/day</span>
                         </div>
@@ -114,11 +114,11 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
 
                     {/* Session Expiry Hours */}
                     <div className="bg-stone-50/70 border border-stone-200/80 p-3.5 rounded-xl">
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                             <span className="text-stone-600 font-medium font-sans text-xs">Session Sub-Key Validity:</span>
                             <span className="text-stone-900 font-semibold bg-white px-2 py-0.5 rounded border border-stone-200 shadow-subtle">{durationHours} Hours</span>
                         </div>
-                        <div className="grid grid-cols-4 gap-2 pt-1">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                             {[1, 6, 12, 24].map((h) => (
                                 <button
                                     key={h}

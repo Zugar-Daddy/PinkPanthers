@@ -35,7 +35,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
         description: "Local simulated agent payments and policy checks"
     }, null, 2);
 
-    const curlSnippet = `curl -u owner -X POST http://localhost:3000/api/mcp \\
+    const curlSnippet = `curl -X POST http://localhost:3000/api/mcp \\
   -H "Content-Type: application/json" \\
   -d '{
     "jsonrpc": "2.0",
@@ -105,12 +105,12 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
             <div className="bg-white border border-stone-200/90 rounded-2xl max-w-2xl w-full p-6 shadow-modal relative overflow-hidden font-mono">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-stone-200/80">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-3 pb-3.5 mb-4 border-b border-stone-200/80">
+                    <div className="flex min-w-0 items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
                             <Terminal className="w-5 h-5 text-stone-700" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight flex items-center gap-2">
                                 <span>Model Context Protocol (MCP) Hub</span>
                                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">
@@ -176,7 +176,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                 {/* Content based on tab */}
                 {activeTab !== 'tester' ? (
                     <div className="space-y-3">
-                        <div className="flex justify-between items-center text-xs text-stone-500 font-sans">
+                        <div className="flex flex-wrap justify-between items-center gap-2 text-xs text-stone-500 font-sans">
                             <span>
                                 {activeTab === 'claude' ? 'Paste into claude_desktop_config.json:' : activeTab === 'cursor' ? 'Add as MCP Server in Cursor Settings:' : 'Direct REST JSON-RPC 2.0 invocation:'}
                             </span>
@@ -199,12 +199,12 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                 ) : (
                     <div className="space-y-3">
                         <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-3.5 flex items-center justify-between gap-3 flex-wrap">
-                            <div className="flex items-center gap-2">
+                            <div className="flex min-w-0 flex-wrap items-center gap-2">
                                 <span className="text-xs font-sans text-stone-600">Select MCP Tool:</span>
                                 <select
                                     value={selectedTool}
                                     onChange={(e: any) => setSelectedTool(e.target.value)}
-                                    className="bg-white border border-stone-200 rounded-lg px-2.5 py-1 text-xs text-stone-900 outline-none shadow-subtle"
+                                    className="max-w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1 text-xs text-stone-900 outline-none shadow-subtle"
                                 >
                                     <option value="wallet_get_balance">wallet_get_balance</option>
                                     <option value="wallet_pay">wallet_pay ($15.00 to OpenAI)</option>
@@ -233,7 +233,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
                     </div>
                 )}
 
-                <div className="mt-4 pt-3 border-t border-stone-200/60 flex items-center justify-between text-xs text-stone-500 font-sans">
+                <div className="mt-4 pt-3 border-t border-stone-200/60 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500 font-sans">
                     <span className="font-mono text-[11px] text-stone-600 flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5 text-emerald-700" /> Standard Anthropic MCP Specification v2024-11-05
                     </span>

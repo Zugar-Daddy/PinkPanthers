@@ -20,12 +20,12 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
         <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover space-y-4 transition-all duration-200">
             
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-stone-200/80">
-                <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3 pb-3.5 border-b border-stone-200/80">
+                <div className="flex min-w-0 items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
                         <Activity className="w-5 h-5 text-stone-700" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <div className="flex items-center gap-2">
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
                                 Recent activity
@@ -57,7 +57,7 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
             {/* Event List */}
             <div className="divide-y divide-stone-200/60 max-h-96 overflow-y-auto pr-1">
                 {filteredEvents.map(event => (
-                    <div key={event.id} className="py-3 px-2 flex items-center justify-between gap-3 hover:bg-stone-50/70 transition-colors rounded-xl">
+                    <div key={event.id} className="py-3 px-2 flex flex-wrap items-center justify-between gap-3 hover:bg-stone-50/70 transition-colors rounded-xl">
                         <div className="flex items-center gap-3 min-w-0">
                             {/* Avatar tag */}
                             <div className="w-7 h-7 rounded-lg bg-stone-900 text-white font-mono text-xs flex items-center justify-center shrink-0">
@@ -87,7 +87,7 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
                             </div>
                         </div>
 
-                        <div className="text-right shrink-0">
+                        <div className="min-w-0 text-right">
                             <div className="font-mono font-medium text-xs text-stone-900">
                                 {formatINR(event.amount)}
                             </div>

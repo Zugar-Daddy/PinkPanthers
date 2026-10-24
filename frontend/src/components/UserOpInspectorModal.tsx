@@ -35,12 +35,12 @@ export const UserOpInspectorModal: React.FC<UserOpInspectorModalProps> = ({ op, 
     return (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
             <div className="bg-white border border-stone-200/90 rounded-2xl max-w-2xl w-full p-6 shadow-modal relative overflow-hidden font-mono">
-                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-stone-200/80">
-                    <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 mb-4 border-b border-stone-200/80">
+                    <div className="flex min-w-0 items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-800 border border-stone-200/80 flex items-center justify-center shadow-subtle">
                             <Code className="w-5 h-5 text-stone-700" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight font-sans">ERC-4337 PackedUserOperation Inspector</h2>
                             <p className="text-xs text-stone-500 font-sans">Raw protocol payload validated by EntryPoint v0.7</p>
                         </div>
@@ -68,7 +68,7 @@ export const UserOpInspectorModal: React.FC<UserOpInspectorModalProps> = ({ op, 
                     <pre>{formattedJson}</pre>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-xs text-stone-500 font-sans">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-500 font-sans">
                     <span className="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-full font-mono text-xs font-medium">
                         <ShieldCheck className="w-4 h-4 text-emerald-600" /> Validated by PolicyEngine.sol
                     </span>

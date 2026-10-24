@@ -43,7 +43,7 @@ const sectionIntro: Record<ActiveTab, { title: string; description: string }> = 
     fleet: { title: 'Agents', description: 'See who is active and switch between agents.' },
     card: { title: 'Cards & policy', description: 'Review card controls and spending limits.' },
     lab: { title: 'Simulation lab', description: 'Test an agent action and see how the current policy responds.' },
-    simulator: { title: 'Copilot', description: 'Ask for live listings and review sourced options before visiting a merchant.' },
+    simulator: { title: 'Copilot', description: 'Buy from live listings or transfer funds using your simulated wallet.' },
     stream: { title: 'Activity', description: 'Follow recent agent actions and account operations.' },
     cli: { title: 'Terminal', description: 'Explore account actions in the local terminal.' },
     threats: { title: 'Security tests', description: 'Try common attacks against the simulated policy.' },
@@ -268,7 +268,7 @@ export default function Home() {
                             <h1 className="mt-2 text-[32px] font-semibold leading-tight tracking-[-0.045em] text-stone-950 sm:text-[38px]">{sectionIntro[activeTab].title}</h1>
                             <p className="mt-2 text-sm text-stone-500">{sectionIntro[activeTab].description}</p>
                         </div>
-                        <span className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600">{activeTab === 'simulator' ? 'Live research · merchant checkout' : `Selected: ${wallet.agentName}`}</span>
+                        <span className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600">{activeTab === 'simulator' ? 'Live listings · simulated wallet' : `Selected: ${wallet.agentName}`}</span>
                     </div>
 
                     {activeTab === 'overview' && (

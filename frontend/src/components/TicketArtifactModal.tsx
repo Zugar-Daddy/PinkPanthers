@@ -131,7 +131,7 @@ export const TicketArtifactModal: React.FC<TicketArtifactModalProps> = ({ artifa
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
                                 <div>
                                     <span className="text-stone-400 text-[10px]">Gate:</span>
                                     <div className="font-semibold text-stone-900">{artifact.gate}</div>
@@ -195,7 +195,7 @@ export const TicketArtifactModal: React.FC<TicketArtifactModalProps> = ({ artifa
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px] border-t border-stone-100">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono text-[11px] border-t border-stone-100">
                                 <div>
                                     <span className="text-stone-400 text-[10px]">Coach:</span>
                                     <div className="font-bold text-blue-900">{artifact.coach}</div>
