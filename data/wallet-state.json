@@ -11,10 +11,10 @@
     "passkeyCredentialId": "credential-p256-apple-secure-enclave",
     "passkeyDeviceName": "TouchID / FaceID (WebAuthn P-256)",
     "totalAgentsCount": 12,
-    "totalFleetSpendToday": 2664200
+    "totalFleetSpendToday": 2665650
   },
   "balances": {
-    "usdc": 1071200,
+    "usdc": 1069750,
     "eth": 0.45,
     "paymasterGasTankINR": 4850
   },
@@ -83,7 +83,7 @@
       "0x00000000000000000000000000000000000F6F6F"
     ]
   },
-  "dailySpent": 48750,
+  "dailySpent": 50200,
   "lastEpochReset": 1729792800000,
   "virtualCard": {
     "cardNumber": "4242 0815 3390 8840",
@@ -525,6 +525,29 @@
     }
   ],
   "userOps": [
+    {
+      "id": "op-appr-1792866138684",
+      "userOpHash": "0x3a500f...4f5b7f",
+      "timestamp": "11:52:18 pm",
+      "targetName": "Travel & Ticket Booking API (IRCTC Railways)",
+      "targetAddress": "0x00000000000000000000000000000000000C3C3C",
+      "functionCalled": "bookTicket(uint256 1450)",
+      "amount": 1450,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "OUT_OF_POLICY",
+      "reason": "Passkey Biometric Authorized by Principal Madhav B.",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 17,
+        "callData": "0xbookTick...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xOwnerPasskeyP256Sig..."
+      }
+    },
     {
       "id": "op-1792865556749",
       "userOpHash": "0x703a64...f70b5b",

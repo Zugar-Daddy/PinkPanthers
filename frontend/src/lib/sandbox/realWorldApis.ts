@@ -92,13 +92,27 @@ export interface IrctcTrainTicket {
     status: 'CNF / CONFIRMED' | 'RAC';
 }
 
+export interface CorporatePayrollReceipt {
+    type: 'PAYROLL';
+    batchId: string;
+    employeeCount: number;
+    disbursedVia: string;
+    beneficiaryBank: string;
+    settlementMode: string;
+    breakdown: { role: string; amount: number; accountMasked: string }[];
+    amount: number;
+    disbursedAt: string;
+    status: 'DISBURSED';
+}
+
 export type RealWorldArtifact = 
     | RedBusTicket 
     | IndigoFlightTicket 
     | IrctcTrainTicket
     | BlinkitOrder 
     | AwsCloudInvoice 
-    | OpenAiInvoice;
+    | OpenAiInvoice
+    | CorporatePayrollReceipt;
 
 /**
  * Real-World Mock API Dispatcher
@@ -306,6 +320,40 @@ export class RealWorldApiGateway {
             amount,
             passengerName,
             status: 'CNF / CONFIRMED'
+        };
+    }
+
+    static generatePayrollReceipt(
+        amount: number = 1000000.00,
+        employeeCount: number = 5
+    ): CorporatePayrollReceipt {
+        const batchId = `PAY-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
+        const perEmployee = Math.round(amount / employeeCount);
+        const roles = [
+            'Lead Full-Stack Engineer',
+            'Senior AI / Web3 Researcher',
+            'Frontend Core Architect',
+            'DevOps & Infrastructure Lead',
+            'Smart Contract QA Lead'
+        ];
+
+        const breakdown = roles.slice(0, employeeCount).map((role, idx) => ({
+            role,
+            amount: perEmployee,
+            accountMasked: `HDFC ···· ${Math.floor(1000 + Math.random() * 9000)}`
+        }));
+
+        return {
+            type: 'PAYROLL',
+            batchId,
+            employeeCount,
+            disbursedVia: 'RazorpayX Corporate Payroll API',
+            beneficiaryBank: 'HDFC Bank Corporate Salary Accounts',
+            settlementMode: 'NEFT / IMPS Instant Corporate Batch',
+            breakdown,
+            amount,
+            disbursedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+            status: 'DISBURSED'
         };
     }
 }

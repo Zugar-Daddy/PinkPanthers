@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Check, Copy, Bus, Plane, Train, ShoppingBag, Cloud, Bot, ExternalLink, ShieldCheck, QrCode } from 'lucide-react';
+import { X, Check, Copy, Bus, Plane, Train, Users, ShoppingBag, Cloud, Bot, ExternalLink, ShieldCheck, QrCode } from 'lucide-react';
 import { RealWorldArtifact } from '../lib/sandbox/realWorldApis';
 import { formatINR } from '../lib/web3/agentWalletClient';
 
@@ -269,6 +269,54 @@ export const TicketArtifactModal: React.FC<TicketArtifactModalProps> = ({ artifa
                         <div className="grid grid-cols-2 gap-2 text-[11px] text-stone-600">
                             <div>Invoice: <span className="text-stone-900 font-semibold">{artifact.invoiceNumber}</span></div>
                             <div>Amount: <span className="text-emerald-700 font-semibold">{formatINR(artifact.amount)}</span></div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 5. Corporate Payroll Receipt */}
+                {artifact.type === 'PAYROLL' && (
+                    <div className="bg-gradient-to-br from-emerald-50 via-white to-stone-50 border border-emerald-200/80 rounded-2xl p-5 shadow-subtle space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-emerald-800 text-white flex items-center justify-center shadow-xs">
+                                    <Users className="w-4 h-4 text-emerald-200" />
+                                </div>
+                                <div>
+                                    <span className="text-xs font-bold text-emerald-950 font-serif tracking-tight">Corporate Payroll Disbursement</span>
+                                    <div className="text-[10px] text-stone-500 font-mono">Batch: <span className="font-semibold text-emerald-800">{artifact.batchId}</span></div>
+                                </div>
+                            </div>
+                            <span className="text-[10px] font-mono font-semibold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded-full">
+                                {artifact.status}
+                            </span>
+                        </div>
+
+                        <div className="bg-white/90 border border-emerald-100 rounded-xl p-3.5 space-y-2 text-xs">
+                            <div className="flex justify-between items-center pb-2 border-b border-emerald-100">
+                                <div>
+                                    <div className="text-[10px] text-stone-400 uppercase font-mono">Disbursement Rail</div>
+                                    <div className="font-semibold text-stone-900 text-[11px]">{artifact.disbursedVia}</div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[10px] text-stone-400 uppercase font-mono">Beneficiaries</div>
+                                    <div className="font-bold text-stone-900">{artifact.employeeCount} Staff Members</div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5 pt-1">
+                                <div className="text-[10px] font-mono uppercase text-stone-400">Beneficiary Breakdown</div>
+                                {artifact.breakdown.map((b, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-[11px] font-mono">
+                                        <span className="text-stone-700">{b.role} <span className="text-[10px] text-stone-400">({b.accountMasked})</span></span>
+                                        <span className="font-semibold text-stone-900">{formatINR(b.amount)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-[10px] font-mono text-stone-500 pt-1">
+                            <span>Disbursed via SafeAgent Treasury</span>
+                            <span className="font-bold text-emerald-700 text-sm">Total: {formatINR(artifact.amount)}</span>
                         </div>
                     </div>
                 )}
