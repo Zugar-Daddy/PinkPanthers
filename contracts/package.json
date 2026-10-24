@@ -1,0 +1,12 @@
+{
+  "name": "agent-wallet-contracts",
+  "version": "1.0.0",
+  "description": "ERC-4337 Agent Wallet with On-Chain Policy Engine and Passkey Security",
+  "scripts": {
+    "test": "node test/runTests.js && node test/policyAndExecutionTest.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "solc": "^0.8.24"
+  }
+}
