@@ -4,6 +4,8 @@ import {
     writeWalletState,
     executeAgentPayment,
     toggleCardFreeze,
+    switchActiveAgent,
+    updateCardLimit,
     approveQueuedAction,
     rejectQueuedAction
 } from '../../../../lib/state/walletStore';
@@ -26,14 +28,15 @@ export async function POST(req: NextRequest) {
 
         switch (action) {
             case 'submit_payment': {
-                const { targetName, targetAddress, functionCalled, amount, description } = payload;
-                const result = executeAgentPayment(targetName, targetAddress, functionCalled, amount, description);
+                const { targetName, targetAddress, functionCalled, amount, description, agentId } = payload;
+                const result = executeAgentPayment(targetName, targetAddress, functionCalled, amount, description, agentId);
                 const updatedState = readWalletState();
                 return NextResponse.json({ success: true, result, state: updatedState });
             }
 
             case 'toggle_freeze': {
-                const isFrozen = toggleCardFreeze();
+                const { agentId } = payload || {};
+                const isFrozen = toggleCardFreeze(agentId);
                 const updatedState = readWalletState();
                 return NextResponse.json({ success: true, isFrozen, state: updatedState });
             }
@@ -54,19 +57,8 @@ export async function POST(req: NextRequest) {
 
             case 'switch_agent': {
                 const { agentId } = payload;
-                const state = readWalletState();
-                const ag = state.fleet.find(a => a.id === agentId);
-                if (ag) {
-                    state.activeAgent.id = ag.id;
-                    state.activeAgent.name = ag.name;
-                    state.activeAgent.address = ag.address;
-                    state.policy.dailyBudget = ag.dailyBudget;
-                    state.dailySpent = ag.spentToday;
-                    state.virtualCard.holder = `${ag.name.toUpperCase()} / SAFEAGENT`;
-                    state.virtualCard.maskedNumber = ag.assignedCard;
-                    writeWalletState(state);
-                }
-                return NextResponse.json({ success: true, state });
+                const updatedState = switchActiveAgent(agentId);
+                return NextResponse.json({ success: true, state: updatedState });
             }
 
             case 'update_policy': {
@@ -77,6 +69,12 @@ export async function POST(req: NextRequest) {
                 state.policy.sessionExpiryHours = sessionExpiryHours;
                 state.activeAgent.sessionActive = true;
                 state.activeAgent.sessionExpiresAt = Date.now() + sessionExpiryHours * 3600 * 1000;
+                const activeAg = state.fleet.find(a => a.id === state.activeAgent.id);
+                if (activeAg) {
+                    activeAg.dailyBudget = dailyBudget;
+                    activeAg.maxPerTx = maxPerTx;
+                    if (activeAg.cardDetails) activeAg.cardDetails.dailyLimit = dailyBudget;
+                }
                 writeWalletState(state);
                 return NextResponse.json({ success: true, state });
             }
@@ -96,11 +94,10 @@ export async function POST(req: NextRequest) {
             }
 
             case 'update_card_limit': {
-                const { limit } = payload;
-                const state = readWalletState();
-                state.virtualCard.dailyLimit = limit;
-                writeWalletState(state);
-                return NextResponse.json({ success: true, state });
+                const { limit, agentId } = payload;
+                updateCardLimit(limit, agentId);
+                const updatedState = readWalletState();
+                return NextResponse.json({ success: true, state: updatedState });
             }
 
             default:

@@ -45,8 +45,10 @@ function writeState(state) {
 /**
  * Execute In-Policy Payment
  */
-function executePayment(vendor, targetAddress, functionCalled, amount, description) {
+function executePayment(vendor, targetAddress, functionCalled, amount, description, agentId) {
     const state = readState();
+    const targetAgentId = agentId || state.activeAgent.id;
+    const activeAg = state.fleet.find(a => a.id === targetAgentId) || state.activeAgent;
 
     if (!state.activeAgent.sessionActive) {
         return { status: 'REVERTED', reason: 'Agent Session Key is Inactive or Revoked' };
@@ -56,11 +58,16 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
         return { status: 'REVERTED', reason: 'Session Key has Expired on-chain (validUntil passed)' };
     }
 
-    if (state.virtualCard.isFrozen) {
-        return { status: 'REVERTED', reason: 'Virtual Debit Card is currently FROZEN by Principal' };
+    // 1. Check if target agent's specific card is frozen
+    const agentCard = activeAg.cardDetails || state.virtualCard;
+    if (agentCard.isFrozen) {
+        return {
+            status: 'REVERTED',
+            reason: `Virtual Debit Card (${agentCard.maskedNumber}) for ${activeAg.name} is currently FROZEN by Principal`
+        };
     }
 
-    // 1. Whitelist Check
+    // 2. Whitelist Check
     const isContractAllowed = state.policy.allowedContracts.some(
         c => c.address.toLowerCase() === targetAddress.toLowerCase()
     );
@@ -72,12 +79,13 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
         return { status: 'REVERTED', reason: `Target address not allowlisted: ${targetAddress}` };
     }
 
-    // 2. Per-Tx Cap Check
-    if (amount > state.policy.maxPerTx) {
-        const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds Per-Tx Cap (₹${state.policy.maxPerTx.toLocaleString('en-IN')})`;
+    // 3. Per-Tx Cap Check (Scoped to active agent's role policy)
+    const agentMaxPerTx = activeAg.maxPerTx || state.policy.maxPerTx;
+    if (amount > agentMaxPerTx) {
+        const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds Per-Tx Cap (₹${agentMaxPerTx.toLocaleString('en-IN')})`;
         state.queuedApprovals.unshift({
             id: `req-mcp-${Date.now()}`,
-            agent: state.activeAgent.name,
+            agent: activeAg.name,
             targetName: vendor,
             targetAddress,
             amount,
@@ -90,13 +98,15 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
         return { status: 'QUEUED', reason };
     }
 
-    // 3. Daily Budget Check
-    if (state.dailySpent + amount > state.policy.dailyBudget) {
-        const remaining = Math.max(0, state.policy.dailyBudget - state.dailySpent);
-        const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds 24h Remaining Budget (₹${remaining.toLocaleString('en-IN')} remaining of ₹${state.policy.dailyBudget.toLocaleString('en-IN')})`;
+    // 4. Daily Budget Check (Scoped to agent's budget)
+    const agentBudget = activeAg.dailyBudget || state.policy.dailyBudget;
+    const agentSpent = activeAg.spentToday || 0;
+    if (agentSpent + amount > agentBudget) {
+        const remaining = Math.max(0, agentBudget - agentSpent);
+        const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds 24h Remaining Budget (₹${remaining.toLocaleString('en-IN')} remaining of ₹${agentBudget.toLocaleString('en-IN')})`;
         state.queuedApprovals.unshift({
             id: `req-mcp-${Date.now()}`,
-            agent: state.activeAgent.name,
+            agent: activeAg.name,
             targetName: vendor,
             targetAddress,
             amount,
@@ -110,15 +120,19 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
     }
 
     // In-Policy Success!
-    state.dailySpent += amount;
+    activeAg.spentToday = (activeAg.spentToday || 0) + amount;
+    if (activeAg.cardDetails) {
+        activeAg.cardDetails.spentToday = (activeAg.cardDetails.spentToday || 0) + amount;
+    }
+    activeAg.lastAction = `${functionCalled} · ${vendor} (₹${amount.toLocaleString('en-IN')})`;
+
+    if (activeAg.id === state.activeAgent.id) {
+        state.dailySpent = activeAg.spentToday;
+        state.virtualCard.spentToday = activeAg.spentToday;
+    }
+
     state.balances.usdc -= amount;
     state.principal.totalFleetSpendToday += amount;
-
-    const activeAg = state.fleet.find(a => a.id === state.activeAgent.id);
-    if (activeAg) {
-        activeAg.spentToday += amount;
-        activeAg.lastAction = `${functionCalled} · ${vendor} (₹${amount.toLocaleString('en-IN')})`;
-    }
 
     const opHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
     state.userOps.unshift({
@@ -147,10 +161,10 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
 
     state.activityStream.unshift({
         id: `stream-mcp-${Date.now()}`,
-        agentId: state.activeAgent.id,
-        agentName: state.activeAgent.name,
-        category: activeAg ? activeAg.category : 'finance',
-        tag: activeAg ? activeAg.tag : 'AG',
+        agentId: activeAg.id,
+        agentName: activeAg.name,
+        category: activeAg.category || 'finance',
+        tag: activeAg.tag || 'AG',
         action: functionCalled.split('(')[0],
         vendor,
         amount,
@@ -167,18 +181,30 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
 }
 
 /**
- * Toggle Virtual Card Freeze
+ * Toggle Virtual Card Freeze for a specific agent (or active agent)
  */
-function toggleCardFreeze(freezeState) {
+function toggleCardFreeze(freezeState, agentId) {
     const state = readState();
-    const shouldFreeze = freezeState !== undefined ? Boolean(freezeState) : !state.virtualCard.isFrozen;
-    state.virtualCard.isFrozen = shouldFreeze;
+    const targetId = agentId || state.activeAgent.id;
+    const ag = state.fleet.find(a => a.id === targetId) || state.fleet[0];
+
+    const currentFrozen = ag?.cardDetails ? ag.cardDetails.isFrozen : state.virtualCard.isFrozen;
+    const shouldFreeze = freezeState !== undefined ? Boolean(freezeState) : !currentFrozen;
+
+    if (ag && ag.cardDetails) {
+        ag.cardDetails.isFrozen = shouldFreeze;
+    }
+    if (!agentId || targetId === state.activeAgent.id) {
+        state.virtualCard.isFrozen = shouldFreeze;
+    }
+
     const action = shouldFreeze ? 'FROZEN' : 'ACTIVE';
+    const cardMasked = ag?.cardDetails?.maskedNumber || state.virtualCard.maskedNumber;
     state.inboxMessages.unshift({
         id: `msg-${Date.now()}`,
         sender: 'Card Control System',
-        subject: `Virtual Card ${action}`,
-        body: `Agent virtual card ···· 1126 status changed to ${action} via MCP Tool by Agent ${state.activeAgent.name}.`,
+        subject: `Virtual Card ${action} (${cardMasked})`,
+        body: `Agent ${ag?.name || state.activeAgent.name} virtual card ${cardMasked} status changed to ${action} via MCP Tool by Principal ${state.principal.name}.`,
         timestamp: 'Just now',
         unread: true,
         category: 'alert'
@@ -211,7 +237,8 @@ const MCP_TOOLS = [
                 target_address: { type: 'string', description: 'Whitelisted smart contract address' },
                 function_called: { type: 'string', description: 'Approved ABI method call (e.g. payInvoice, orderCheckout)' },
                 amount_usd: { type: 'number', description: 'Amount to pay in INR/USD' },
-                reason: { type: 'string', description: 'Reason for payment justification' }
+                reason: { type: 'string', description: 'Reason for payment justification' },
+                agent_id: { type: 'string', description: 'Optional: ID of the fleet agent executing the payment' }
             },
             required: ['target_vendor', 'target_address', 'amount_usd']
         }
@@ -223,6 +250,7 @@ const MCP_TOOLS = [
             type: 'object',
             properties: {
                 freeze: { type: 'boolean', description: 'True to freeze, false to unfreeze' },
+                agent_id: { type: 'string', description: 'Optional: ID of the fleet agent whose card should be toggled' },
                 reason: { type: 'string', description: 'Security or operational reason' }
             },
             required: ['freeze']
@@ -307,7 +335,14 @@ function handleMcpRequest(req) {
 
         switch (toolName) {
             case 'wallet_get_balance': {
-                const remaining = Math.max(0, state.policy.dailyBudget - state.dailySpent);
+                const targetId = args.agent_id || state.activeAgent.id;
+                const ag = state.fleet.find(a => a.id === targetId) || state.fleet[0];
+                const budget = ag ? ag.dailyBudget : state.policy.dailyBudget;
+                const spent = ag ? ag.spentToday : state.dailySpent;
+                const remaining = Math.max(0, budget - spent);
+                const maxPerTx = ag?.maxPerTx || state.policy.maxPerTx;
+                const card = ag?.cardDetails || state.virtualCard;
+
                 return {
                     jsonrpc: '2.0',
                     id,
@@ -317,16 +352,24 @@ function handleMcpRequest(req) {
                                 type: 'text',
                                 text: JSON.stringify({
                                     smart_account: state.smartAccountAddress,
+                                    agent_id: ag ? ag.id : state.activeAgent.id,
+                                    agent_name: ag ? ag.name : state.activeAgent.name,
                                     usdc_balance: state.balances.usdc,
                                     eth_balance: state.balances.eth,
                                     paymaster_gas_tank_inr: state.balances.paymasterGasTankINR,
-                                    daily_budget: state.policy.dailyBudget,
-                                    daily_spent: state.dailySpent,
+                                    daily_budget: budget,
+                                    daily_spent: spent,
                                     remaining_budget: remaining,
-                                    per_tx_cap: state.policy.maxPerTx,
-                                    active_agent: state.activeAgent.name,
+                                    per_tx_cap: maxPerTx,
                                     session_active: state.activeAgent.sessionActive,
-                                    virtual_card: `${state.virtualCard.maskedNumber} (${state.virtualCard.isFrozen ? 'FROZEN' : 'ACTIVE'})`
+                                    virtual_card: `${card.maskedNumber} (${card.isFrozen ? 'FROZEN' : 'ACTIVE'})`,
+                                    card_details: {
+                                        masked_number: card.maskedNumber,
+                                        is_frozen: card.isFrozen,
+                                        holder: card.holder,
+                                        daily_limit: card.dailyLimit,
+                                        spent_today: card.spentToday
+                                    }
                                 }, null, 2)
                             }
                         ]
@@ -340,8 +383,9 @@ function handleMcpRequest(req) {
                 const targetAddress = args.target_address || '0x00000000000000000000000000000000000A1A1A';
                 const func = args.function_called || 'payInvoice()';
                 const desc = args.reason || `Payment to ${vendor}`;
+                const targetAgentId = args.agent_id || args.agent;
 
-                const result = executePayment(vendor, targetAddress, func, amount, desc);
+                const result = executePayment(vendor, targetAddress, func, amount, desc, targetAgentId);
 
                 if (result.status === 'REVERTED') {
                     return {
@@ -398,7 +442,10 @@ function handleMcpRequest(req) {
             }
 
             case 'wallet_freeze_card': {
-                const isNowFrozen = toggleCardFreeze(args.freeze);
+                const targetAgentId = args.agent_id || args.agent;
+                const isNowFrozen = toggleCardFreeze(args.freeze, targetAgentId);
+                const ag = targetAgentId ? state.fleet.find(a => a.id === targetAgentId) : null;
+                const cardMasked = ag?.cardDetails?.maskedNumber || state.virtualCard.maskedNumber;
                 return {
                     jsonrpc: '2.0',
                     id,
@@ -407,9 +454,11 @@ function handleMcpRequest(req) {
                             {
                                 type: 'text',
                                 text: JSON.stringify({
-                                    card: state.virtualCard.maskedNumber,
+                                    agent_id: ag ? ag.id : state.activeAgent.id,
+                                    agent_name: ag ? ag.name : state.activeAgent.name,
+                                    card: cardMasked,
                                     is_frozen: isNowFrozen,
-                                    message: isNowFrozen ? 'Card FROZEN successfully on-chain' : 'Card REACTIVATED on-chain'
+                                    message: isNowFrozen ? `Card ${cardMasked} FROZEN successfully on-chain` : `Card ${cardMasked} REACTIVATED on-chain`
                                 }, null, 2)
                             }
                         ]

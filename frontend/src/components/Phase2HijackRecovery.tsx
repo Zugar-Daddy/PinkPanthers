@@ -126,7 +126,9 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
 
         if (shouldFreeze) {
             setIsAgentAutoFrozen(true);
-            wallet.virtualCard.isFrozen = true;
+            if (!wallet.virtualCard.isFrozen) {
+                wallet.toggleCardFreeze();
+            }
             setAnomalyAuditLogs(prev => [
                 `🚨 [AUTO-FREEZE TRIGGERED] Anomaly Score: 88% >= Threshold (${anomalyThreshold}%). High velocity detected: 5 txs in 2.1s, 4.8x amount spike. Agent sub-key automatically HALTED on-chain via toggleEmergencyHalt(). Virtual Card FROZEN.`,
                 ...prev
@@ -142,7 +144,9 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
     const unfreezeAgent = () => {
         setIsAgentAutoFrozen(false);
         setAnomalyScore(15);
-        wallet.virtualCard.isFrozen = false;
+        if (wallet.virtualCard.isFrozen) {
+            wallet.toggleCardFreeze();
+        }
         setAnomalyAuditLogs(prev => [
             `✅ [MANUAL RESTORE] Principal authenticated. Agent Emergency Halt lifted. Virtual Card re-activated. Baseline recalibrated.`,
             ...prev
@@ -210,7 +214,13 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
         if (recoveryStatus === 'EXECUTABLE') {
             setRecoveryStatus('EXECUTED');
             setIsAgentAutoFrozen(false);
-            wallet.agentAddress = '0xNewCleanSubKey' + Math.floor(Math.random() * 10000);
+            const newKey = '0xNewCleanSubKey' + Math.floor(Math.random() * 10000);
+            wallet.agentAddress = newKey;
+            const ag = wallet.fleet.find(a => a.id === wallet.activeAgentId);
+            if (ag) ag.address = newKey;
+            if (wallet.virtualCard.isFrozen) {
+                wallet.toggleCardFreeze();
+            }
         }
     };
 

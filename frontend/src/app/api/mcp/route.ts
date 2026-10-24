@@ -52,7 +52,8 @@ export async function POST(req: NextRequest) {
                                     target_address: { type: 'string', description: 'Whitelisted smart contract address' },
                                     function_called: { type: 'string', description: 'Approved ABI method call (e.g. payInvoice, orderCheckout)' },
                                     amount_usd: { type: 'number', description: 'Amount to pay in INR/USD' },
-                                    reason: { type: 'string', description: 'Reason for payment justification' }
+                                    reason: { type: 'string', description: 'Reason for payment justification' },
+                                    agent_id: { type: 'string', description: 'Optional: ID of the fleet agent executing the payment' }
                                 },
                                 required: ['target_vendor', 'target_address', 'amount_usd']
                             }
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
                                 type: 'object',
                                 properties: {
                                     freeze: { type: 'boolean', description: 'True to freeze, false to unfreeze' },
+                                    agent_id: { type: 'string', description: 'Optional: ID of the fleet agent whose card should be toggled' },
                                     reason: { type: 'string', description: 'Security or operational reason' }
                                 },
                                 required: ['freeze']
@@ -112,7 +114,14 @@ export async function POST(req: NextRequest) {
 
             switch (toolName) {
                 case 'wallet_get_balance': {
-                    const remaining = Math.max(0, state.policy.dailyBudget - state.dailySpent);
+                    const targetId = args.agent_id || state.activeAgent.id;
+                    const ag = state.fleet.find(a => a.id === targetId) || state.fleet[0];
+                    const budget = ag ? ag.dailyBudget : state.policy.dailyBudget;
+                    const spent = ag ? ag.spentToday : state.dailySpent;
+                    const remaining = Math.max(0, budget - spent);
+                    const maxPerTx = ag?.maxPerTx || state.policy.maxPerTx;
+                    const card = ag?.cardDetails || state.virtualCard;
+
                     return NextResponse.json({
                         jsonrpc: '2.0',
                         id,
@@ -122,16 +131,24 @@ export async function POST(req: NextRequest) {
                                     type: 'text',
                                     text: JSON.stringify({
                                         smart_account: state.smartAccountAddress,
+                                        agent_id: ag ? ag.id : state.activeAgent.id,
+                                        agent_name: ag ? ag.name : state.activeAgent.name,
                                         usdc_balance: state.balances.usdc,
                                         eth_balance: state.balances.eth,
                                         paymaster_gas_tank_inr: state.balances.paymasterGasTankINR,
-                                        daily_budget: state.policy.dailyBudget,
-                                        daily_spent: state.dailySpent,
+                                        daily_budget: budget,
+                                        daily_spent: spent,
                                         remaining_budget: remaining,
-                                        per_tx_cap: state.policy.maxPerTx,
-                                        active_agent: state.activeAgent.name,
+                                        per_tx_cap: maxPerTx,
                                         session_active: state.activeAgent.sessionActive,
-                                        virtual_card: `${state.virtualCard.maskedNumber} (${state.virtualCard.isFrozen ? 'FROZEN' : 'ACTIVE'})`
+                                        virtual_card: `${card.maskedNumber} (${card.isFrozen ? 'FROZEN' : 'ACTIVE'})`,
+                                        card_details: {
+                                            masked_number: card.maskedNumber,
+                                            is_frozen: card.isFrozen,
+                                            holder: card.holder,
+                                            daily_limit: card.dailyLimit,
+                                            spent_today: card.spentToday
+                                        }
                                     }, null, 2)
                                 }
                             ]
@@ -145,8 +162,9 @@ export async function POST(req: NextRequest) {
                     const targetAddress = args.target_address || '0x00000000000000000000000000000000000A1A1A';
                     const func = args.function_called || 'payInvoice()';
                     const desc = args.reason || `Payment to ${vendor}`;
+                    const targetAgentId = args.agent_id || args.agent;
 
-                    const execResult = executeAgentPayment(vendor, targetAddress, func, amount, desc);
+                    const execResult = executeAgentPayment(vendor, targetAddress, func, amount, desc, targetAgentId);
 
                     if (execResult.status === 'REVERTED') {
                         return NextResponse.json({
@@ -203,12 +221,15 @@ export async function POST(req: NextRequest) {
                 }
 
                 case 'wallet_freeze_card': {
-                    const shouldFreeze = Boolean(args.freeze);
-                    const currentFrozen = state.virtualCard.isFrozen;
-                    let isNowFrozen = currentFrozen;
-                    if (shouldFreeze !== currentFrozen) {
-                        isNowFrozen = toggleCardFreeze();
+                    const targetAgentId = args.agent_id || args.agent;
+                    const ag = targetAgentId ? state.fleet.find(a => a.id === targetAgentId) : null;
+                    const targetCard = ag?.cardDetails || state.virtualCard;
+                    const shouldFreeze = args.freeze !== undefined ? Boolean(args.freeze) : !targetCard.isFrozen;
+                    let isNowFrozen = targetCard.isFrozen;
+                    if (shouldFreeze !== targetCard.isFrozen) {
+                        isNowFrozen = toggleCardFreeze(targetAgentId);
                     }
+                    const cardMasked = targetCard.maskedNumber;
                     return NextResponse.json({
                         jsonrpc: '2.0',
                         id,
@@ -217,9 +238,11 @@ export async function POST(req: NextRequest) {
                                 {
                                     type: 'text',
                                     text: JSON.stringify({
-                                        card: state.virtualCard.maskedNumber,
+                                        agent_id: ag ? ag.id : state.activeAgent.id,
+                                        agent_name: ag ? ag.name : state.activeAgent.name,
+                                        card: cardMasked,
                                         is_frozen: isNowFrozen,
-                                        message: isNowFrozen ? 'Card FROZEN successfully on-chain' : 'Card REACTIVATED on-chain'
+                                        message: isNowFrozen ? `Card ${cardMasked} FROZEN successfully on-chain` : `Card ${cardMasked} REACTIVATED on-chain`
                                     }, null, 2)
                                 }
                             ]

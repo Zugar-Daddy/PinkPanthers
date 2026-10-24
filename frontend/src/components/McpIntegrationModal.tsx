@@ -65,17 +65,23 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
         setToolResult(null);
 
         let params: any = { name: selectedTool, arguments: {} };
-        if (selectedTool === 'wallet_pay') {
+        if (selectedTool === 'wallet_get_balance') {
+            params.arguments = {
+                agent_id: wallet.activeAgentId
+            };
+        } else if (selectedTool === 'wallet_pay') {
             params.arguments = {
                 target_vendor: 'OpenAI Billing API',
                 target_address: '0x00000000000000000000000000000000000A1A1A',
                 function_called: 'payInvoice',
                 amount_usd: 15.00,
-                reason: 'Replenishing GPT-4 inference tokens via MCP'
+                reason: 'Replenishing GPT-4 inference tokens via MCP',
+                agent_id: wallet.activeAgentId
             };
         } else if (selectedTool === 'wallet_freeze_card') {
             params.arguments = {
-                freeze: true,
+                freeze: !wallet.virtualCard.isFrozen,
+                agent_id: wallet.activeAgentId,
                 reason: 'MCP security freeze request'
             };
         }
@@ -93,6 +99,7 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
             });
             const data = await res.json();
             setToolResult(JSON.stringify(data, null, 2));
+            await wallet.syncFromServer();
         } catch (e: any) {
             setToolResult(JSON.stringify({ error: e?.message || 'Failed to call /api/mcp' }, null, 2));
         } finally {

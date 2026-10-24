@@ -196,9 +196,14 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                                     </div>
 
                                     <div className="flex items-center justify-between pt-2.5 border-t border-stone-200/60">
-                                        <span className="text-[10px] font-mono text-stone-400">
-                                            Card: {agent.assignedCard}
-                                        </span>
+                                        <div className="flex items-center gap-1.5 text-[10px] font-mono text-stone-400">
+                                            <span>Card: {agent.assignedCard}</span>
+                                            {agent.cardDetails?.isFrozen && (
+                                                <span className="text-[9px] px-1.5 py-0.2 bg-rose-50 text-rose-700 border border-rose-200 rounded font-semibold tracking-wider">
+                                                    FROZEN
+                                                </span>
+                                            )}
+                                        </div>
 
                                         <button
                                             onClick={() => onSelectAgent(agent.id)}

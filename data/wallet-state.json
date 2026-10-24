@@ -11,23 +11,23 @@
     "passkeyCredentialId": "credential-p256-apple-secure-enclave",
     "passkeyDeviceName": "TouchID / FaceID (WebAuthn P-256)",
     "totalAgentsCount": 12,
-    "totalFleetSpendToday": 2486600
+    "totalFleetSpendToday": 2513100
   },
   "balances": {
-    "usdc": 1248800,
+    "usdc": 1222300,
     "eth": 0.45,
     "paymasterGasTankINR": 4850
   },
   "activeAgent": {
-    "id": "support-02",
-    "name": "support-bot-02",
-    "address": "0xAgent3310cB11aA33281bA9281a829188aA3310",
+    "id": "finance-07",
+    "name": "finance-agent-07",
+    "address": "0xAgent92F1c30E682cB72a6A20C57aD7858D0aA4481023",
     "sessionActive": true,
     "sessionExpiresAt": 1792882638591
   },
   "policy": {
-    "dailyBudget": 50000,
-    "maxPerTx": 2500,
+    "dailyBudget": 500000,
+    "maxPerTx": 300000,
     "sessionExpiryHours": 6,
     "allowedContracts": [
       {
@@ -76,17 +76,17 @@
       "0xE592427A0AEce92De3Edee1F18E0157C05861564"
     ]
   },
-  "dailySpent": 18700,
+  "dailySpent": 325500,
   "lastEpochReset": 1729792800000,
   "virtualCard": {
     "cardNumber": "4242 0815 9012 1126",
-    "maskedNumber": "4242 0815 ···· 8840",
+    "maskedNumber": "4242 0815 ···· 1126",
     "expiry": "08/28",
     "cvv": "842",
-    "holder": "SUPPORT-BOT-02 / SAFEAGENT",
+    "holder": "FINANCE-AGENT-07 / SAFEAGENT",
     "isFrozen": false,
     "dailyLimit": 500000,
-    "spentToday": 299000,
+    "spentToday": 325500,
     "brand": "VISA BUSINESS"
   },
   "fleet": [
@@ -98,10 +98,22 @@
       "tag": "FI",
       "address": "0xAgent92F1c30E682cB72a6A20C57aD7858D0aA4481023",
       "dailyBudget": 500000,
-      "spentToday": 299000,
+      "maxPerTx": 300000,
+      "spentToday": 325500,
       "status": "active",
       "assignedCard": "4242 0815 ···· 1126",
-      "lastAction": "paid invoice · Datadog (₹2,99,000)"
+      "lastAction": "payInvoice() · OpenAI Billing API (₹25,000)",
+      "cardDetails": {
+        "cardNumber": "4242 0815 9012 1126",
+        "maskedNumber": "4242 0815 ···· 1126",
+        "expiry": "08/28",
+        "cvv": "842",
+        "holder": "FINANCE-AGENT-07 / SAFEAGENT",
+        "isFrozen": false,
+        "dailyLimit": 500000,
+        "spentToday": 325500,
+        "brand": "VISA BUSINESS"
+      }
     },
     {
       "id": "concierge-08",
@@ -111,10 +123,22 @@
       "tag": "CO",
       "address": "0xAgent8821bA41c8dF291a82E92aC5718a381920B8821",
       "dailyBudget": 50000,
+      "maxPerTx": 20000,
       "spentToday": 14600,
       "status": "active",
       "assignedCard": "4242 0815 ···· 8840",
-      "lastAction": "paid vendor · Zoom (₹14,600)"
+      "lastAction": "paid vendor · Zoom (₹14,600)",
+      "cardDetails": {
+        "cardNumber": "4242 0815 3390 8840",
+        "maskedNumber": "4242 0815 ···· 8840",
+        "expiry": "11/27",
+        "cvv": "319",
+        "holder": "CONCIERGE-08 / SAFEAGENT",
+        "isFrozen": false,
+        "dailyLimit": 50000,
+        "spentToday": 14600,
+        "brand": "VISA BUSINESS"
+      }
     },
     {
       "id": "media-10",
@@ -124,10 +148,22 @@
       "tag": "ME",
       "address": "0xAgent4419eD92cA01f8271a39d891A928bA339124419",
       "dailyBudget": 250000,
+      "maxPerTx": 150000,
       "spentToday": 108600,
       "status": "active",
       "assignedCard": "4242 0815 ···· 3391",
-      "lastAction": "bought placement · Google Ads (₹1,08,600)"
+      "lastAction": "bought placement · Google Ads (₹1,08,600)",
+      "cardDetails": {
+        "cardNumber": "4242 0815 7712 3391",
+        "maskedNumber": "4242 0815 ···· 3391",
+        "expiry": "04/28",
+        "cvv": "552",
+        "holder": "MEDIA-BUYER-10 / SAFEAGENT",
+        "isFrozen": false,
+        "dailyLimit": 250000,
+        "spentToday": 108600,
+        "brand": "VISA BUSINESS"
+      }
     },
     {
       "id": "devops-04",
@@ -137,10 +173,22 @@
       "tag": "DE",
       "address": "0xAgent7702fB12aC90281bA9281a829188aA910237702",
       "dailyBudget": 100000,
+      "maxPerTx": 50000,
       "spentToday": 22000,
       "status": "active",
       "assignedCard": "4242 0815 ···· 9102",
-      "lastAction": "paid API credit · Replicate (₹22,000)"
+      "lastAction": "paid API credit · Replicate (₹22,000)",
+      "cardDetails": {
+        "cardNumber": "4242 0815 6601 9102",
+        "maskedNumber": "4242 0815 ···· 9102",
+        "expiry": "09/27",
+        "cvv": "109",
+        "holder": "DEVOPS-BOT-04 / SAFEAGENT",
+        "isFrozen": false,
+        "dailyLimit": 100000,
+        "spentToday": 22000,
+        "brand": "VISA BUSINESS"
+      }
     },
     {
       "id": "qa-11",
@@ -150,10 +198,22 @@
       "tag": "QA",
       "address": "0xAgent9923aE11bF99281bA9281a829188aA9923",
       "dailyBudget": 25000,
+      "maxPerTx": 10000,
       "spentToday": 9000,
       "status": "active",
-      "assignedCard": "4242 0815 ···· 1126",
-      "lastAction": "paid API credit · BrowserStack (₹9,000)"
+      "assignedCard": "4242 0815 ···· 4410",
+      "lastAction": "paid API credit · BrowserStack (₹9,000)",
+      "cardDetails": {
+        "cardNumber": "4242 0815 8821 4410",
+        "maskedNumber": "4242 0815 ···· 4410",
+        "expiry": "01/29",
+        "cvv": "741",
+        "holder": "QA-TESTER-11 / SAFEAGENT",
+        "isFrozen": false,
+        "dailyLimit": 25000,
+        "spentToday": 9000,
+        "brand": "VISA BUSINESS"
+      }
     },
     {
       "id": "support-02",
@@ -163,45 +223,39 @@
       "tag": "SU",
       "address": "0xAgent3310cB11aA33281bA9281a829188aA3310",
       "dailyBudget": 50000,
-      "spentToday": 18700,
+      "maxPerTx": 25000,
+      "spentToday": 17500,
       "status": "active",
-      "assignedCard": "4242 0815 ···· 8840",
-      "lastAction": "payInvoice(amount: 1200) · OpenAI Billing API (₹1,200)"
+      "assignedCard": "4242 0815 ···· 5521",
+      "lastAction": "approved expense · Freshworks (₹17,500)",
+      "cardDetails": {
+        "cardNumber": "4242 0815 1109 5521",
+        "maskedNumber": "4242 0815 ···· 5521",
+        "expiry": "06/28",
+        "cvv": "428",
+        "holder": "SUPPORT-BOT-02 / SAFEAGENT",
+        "isFrozen": false,
+        "dailyLimit": 50000,
+        "spentToday": 17500,
+        "brand": "VISA BUSINESS"
+      }
     }
   ],
   "inboxMessages": [
     {
-      "id": "msg-1792861047805",
+      "id": "msg-1792862086101",
       "sender": "Card Control System",
-      "subject": "Virtual Card ACTIVE",
-      "body": "Agent virtual card ···· 1126 status changed to ACTIVE via MCP Tool by Agent support-bot-02.",
+      "subject": "Virtual Card ACTIVE (4242 0815 ···· 8840)",
+      "body": "Agent concierge-08 virtual card 4242 0815 ···· 8840 status changed to ACTIVE via MCP Tool by Principal Madhav B..",
       "timestamp": "Just now",
       "unread": true,
       "category": "alert"
     },
     {
-      "id": "msg-1792860891942",
+      "id": "msg-1792862085656",
       "sender": "Card Control System",
-      "subject": "Virtual Card FROZEN",
-      "body": "Agent virtual card ···· 1126 status changed to FROZEN by Principal Madhav B..",
-      "timestamp": "Just now",
-      "unread": true,
-      "category": "alert"
-    },
-    {
-      "id": "msg-1792860885269",
-      "sender": "Card Control System",
-      "subject": "Virtual Card ACTIVE",
-      "body": "Agent virtual card ···· 1126 status changed to ACTIVE by Principal Madhav B..",
-      "timestamp": "Just now",
-      "unread": true,
-      "category": "alert"
-    },
-    {
-      "id": "msg-1792860877531",
-      "sender": "Card Control System",
-      "subject": "Virtual Card FROZEN",
-      "body": "Agent virtual card ···· 1126 status changed to FROZEN by Principal Madhav B..",
+      "subject": "Virtual Card FROZEN (4242 0815 ···· 8840)",
+      "body": "Agent concierge-08 virtual card 4242 0815 ···· 8840 status changed to FROZEN via MCP Tool by Principal Madhav B..",
       "timestamp": "Just now",
       "unread": true,
       "category": "alert"
@@ -246,16 +300,28 @@
   ],
   "activityStream": [
     {
-      "id": "stream-mcp-1792861053316",
-      "agentId": "support-02",
-      "agentName": "support-bot-02",
-      "category": "ops",
-      "tag": "SU",
+      "id": "stream-mcp-1792862086439",
+      "agentId": "finance-07",
+      "agentName": "finance-agent-07",
+      "category": "finance",
+      "tag": "FI",
       "action": "payInvoice",
       "vendor": "OpenAI Billing API",
-      "amount": 1200,
+      "amount": 25000,
       "timeAgo": "now",
-      "timestamp": 1792861053316
+      "timestamp": 1792862086439
+    },
+    {
+      "id": "stream-mcp-1792862086009",
+      "agentId": "finance-07",
+      "agentName": "finance-agent-07",
+      "category": "finance",
+      "tag": "FI",
+      "action": "payInvoice",
+      "vendor": "OpenAI Billing API",
+      "amount": 1500,
+      "timeAgo": "now",
+      "timestamp": 1792862086009
     },
     {
       "id": "stream-1",
@@ -294,21 +360,56 @@
       "timestamp": 1729794973000
     }
   ],
-  "queuedApprovals": [],
-  "userOps": [
+  "queuedApprovals": [
     {
-      "id": "op-mcp-1792861053293",
-      "userOpHash": "0xe4d3f3...957d02",
-      "timestamp": "10:27:33 pm",
+      "id": "req-mcp-1792862086307",
+      "agent": "concierge-08",
       "targetName": "OpenAI Billing API",
       "targetAddress": "0x00000000000000000000000000000000000A1A1A",
-      "functionCalled": "payInvoice(amount: 1200)",
-      "amount": 1200,
+      "amount": 25000,
+      "actionName": "payInvoice()",
+      "reason": "Amount (₹25,000) exceeds Per-Tx Cap (₹20,000)",
+      "timestamp": "10:44:46 pm",
+      "status": "PENDING"
+    }
+  ],
+  "userOps": [
+    {
+      "id": "op-mcp-1792862086430",
+      "userOpHash": "0x04cffe...b61c21",
+      "timestamp": "10:44:46 pm",
+      "targetName": "OpenAI Billing API",
+      "targetAddress": "0x00000000000000000000000000000000000A1A1A",
+      "functionCalled": "payInvoice()",
+      "amount": 25000,
       "gasSponsored": true,
       "gasCostUSD": 10,
       "status": "EXECUTED",
       "validationResult": "IN_POLICY",
-      "reason": "MCP Autonomous Agent payment: Top up GPT-4o autonomous evaluation credits",
+      "reason": "MCP Autonomous Agent payment: In-policy payment for finance agent",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 3,
+        "callData": "0xpayInvoi...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-mcp-1792862086000",
+      "userOpHash": "0x23afbd...0e7ead",
+      "timestamp": "10:44:46 pm",
+      "targetName": "OpenAI Billing API",
+      "targetAddress": "0x00000000000000000000000000000000000A1A1A",
+      "functionCalled": "payInvoice()",
+      "amount": 1500,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "MCP Autonomous Agent payment: Test in-policy payment with active card",
       "rawUserOp": {
         "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
         "nonce": 2,
@@ -331,7 +432,7 @@
       "gasCostUSD": 10,
       "status": "EXECUTED",
       "validationResult": "IN_POLICY",
-      "reason": "Autonomous top-up of API credits (₹1,500 < ₹2,500 limit). Verified on-chain.",
+      "reason": "Autonomous top-up of API credits (₹1,500 < ₹3,00,000 limit). Verified on-chain.",
       "rawUserOp": {
         "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
         "nonce": 1,

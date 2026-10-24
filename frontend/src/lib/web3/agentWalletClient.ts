@@ -56,10 +56,12 @@ export interface FleetAgent {
     tag: string;
     address: string;
     dailyBudget: number;
+    maxPerTx: number;
     spentToday: number;
     status: 'active' | 'provisioning' | 'paused';
     assignedCard: string;
     lastAction: string;
+    cardDetails: VirtualCardDetails;
 }
 
 export interface VirtualCardDetails {
@@ -131,10 +133,22 @@ export class AgentWalletClient {
             tag: 'FI',
             address: '0xAgent92F1c30E682cB72a6A20C57aD7858D0aA4481023',
             dailyBudget: 500000,
+            maxPerTx: 300000,
             spentToday: 299000,
             status: 'active',
             assignedCard: '4242 0815 ···· 1126',
-            lastAction: 'paid invoice · Datadog (₹2,99,000)'
+            lastAction: 'paid invoice · Datadog (₹2,99,000)',
+            cardDetails: {
+                cardNumber: '4242 0815 9012 1126',
+                maskedNumber: '4242 0815 ···· 1126',
+                expiry: '08/28',
+                cvv: '842',
+                holder: 'FINANCE-AGENT-07 / SAFEAGENT',
+                isFrozen: false,
+                dailyLimit: 500000.00,
+                spentToday: 299000.00,
+                brand: 'VISA BUSINESS'
+            }
         },
         {
             id: 'concierge-08',
@@ -144,10 +158,22 @@ export class AgentWalletClient {
             tag: 'CO',
             address: '0xAgent8821bA41c8dF291a82E92aC5718a381920B8821',
             dailyBudget: 50000,
+            maxPerTx: 20000,
             spentToday: 14600,
             status: 'active',
             assignedCard: '4242 0815 ···· 8840',
-            lastAction: 'paid vendor · Zoom (₹14,600)'
+            lastAction: 'paid vendor · Zoom (₹14,600)',
+            cardDetails: {
+                cardNumber: '4242 0815 3390 8840',
+                maskedNumber: '4242 0815 ···· 8840',
+                expiry: '11/27',
+                cvv: '319',
+                holder: 'CONCIERGE-08 / SAFEAGENT',
+                isFrozen: false,
+                dailyLimit: 50000.00,
+                spentToday: 14600.00,
+                brand: 'VISA BUSINESS'
+            }
         },
         {
             id: 'media-10',
@@ -157,10 +183,22 @@ export class AgentWalletClient {
             tag: 'ME',
             address: '0xAgent4419eD92cA01f8271a39d891A928bA339124419',
             dailyBudget: 250000,
+            maxPerTx: 150000,
             spentToday: 108600,
             status: 'active',
             assignedCard: '4242 0815 ···· 3391',
-            lastAction: 'bought placement · Google Ads (₹1,08,600)'
+            lastAction: 'bought placement · Google Ads (₹1,08,600)',
+            cardDetails: {
+                cardNumber: '4242 0815 7712 3391',
+                maskedNumber: '4242 0815 ···· 3391',
+                expiry: '04/28',
+                cvv: '552',
+                holder: 'MEDIA-BUYER-10 / SAFEAGENT',
+                isFrozen: false,
+                dailyLimit: 250000.00,
+                spentToday: 108600.00,
+                brand: 'VISA BUSINESS'
+            }
         },
         {
             id: 'devops-04',
@@ -170,10 +208,22 @@ export class AgentWalletClient {
             tag: 'DE',
             address: '0xAgent7702fB12aC90281bA9281a829188aA910237702',
             dailyBudget: 100000,
+            maxPerTx: 50000,
             spentToday: 22000,
             status: 'active',
             assignedCard: '4242 0815 ···· 9102',
-            lastAction: 'paid API credit · Replicate (₹22,000)'
+            lastAction: 'paid API credit · Replicate (₹22,000)',
+            cardDetails: {
+                cardNumber: '4242 0815 6601 9102',
+                maskedNumber: '4242 0815 ···· 9102',
+                expiry: '09/27',
+                cvv: '109',
+                holder: 'DEVOPS-BOT-04 / SAFEAGENT',
+                isFrozen: false,
+                dailyLimit: 100000.00,
+                spentToday: 22000.00,
+                brand: 'VISA BUSINESS'
+            }
         },
         {
             id: 'qa-11',
@@ -183,10 +233,22 @@ export class AgentWalletClient {
             tag: 'QA',
             address: '0xAgent9923aE11bF99281bA9281a829188aA9923',
             dailyBudget: 25000,
+            maxPerTx: 10000,
             spentToday: 9000,
             status: 'active',
-            assignedCard: '4242 0815 ···· 1126',
-            lastAction: 'paid API credit · BrowserStack (₹9,000)'
+            assignedCard: '4242 0815 ···· 4410',
+            lastAction: 'paid API credit · BrowserStack (₹9,000)',
+            cardDetails: {
+                cardNumber: '4242 0815 8821 4410',
+                maskedNumber: '4242 0815 ···· 4410',
+                expiry: '01/29',
+                cvv: '741',
+                holder: 'QA-TESTER-11 / SAFEAGENT',
+                isFrozen: false,
+                dailyLimit: 25000.00,
+                spentToday: 9000.00,
+                brand: 'VISA BUSINESS'
+            }
         },
         {
             id: 'support-02',
@@ -196,10 +258,22 @@ export class AgentWalletClient {
             tag: 'SU',
             address: '0xAgent3310cB11aA33281bA9281a829188aA3310',
             dailyBudget: 50000,
+            maxPerTx: 25000,
             spentToday: 17500,
             status: 'active',
-            assignedCard: '4242 0815 ···· 8840',
-            lastAction: 'approved expense · Freshworks (₹17,500)'
+            assignedCard: '4242 0815 ···· 5521',
+            lastAction: 'approved expense · Freshworks (₹17,500)',
+            cardDetails: {
+                cardNumber: '4242 0815 1109 5521',
+                maskedNumber: '4242 0815 ···· 5521',
+                expiry: '06/28',
+                cvv: '428',
+                holder: 'SUPPORT-BOT-02 / SAFEAGENT',
+                isFrozen: false,
+                dailyLimit: 50000.00,
+                spentToday: 17500.00,
+                brand: 'VISA BUSINESS'
+            }
         }
     ];
 
@@ -459,7 +533,6 @@ export class AgentWalletClient {
             this.paymasterGasTankUSD = s.balances.paymasterGasTankINR;
         }
         if (s.policy) this.policy = s.policy;
-        if (s.virtualCard) this.virtualCard = s.virtualCard;
         if (s.fleet) this.fleet = s.fleet;
         if (s.dailySpent !== undefined) this.dailySpent = s.dailySpent;
         if (s.activeAgent) {
@@ -468,6 +541,12 @@ export class AgentWalletClient {
             this.agentAddress = s.activeAgent.address;
             this.sessionActive = s.activeAgent.sessionActive;
             this.sessionExpiresAt = s.activeAgent.sessionExpiresAt;
+        }
+        if (s.virtualCard) {
+            this.virtualCard = s.virtualCard;
+        } else {
+            const ag = this.fleet.find(a => a.id === this.activeAgentId);
+            if (ag?.cardDetails) this.virtualCard = { ...ag.cardDetails };
         }
         if (s.inboxMessages) this.inboxMessages = s.inboxMessages;
         if (s.activityStream) this.activityStream = s.activityStream;
@@ -497,7 +576,7 @@ export class AgentWalletClient {
     }
 
     /**
-     * Switch Active Fleet Agent
+     * Switch Active Fleet Agent & load their specific virtual card and policy
      */
     switchAgent(agentId: string) {
         const ag = this.fleet.find(a => a.id === agentId);
@@ -506,9 +585,16 @@ export class AgentWalletClient {
             this.agentName = ag.name;
             this.agentAddress = ag.address;
             this.policy.dailyBudget = ag.dailyBudget;
+            this.policy.maxPerTx = ag.maxPerTx || 50000;
             this.dailySpent = ag.spentToday;
-            this.virtualCard.holder = `${ag.name.toUpperCase()} / SAFEAGENT`;
-            this.virtualCard.maskedNumber = ag.assignedCard;
+            if (ag.cardDetails) {
+                this.virtualCard = { ...ag.cardDetails };
+            } else {
+                this.virtualCard.holder = `${ag.name.toUpperCase()} / SAFEAGENT`;
+                this.virtualCard.maskedNumber = ag.assignedCard;
+                this.virtualCard.dailyLimit = ag.dailyBudget;
+                this.virtualCard.spentToday = ag.spentToday;
+            }
         }
         if (typeof window !== 'undefined') {
             fetch('/api/wallet/state', {
@@ -520,16 +606,21 @@ export class AgentWalletClient {
     }
 
     /**
-     * Toggle Virtual Card Freeze
+     * Toggle Virtual Card Freeze for the active agent
      */
     toggleCardFreeze(): boolean {
-        this.virtualCard.isFrozen = !this.virtualCard.isFrozen;
-        const action = this.virtualCard.isFrozen ? 'FROZEN' : 'ACTIVE';
+        const shouldFreeze = !this.virtualCard.isFrozen;
+        this.virtualCard.isFrozen = shouldFreeze;
+        const activeAg = this.fleet.find(a => a.id === this.activeAgentId);
+        if (activeAg && activeAg.cardDetails) {
+            activeAg.cardDetails.isFrozen = shouldFreeze;
+        }
+        const action = shouldFreeze ? 'FROZEN' : 'ACTIVE';
         this.inboxMessages.unshift({
             id: `msg-${Date.now()}`,
             sender: 'Card Control System',
-            subject: `Virtual Card ${action}`,
-            body: `Agent virtual card ···· 1126 status changed to ${action} by Principal ${this.principalName}.`,
+            subject: `Virtual Card ${action} (${this.virtualCard.maskedNumber})`,
+            body: `Agent ${this.agentName} virtual card (${this.virtualCard.maskedNumber}) status changed to ${action} by Principal ${this.principalName}.`,
             timestamp: 'Just now',
             unread: true,
             category: 'alert'
@@ -538,22 +629,28 @@ export class AgentWalletClient {
             fetch('/api/wallet/state', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'toggle_freeze', payload: {} })
+                body: JSON.stringify({ action: 'toggle_freeze', payload: { agentId: this.activeAgentId } })
             }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
         }
         return this.virtualCard.isFrozen;
     }
 
     /**
-     * Update Card Daily Limit
+     * Update Card Daily Limit for the active agent
      */
     updateCardLimit(limit: number) {
         this.virtualCard.dailyLimit = limit;
+        this.policy.dailyBudget = limit;
+        const activeAg = this.fleet.find(a => a.id === this.activeAgentId);
+        if (activeAg) {
+            activeAg.dailyBudget = limit;
+            if (activeAg.cardDetails) activeAg.cardDetails.dailyLimit = limit;
+        }
         if (typeof window !== 'undefined') {
             fetch('/api/wallet/state', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'update_card_limit', payload: { limit } })
+                body: JSON.stringify({ action: 'update_card_limit', payload: { limit, agentId: this.activeAgentId } })
             }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
         }
     }
@@ -883,6 +980,16 @@ export class AgentWalletClient {
         this.policy.maxPerTx = maxPerTx;
         this.policy.sessionExpiryHours = durationHours;
         this.dailySpent = 0;
+        const activeAg = this.fleet.find(a => a.id === this.activeAgentId);
+        if (activeAg) {
+            activeAg.dailyBudget = dailyBudget;
+            activeAg.maxPerTx = maxPerTx;
+            activeAg.spentToday = 0;
+            if (activeAg.cardDetails) {
+                activeAg.cardDetails.dailyLimit = dailyBudget;
+                activeAg.cardDetails.spentToday = 0;
+            }
+        }
         if (typeof window !== 'undefined') {
             fetch('/api/wallet/state', {
                 method: 'POST',

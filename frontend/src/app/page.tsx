@@ -20,7 +20,7 @@ import { InteractiveCliTerminal } from '../components/InteractiveCliTerminal';
 
 import { Phase2HijackRecovery } from '../components/Phase2HijackRecovery';
 
-import { agentWalletClient, QueuedApproval, UserOperationLog } from '../lib/web3/agentWalletClient';
+import { agentWalletClient, QueuedApproval, UserOperationLog, formatINR } from '../lib/web3/agentWalletClient';
 import { LayoutGrid, Bot, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users, Skull } from 'lucide-react';
 
 type ActiveTab = 'overview' | 'fleet' | 'card' | 'simulator' | 'stream' | 'cli' | 'threats' | 'phase2';
@@ -157,18 +157,19 @@ export default function Home() {
     };
 
     const handleTriggerOverspend = () => {
+        const overspendAmount = Math.max(25000, (wallet.policy.maxPerTx || 2500) * 2);
         wallet.submitAgentAction(
             'High-End Compute Cluster API',
             '0x00000000000000000000000000000000000C3C3C',
-            'prepayCluster(uint256 25000)',
-            25000.00,
-            'Agent attempts ₹25,000 purchase on ₹2,500 per-tx limit'
+            `prepayCluster(uint256 ${overspendAmount})`,
+            overspendAmount,
+            `Agent attempts ${formatINR(overspendAmount)} purchase on ${formatINR(wallet.policy.maxPerTx)} per-tx limit`
         );
         setActiveApprovalRequest(wallet.queuedApprovals[0] || null);
         const newLog = {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
-            attackType: 'Budget Overspend (₹25,000 > ₹2,500)',
+            attackType: `Budget Overspend (${formatINR(overspendAmount)} > ${formatINR(wallet.policy.maxPerTx)})`,
             result: 'HALTED & ESCALATED',
             defenseMechanism: 'Owner TouchID Passkey Gate'
         };

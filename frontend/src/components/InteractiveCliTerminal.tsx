@@ -25,9 +25,16 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
         let response = '';
         const trimmed = cmd.trim().toLowerCase();
 
-        if (trimmed.includes('fleet')) {
+        if (trimmed.includes('freeze')) {
+            const isNow = wallet.toggleCardFreeze();
+            response = `[VIRTUAL CARD CONTROLLER]\n` +
+                `Active Agent: ${wallet.agentName}\n` +
+                `Card: ${wallet.virtualCard.maskedNumber}\n` +
+                `Action: ${isNow ? 'FROZEN on-chain' : 'UNFROZEN & REACTIVATED'}\n` +
+                `PolicyEngine.sol validation guardrail updated.`;
+        } else if (trimmed.includes('fleet')) {
             response = `[AGENT FLEET]\n` +
-                wallet.fleet.map(a => `• ${a.name.padEnd(18)} [${a.category.toUpperCase()}] Spent: ${formatINR(a.spentToday)}/${formatINR(a.dailyBudget)} | Card: ${a.assignedCard}`).join('\n');
+                wallet.fleet.map(a => `• ${a.name.padEnd(18)} [${a.category.toUpperCase()}] Spent: ${formatINR(a.spentToday)}/${formatINR(a.dailyBudget)} | Card: ${a.assignedCard} (${a.cardDetails?.isFrozen ? 'FROZEN' : 'ACTIVE'})`).join('\n');
         } else if (trimmed.includes('card')) {
             response = `[VIRTUAL CARD RESOURCE]\n` +
                 `Number: ${wallet.virtualCard.maskedNumber}\n` +
@@ -87,6 +94,12 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
                         className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition"
                     >
                         card --status
+                    </button>
+                    <button
+                        onClick={() => runCliCommand('safeagent card --freeze')}
+                        className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-medium transition"
+                    >
+                        card --freeze
                     </button>
                     <button
                         onClick={() => runCliCommand('safeagent mcp --ping')}

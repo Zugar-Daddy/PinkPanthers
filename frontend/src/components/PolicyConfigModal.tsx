@@ -24,7 +24,19 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
     const [durationHours, setDurationHours] = useState(wallet.policy.sessionExpiryHours);
     const [isSaved, setIsSaved] = useState(false);
 
+    // Sync state whenever modal opens or active agent / policy changes
+    React.useEffect(() => {
+        if (isOpen) {
+            setDailyBudget(wallet.policy.dailyBudget);
+            setMaxPerTx(wallet.policy.maxPerTx);
+            setDurationHours(wallet.policy.sessionExpiryHours);
+        }
+    }, [isOpen, wallet.activeAgentId, wallet.policy.dailyBudget, wallet.policy.maxPerTx, wallet.policy.sessionExpiryHours]);
+
     if (!isOpen) return null;
+
+    const maxSliderPerTx = Math.max(300000, maxPerTx * 1.5);
+    const maxSliderDailyBudget = Math.max(500000, dailyBudget * 1.5);
 
     const handleSave = () => {
         onUpdatePolicy(dailyBudget, maxPerTx, durationHours);
@@ -46,7 +58,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         </div>
                         <div>
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">Agent Policy Controls</h2>
-                            <p className="text-xs text-stone-500 font-sans">Owner-enforced on-chain spending guardrails</p>
+                            <p className="text-xs text-stone-500 font-sans">Owner-enforced on-chain spending guardrails for <span className="font-semibold text-stone-700">{wallet.agentName}</span></p>
                         </div>
                     </div>
                     <button
@@ -67,7 +79,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         <input
                             type="range"
                             min={500}
-                            max={10000}
+                            max={maxSliderPerTx}
                             step={500}
                             value={maxPerTx}
                             onChange={(e) => setMaxPerTx(parseFloat(e.target.value))}
@@ -75,7 +87,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         />
                         <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
                             <span>₹500 (Micro-orders)</span>
-                            <span>₹10,000 (High-tier limit)</span>
+                            <span>{formatINR(maxSliderPerTx)} (Tier limit)</span>
                         </div>
                     </div>
 
@@ -88,7 +100,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         <input
                             type="range"
                             min={2500}
-                            max={50000}
+                            max={maxSliderDailyBudget}
                             step={2500}
                             value={dailyBudget}
                             onChange={(e) => setDailyBudget(parseFloat(e.target.value))}
@@ -96,7 +108,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         />
                         <div className="flex justify-between text-[10px] text-stone-400 mt-1.5 font-mono">
                             <span>₹2,500/day</span>
-                            <span>₹50,000/day</span>
+                            <span>{formatINR(maxSliderDailyBudget)}/day</span>
                         </div>
                     </div>
 

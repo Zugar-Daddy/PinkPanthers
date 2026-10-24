@@ -34,6 +34,27 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
     const [customAmount, setCustomAmount] = useState('1800');
     const [customDesc, setCustomDesc] = useState('Autonomous agent API top-up');
 
+    // Dynamic badge calculation based on currently active agent's policy limits
+    const getBadgeInfo = (amount: number) => {
+        if (amount > wallet.policy.maxPerTx) {
+            return {
+                badge: `Out-of-Policy (${formatINR(amount)} > ${formatINR(wallet.policy.maxPerTx)} Cap)`,
+                badgeColor: 'text-amber-800 bg-amber-50 border border-amber-200/80'
+            };
+        }
+        if (wallet.dailySpent + amount > wallet.policy.dailyBudget) {
+            const remaining = Math.max(0, wallet.policy.dailyBudget - wallet.dailySpent);
+            return {
+                badge: `Exceeds 24h Budget (${formatINR(amount)} > ${formatINR(remaining)} Rem)`,
+                badgeColor: 'text-amber-800 bg-amber-50 border border-amber-200/80'
+            };
+        }
+        return {
+            badge: `In-Policy (${formatINR(amount)} ≤ ${formatINR(wallet.policy.maxPerTx)})`,
+            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80'
+        };
+    };
+
     // Tab 1: General & Mobility Presets
     const generalPresets = [
         {
@@ -44,8 +65,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'payInvoice(uint256 1500)',
             amount: 1500.00,
             icon: Cpu,
-            badge: 'In-Policy (₹1,500 < ₹2,500)',
-            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
+            ...getBadgeInfo(1500.00),
             description: 'Agent autonomously replenishes LLM inference credits'
         },
         {
@@ -56,8 +76,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'orderCheckout(uint256 950)',
             amount: 950.00,
             icon: ShoppingBag,
-            badge: 'In-Policy (₹950 < ₹2,500)',
-            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
+            ...getBadgeInfo(950.00),
             description: 'Agent orders office milk, coffee beans & fruit'
         },
         {
@@ -68,8 +87,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'bookTicket(uint256 800)',
             amount: 800.00,
             icon: Ticket,
-            badge: 'In-Policy (₹800 < ₹2,500)',
-            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
+            ...getBadgeInfo(800.00),
             description: 'Agent reserves daily commute rapid transit ticket'
         },
         {
@@ -80,8 +98,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'bookTicket(uint256 14500)',
             amount: 14500.00,
             icon: Plane,
-            badge: 'Out-of-Policy (₹14,500 > ₹2,500 Cap)',
-            badgeColor: 'text-amber-800 bg-amber-50 border border-amber-200/80',
+            ...getBadgeInfo(14500.00),
             description: 'Agent tries to book conference flight exceeding per-tx cap'
         }
     ];
@@ -96,8 +113,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'topUpCompute(uint256 2200)',
             amount: 2200.00,
             icon: Zap,
-            badge: 'In-Policy (₹2,200 < ₹2,500)',
-            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
+            ...getBadgeInfo(2200.00),
             description: 'DevOps bot tops up serverless edge worker compute'
         },
         {
@@ -108,8 +124,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'orderCatering(uint256 1650)',
             amount: 1650.00,
             icon: ShoppingCart,
-            badge: 'In-Policy (₹1,650 < ₹2,500)',
-            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
+            ...getBadgeInfo(1650.00),
             description: 'Automated executive working lunch catering for team'
         },
         {
@@ -120,8 +135,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'payInvoice(uint256 1800)',
             amount: 1800.00,
             icon: Bot,
-            badge: 'In-Policy (₹1,800 < ₹2,500)',
-            badgeColor: 'text-emerald-800 bg-emerald-50 border border-emerald-200/80',
+            ...getBadgeInfo(1800.00),
             description: 'Autonomous research batch embedding & inference query'
         },
         {
@@ -132,8 +146,7 @@ export const AgentActionSimulator: React.FC<AgentActionSimulatorProps> = ({ wall
             functionCalled: 'topUpCompute(uint256 25000)',
             amount: 25000.00,
             icon: Sparkles,
-            badge: 'Out-of-Policy (₹25,000 > ₹2,500 Cap)',
-            badgeColor: 'text-amber-800 bg-amber-50 border border-amber-200/80',
+            ...getBadgeInfo(25000.00),
             description: 'Agent requests dedicated GPU cluster exceeding per-tx cap'
         }
     ];
