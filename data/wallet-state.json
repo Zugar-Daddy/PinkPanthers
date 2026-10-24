@@ -11,10 +11,10 @@
     "passkeyCredentialId": "credential-p256-apple-secure-enclave",
     "passkeyDeviceName": "TouchID / FaceID (WebAuthn P-256)",
     "totalAgentsCount": 12,
-    "totalFleetSpendToday": 2665650
+    "totalFleetSpendToday": 2667530
   },
   "balances": {
-    "usdc": 1069750,
+    "usdc": 1067870,
     "eth": 0.45,
     "paymasterGasTankINR": 4850
   },
@@ -83,7 +83,7 @@
       "0x00000000000000000000000000000000000F6F6F"
     ]
   },
-  "dailySpent": 50200,
+  "dailySpent": 48870,
   "lastEpochReset": 1729792800000,
   "virtualCard": {
     "cardNumber": "4242 0815 3390 8840",
@@ -91,9 +91,9 @@
     "expiry": "11/27",
     "cvv": "319",
     "holder": "CONCIERGE-08 / SAFEAGENT",
-    "isFrozen": false,
+    "isFrozen": true,
     "dailyLimit": 50000,
-    "spentToday": 48750,
+    "spentToday": 48870,
     "brand": "VISA BUSINESS"
   },
   "fleet": [
@@ -131,19 +131,19 @@
       "address": "0xAgent8821bA41c8dF291a82E92aC5718a381920B8821",
       "dailyBudget": 50000,
       "maxPerTx": 20000,
-      "spentToday": 48750,
+      "spentToday": 48870,
       "status": "active",
       "assignedCard": "4242 0815 ···· 8840",
-      "lastAction": "bookBusTicket(uint256 1850) · RedBus Intercity Mobility (₹1,850)",
+      "lastAction": "execute(120) · Grocery & Delivery Service (Blinkit/Zepto) (₹120)",
       "cardDetails": {
         "cardNumber": "4242 0815 3390 8840",
         "maskedNumber": "4242 0815 ···· 8840",
         "expiry": "11/27",
         "cvv": "319",
         "holder": "CONCIERGE-08 / SAFEAGENT",
-        "isFrozen": false,
+        "isFrozen": true,
         "dailyLimit": 50000,
-        "spentToday": 48750,
+        "spentToday": 48870,
         "brand": "VISA BUSINESS"
       }
     },
@@ -250,6 +250,15 @@
   ],
   "inboxMessages": [
     {
+      "id": "msg-1792867305493",
+      "sender": "Card Control System",
+      "subject": "Virtual Card FROZEN (4242 0815 ···· 8840)",
+      "body": "Agent concierge-08 virtual card (4242 0815 ···· 8840) status changed to FROZEN by Principal Madhav B..",
+      "timestamp": "Just now",
+      "unread": true,
+      "category": "alert"
+    },
+    {
       "id": "msg-1792862086101",
       "sender": "Card Control System",
       "subject": "Virtual Card ACTIVE (4242 0815 ···· 8840)",
@@ -306,6 +315,18 @@
     }
   ],
   "activityStream": [
+    {
+      "id": "stream-1792867178330",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "execute",
+      "vendor": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "amount": 120,
+      "timeAgo": "now",
+      "timestamp": 1792867178330
+    },
     {
       "id": "stream-1792865556749",
       "agentId": "concierge-08",
@@ -513,6 +534,28 @@
   ],
   "queuedApprovals": [
     {
+      "id": "req-1792867283175",
+      "agent": "concierge-08",
+      "targetName": "Corporate Operational Expense",
+      "targetAddress": "0x00000000000000000000000000000000000C3C3C",
+      "amount": 1850,
+      "actionName": "execute(1850)",
+      "reason": "Amount (₹1,850) exceeds 24h Remaining Budget (₹1,130 remaining of ₹50,000)",
+      "timestamp": "12:11:23 am",
+      "status": "PENDING"
+    },
+    {
+      "id": "req-1792867206420",
+      "agent": "concierge-08",
+      "targetName": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "targetAddress": "0x00000000000000000000000000000000000B2B2B",
+      "amount": 1760,
+      "actionName": "execute(1760)",
+      "reason": "Amount (₹1,760) exceeds 24h Remaining Budget (₹1,130 remaining of ₹50,000)",
+      "timestamp": "12:10:06 am",
+      "status": "PENDING"
+    },
+    {
       "id": "req-mcp-1792862086307",
       "agent": "concierge-08",
       "targetName": "OpenAI Billing API",
@@ -525,6 +568,52 @@
     }
   ],
   "userOps": [
+    {
+      "id": "op-1792867178330",
+      "userOpHash": "0x325c87...4d9ed8",
+      "timestamp": "12:09:38 am",
+      "targetName": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "targetAddress": "0x00000000000000000000000000000000000B2B2B",
+      "functionCalled": "execute(120)",
+      "amount": 120,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: 10-minute quick delivery on Blinkit (Fresh Shimla Royal Apples)",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 19,
+        "callData": "0xexecute(...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-appr-1792867123865",
+      "userOpHash": "0x4f753d...854197",
+      "timestamp": "12:08:43 am",
+      "targetName": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "targetAddress": "0x00000000000000000000000000000000000B2B2B",
+      "functionCalled": "execute(1760)",
+      "amount": 1760,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "OUT_OF_POLICY",
+      "reason": "Passkey Biometric Authorized by Principal Madhav B.",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 18,
+        "callData": "0xexecute(...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xOwnerPasskeyP256Sig..."
+      }
+    },
     {
       "id": "op-appr-1792866138684",
       "userOpHash": "0x3a500f...4f5b7f",
