@@ -37,6 +37,7 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
     const [retryTransaction, setRetryTransaction] = useState<Transaction | null>(null);
     const [stage, setStage] = useState('');
     const busy = useRef(false);
+    const sessionNeedsRenewal = !wallet.sessionActive || !Number.isFinite(wallet.sessionExpiresAt) || wallet.sessionExpiresAt <= Date.now() || error.includes('Agent session expired or inactive');
     const command = useRef<{ query: string; id: string } | null>(null);
     const money = (amount: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
     const loadReceipts = async () => {
@@ -68,6 +69,18 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
         busy.current = true; setLoading(true);
         try { await execute(transaction); }
         catch (cause: any) { setError(cause?.message || 'Could not confirm completion. Retry the same transaction safely.'); }
+        finally { busy.current = false; setLoading(false); }
+    };
+    const renewSession = async () => {
+        if (busy.current) return;
+        busy.current = true; setLoading(true); setStage('Renewing agent session…'); setError(''); setNotice('');
+        try {
+            const response = await fetch('/api/wallet/state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'renew_session', payload: { agentId: wallet.activeAgentId } }) });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.error || 'Session renewal failed');
+            await wallet.syncFromServer();
+            setNotice(`Session renewed until ${new Date(result.state.activeAgent.sessionExpiresAt).toLocaleString()}. Retry your transaction; if its quote has expired, refresh prices first.`);
+        } catch (cause: any) { setError(cause?.message || 'Session renewal failed'); }
         finally { busy.current = false; setLoading(false); }
     };
     function newRequest() {
@@ -125,6 +138,10 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
                 <p className="mt-1 text-sm text-stone-600">Say “buy” to purchase a matching live listing, or “transfer ₹500 to alex@upi” to send simulated funds. Say “find” or “compare” to research.</p>
                 <p className="mt-1 text-xs text-stone-500">Simulation mode · {money(wallet.usdcBalance)} available · Transactions deduct simulated INR only. No real purchases, delivery, bookings, or bank transfers.</p></div>
         </div>
+        {sessionNeedsRenewal && <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950 space-y-2">
+            <p>The selected agent’s spending session has expired or is inactive. Renew it for {wallet.policy.sessionExpiryHours} hours to enable simulated purchases and transfers.</p>
+            <button type="button" disabled={loading} onClick={() => void renewSession()} className="rounded-lg bg-[#123b32] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Renew session</button>
+        </div>}
         <form onSubmit={event => { event.preventDefault(); void research(); }} className="flex flex-wrap gap-2">
             <input aria-label="Task for your copilot" value={query} maxLength={600} onChange={event => setQuery(event.target.value)} disabled={loading} placeholder="What would you like to find or do?" className="min-w-0 basis-full flex-1 rounded-xl border border-stone-300 px-4 py-3 text-sm outline-none focus:border-emerald-700 sm:basis-0" />
             <button type="submit" disabled={loading || !query.trim()} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#123b32] px-4 py-3 text-sm font-semibold text-white disabled:opacity-50 sm:w-auto"><Search className="h-4 w-4" /> {loading ? 'Working…' : 'Run'}</button>

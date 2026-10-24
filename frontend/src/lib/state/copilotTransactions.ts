@@ -59,7 +59,9 @@ export function executeSimulation(token: unknown): SimulationReceipt {
         }
         if (Date.now() > expiresAt) throw new Error('This quote expired. Refresh prices before buying.');
         const agent = state.fleet.find(item => item.id === quote.agentId);
-        if (!agent || agent.id !== state.activeAgent.id || agent.status !== 'active' || !state.activeAgent.sessionActive || !Number.isFinite(state.activeAgent.sessionExpiresAt) || Date.now() >= state.activeAgent.sessionExpiresAt) throw new Error('Activate or renew the selected agent session before spending');
+        if (!agent || agent.id !== state.activeAgent.id) throw new Error('Selected agent session changed. Run the request again for the current agent.');
+        if (agent.status !== 'active') throw new Error('The selected agent is paused or provisioning. Select an active agent session before spending.');
+        if (!state.activeAgent.sessionActive || !Number.isFinite(state.activeAgent.sessionExpiresAt) || Date.now() >= state.activeAgent.sessionExpiresAt) throw new Error('Agent session expired or inactive. Use Renew session in the copilot, then retry the transaction.');
         const card = agent.cardDetails || state.virtualCard;
         if (card.isFrozen || state.virtualCard.isFrozen) throw new Error('The selected agent card is frozen');
         const balance = Math.round(state.balances.usdc * 100);

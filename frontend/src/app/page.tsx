@@ -12,6 +12,7 @@ import { OwnerApprovalModal } from '../components/OwnerApprovalModal';
 import { PolicyConfigModal } from '../components/PolicyConfigModal';
 import { UserOpInspectorModal } from '../components/UserOpInspectorModal';
 
+import { PayMasterPanel } from '../components/PayMasterPanel';
 import { PrincipalFleetOverview } from '../components/PrincipalFleetOverview';
 import { AgentVirtualCard } from '../components/AgentVirtualCard';
 import { AgentInboxModal } from '../components/AgentInboxModal';
@@ -67,6 +68,7 @@ export default function Home() {
 
     // Active View Tab
     const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
+    const [paymasterOpen, setPaymasterOpen] = useState(false);
 
     // Modals
     const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
@@ -283,7 +285,7 @@ export default function Home() {
 
                     {activeTab === 'fleet' && (
                         <div className="space-y-6 tab-panel-enter">
-                            <PrincipalFleetOverview wallet={wallet} onSelectAgent={handleSelectAgent} />
+                            {paymasterOpen ? <PayMasterPanel wallet={wallet} onBack={() => setPaymasterOpen(false)} /> : <PrincipalFleetOverview wallet={wallet} onSelectAgent={handleSelectAgent} onOpenPaymaster={() => setPaymasterOpen(true)} />}
                             <LiveActivityStream wallet={wallet} />
                         </div>
                     )}

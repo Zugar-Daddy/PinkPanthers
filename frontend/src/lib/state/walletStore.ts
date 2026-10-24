@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import type { SimulationReceipt } from './copilotTransactions';
+import type { PaymasterState } from '../payroll/types';
 
 export interface CardDetails {
     cardNumber: string;
@@ -32,6 +33,7 @@ export interface FleetAgentState {
 }
 
 export interface WalletState {
+    paymaster?: PaymasterState;
     simulatedTransactions?: SimulationReceipt[];
     smartAccountAddress: string;
     entryPointAddress: string;
@@ -511,3 +513,19 @@ export const approveQueuedAction = (...args: Parameters<typeof approveQueuedActi
 export const rejectQueuedAction = (...args: Parameters<typeof rejectQueuedActionUnlocked>) => withWalletStateLock(() => rejectQueuedActionUnlocked(...args));
 export const queueAgentApproval = (...args: Parameters<typeof queueAgentApprovalUnlocked>) => withWalletStateLock(() => queueAgentApprovalUnlocked(...args));
 export const setCardFrozen = (...args: Parameters<typeof setCardFrozenUnlocked>) => withWalletStateLock(() => setCardFrozenUnlocked(...args));
+
+/** Owner-requested renewal; preserve spending totals, limits, and card state. */
+export function renewAgentSession(agentId: string): WalletState {
+    return withWalletStateLock(() => {
+        const state = readWalletState();
+        const agent = state.fleet.find(item => item.id === agentId);
+        if (!agent || agentId !== state.activeAgent.id) throw new Error('Selected agent changed. Refresh and renew its session again.');
+        if (agent.status !== 'active') throw new Error('The selected agent is paused or provisioning and cannot renew its session.');
+        const hours = state.policy.sessionExpiryHours;
+        if (!Number.isFinite(hours) || hours <= 0 || hours > 720) throw new Error('Set a valid session duration in Cards & policy before renewing.');
+        state.activeAgent.sessionActive = true;
+        state.activeAgent.sessionExpiresAt = Date.now() + hours * 3600000;
+        writeWalletState(state);
+        return state;
+    });
+}

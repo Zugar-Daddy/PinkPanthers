@@ -9,7 +9,8 @@ import {
     approveQueuedAction,
     rejectQueuedAction,
     withWalletStateLock,
-    setCardFrozen
+    setCardFrozen,
+    renewAgentSession
 } from '../../../../lib/state/walletStore';
 
 export const dynamic = 'force-dynamic';
@@ -29,6 +30,14 @@ export async function POST(req: NextRequest) {
         const { action, payload } = body;
 
         switch (action) {
+            case 'renew_session': {
+                if (typeof payload?.agentId !== 'string') return NextResponse.json({ success: false, error: 'Select an agent to renew' }, { status: 400 });
+                try {
+                    return NextResponse.json({ success: true, state: renewAgentSession(payload.agentId) });
+                } catch (error: any) {
+                    return NextResponse.json({ success: false, error: error?.message || 'Session renewal failed' }, { status: 409 });
+                }
+            }
             case 'submit_payment': {
                 const { targetName, targetAddress, functionCalled, amount, description, agentId } = payload;
                 const result = executeAgentPayment(targetName, targetAddress, functionCalled, amount, description, agentId);

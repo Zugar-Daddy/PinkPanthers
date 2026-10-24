@@ -18,6 +18,18 @@ Receipts persist in ignored `data/wallet-state.json` and are available in the co
 
 Run `npm run test:live-copilot` and `npm run test:transactions` in `frontend` to verify provider orchestration and transaction handling using mocks and an isolated temporary wallet (no credentials, real orders, or live wallet writes).
 
+### PayMaster detailed payroll agent
+
+Open **Agents → PayMaster → Open agent**. The workspace contains 15 fictional Indian employee profiles, synthetic attendance (paid leave, sick leave, unpaid leave), and an editable working-day count. Initial compensation is an explicit fixed salary-band assumption, not an AI-generated result: engineer ₹60,000, designer ₹55,000, finance ₹50,000, HR ₹45,000, operations ₹40,000, support ₹35,000 monthly. Every employee's gross salary and TDS rate can be edited.
+
+The default demo policy pays up to two paid-leave days and one sick-leave day each month; excess leave and explicit unpaid leave are prorated using working days. Basic pay is 40% of earned gross; employee PF is 12% of basic capped at a ₹15,000 wage base; professional tax is a flat ₹200 when earned pay is positive; TDS defaults to 0% and is configurable per employee. Each money step rounds to paise. These are editable simulation assumptions, not a statutory tax engine; ESI, employer contributions, gratuity, annual tax adjustments and reimbursements are outside this example.
+
+**Run AI payroll & pay** makes one request to the existing Azure endpoint/deployment, with a 60-second timeout. The AI calculates and explains each employee's payslip; the server independently checks every amount before accepting it. Invalid or incomplete model output fails without substitute calculations or payments. The UI shows the saved inputs, all earnings/deductions, AI explanations, receipts, and downloadable run JSON.
+
+Automatic distribution applies to an explicitly started monthly run, not a background scheduler. Disable automatic payout to calculate first and distribute later. A dedicated `paymaster-01` agent is created on the first save or run, with its own bounded payroll authorization. Other agents and their sessions remain unchanged. A frozen PayMaster card, paused agent, insufficient funds, stale inputs, or exceeded batch/employee/daily limit prevents the whole batch. Payment writes all salaries and the wallet debit atomically, with one paid run allowed per month. There are no real bank transfers or tax remittances.
+
+Inputs, immutable run snapshots and receipts are stored in the existing ignored wallet state file; no sample payroll results are prepopulated. Changing a month retains the displayed attendance for explicit review. Concurrent edits are version checked, interrupted calculations can be retried, and already-paid months return the existing result without another debit. `npm run test:paymaster` tests AI orchestration, policy arithmetic, failure cases and wallet isolation using a temporary wallet. Existing copilot, transaction, and local-auth tests remain available.
+
 > **Track 02: Web3 & Blockchain (W3-02) — "Agent Wallet: Letting AI Agents Pay Safely"**  
 > *A production-accurate ERC-4337 Account Abstraction smart-contract wallet and financial infrastructure providing autonomous AI agents with restricted, owner-defined session keys, virtual cards, connected inboxes, and Model Context Protocol (MCP) endpoints. Inspired by and compatible with [AgentWallet.ai](https://agentwallet.ai/), styled in the [EdVR](https://edvr.vercel.app/) Neo-Brutalist design language.*
 

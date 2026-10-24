@@ -7,9 +7,10 @@ import { AgentWalletClient, FleetAgent, FleetCategory, formatINR } from '../lib/
 interface PrincipalFleetOverviewProps {
     wallet: AgentWalletClient;
     onSelectAgent: (agentId: string) => void;
+    onOpenPaymaster: () => void;
 }
 
-export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ wallet, onSelectAgent }) => {
+export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ wallet, onSelectAgent, onOpenPaymaster }) => {
     const [categoryFilter, setCategoryFilter] = React.useState<FleetCategory>('all');
     const visibleFleetSpend = wallet.fleet.reduce((total, agent) => total + agent.spentToday, 0);
 
@@ -20,6 +21,12 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
 
     return (
         <div className="space-y-6">
+            <button type="button" onClick={onOpenPaymaster} className="w-full rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-left flex items-center justify-between gap-4 hover:bg-emerald-100 transition">
+                <div><span className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Detailed agent · Payroll</span>
+                    <h2 className="mt-1 text-xl font-serif text-emerald-950">{wallet.fleet.find(agent => agent.id === 'paymaster-01')?.name || 'PayMaster'}</h2>
+                    <p className="mt-1 text-sm text-emerald-900">15 employees. Editable leave and salary rules. AI payslips and automatic simulated payouts.</p>
+                </div><span className="shrink-0 text-sm font-semibold text-emerald-900">Open agent →</span>
+            </button>
             {/* Header info */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200/80">
                 <div>
@@ -150,7 +157,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className="text-xs font-semibold text-stone-900 font-sans flex items-center gap-1.5">
-                                                        <span>{agent.name}</span>
+                                                        {agent.id === 'paymaster-01' ? <button type="button" onClick={onOpenPaymaster} className="underline underline-offset-2">{agent.name}</button> : <span>{agent.name}</span>}
                                                         {isSelected && (
                                                             <span className="text-[9px] font-mono px-1.5 py-0.2 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded font-medium">
                                                                 SELECTED
