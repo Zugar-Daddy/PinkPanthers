@@ -3,7 +3,7 @@ import {
     readWalletState,
     executeAgentPayment,
     toggleCardFreeze,
-    approveQueuedAction
+    queueAgentApproval
 } from '../../../lib/state/walletStore';
 
 export const dynamic = 'force-dynamic';
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
                         },
                         {
                             name: 'wallet_pay',
-                            description: 'Execute an autonomous payment on-chain via ERC-4337 Smart Account strictly verified against PolicyEngine guardrails.',
+                            description: 'Simulate an agent payment in local wallet state under configured guardrails.',
                             inputSchema: {
                                 type: 'object',
                                 properties: {
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
                         },
                         {
                             name: 'wallet_freeze_card',
-                            description: 'Immediately freeze or unfreeze the agent-linked virtual debit card on-chain.',
+                            description: 'Freeze or unfreeze the local virtual card state.',
                             inputSchema: {
                                 type: 'object',
                                 properties: {
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
                         },
                         {
                             name: 'wallet_request_approval',
-                            description: 'Submit an out-of-policy transaction to the Principal for Biometric Passkey (TouchID) approval.',
+                            description: 'Stage an out-of-policy payment for owner review in the local simulator.',
                             inputSchema: {
                                 type: 'object',
                                 properties: {
@@ -83,14 +83,6 @@ export async function POST(req: NextRequest) {
                                     justification: { type: 'string', description: 'Detailed justification for the human owner' }
                                 },
                                 required: ['amount_usd', 'vendor', 'justification']
-                            }
-                        },
-                        {
-                            name: 'wallet_get_inbox_otp',
-                            description: 'Retrieve real-time 2FA OTP verification codes received by the agent for 3DS merchant checkout.',
-                            inputSchema: {
-                                type: 'object',
-                                properties: {}
                             }
                         },
                         {
@@ -206,13 +198,13 @@ export async function POST(req: NextRequest) {
                                 {
                                     type: 'text',
                                     text: JSON.stringify({
-                                        status: 'EXECUTED_ON_CHAIN',
-                                        protocol: 'ERC-4337 v0.7',
+                                        status: 'SIMULATED',
+                                        protocol: 'local-state',
                                         vendor,
                                         amount_paid: amount,
                                         user_op_hash: execResult.userOpHash,
                                         gas_sponsored: true,
-                                        policy_check: 'PASSED_ON_CHAIN'
+                                        policy_check: 'PASSED_IN_SIMULATION'
                                     }, null, 2)
                                 }
                             ]
@@ -242,7 +234,7 @@ export async function POST(req: NextRequest) {
                                         agent_name: ag ? ag.name : state.activeAgent.name,
                                         card: cardMasked,
                                         is_frozen: isNowFrozen,
-                                        message: isNowFrozen ? `Card ${cardMasked} FROZEN successfully on-chain` : `Card ${cardMasked} REACTIVATED on-chain`
+                                        message: isNowFrozen ? `Card ${cardMasked} FROZEN in local state` : `Card ${cardMasked} REACTIVATED in local state`
                                     }, null, 2)
                                 }
                             ]
@@ -256,7 +248,7 @@ export async function POST(req: NextRequest) {
                     const targetAddress = args.target_address || '0x00000000000000000000000000000000000A1A1A';
                     const just = args.justification || 'Emergency spending request';
 
-                    const execResult = executeAgentPayment(vendor, targetAddress, 'requestOverride()', amount, just);
+                    const requestId = queueAgentApproval(vendor, targetAddress, amount, just);
                     return NextResponse.json({
                         jsonrpc: '2.0',
                         id,
@@ -266,29 +258,10 @@ export async function POST(req: NextRequest) {
                                     type: 'text',
                                     text: JSON.stringify({
                                         status: 'STAGED_FOR_APPROVAL',
+                                        request_id: requestId,
                                         vendor,
                                         amount,
-                                        message: 'Escalation alert dispatched to Principal device (TouchID / WebAuthn).'
-                                    }, null, 2)
-                                }
-                            ]
-                        }
-                    });
-                }
-
-                case 'wallet_get_inbox_otp': {
-                    const otpMessages = state.inboxMessages.filter(m => m.category === '2fa');
-                    return NextResponse.json({
-                        jsonrpc: '2.0',
-                        id,
-                        result: {
-                            content: [
-                                {
-                                    type: 'text',
-                                    text: JSON.stringify({
-                                        count: otpMessages.length,
-                                        latest_otp: otpMessages[0]?.code || null,
-                                        messages: otpMessages
+                                        message: 'Request stored for owner review in local state.'
                                     }, null, 2)
                                 }
                             ]
@@ -306,7 +279,10 @@ export async function POST(req: NextRequest) {
                                     type: 'text',
                                     text: JSON.stringify({
                                         total_agents: state.fleet.length,
-                                        fleet: state.fleet
+                                    fleet: state.fleet.map(({ cardDetails, ...agent }) => ({
+                                        ...agent,
+                                        cardDetails: { maskedNumber: cardDetails.maskedNumber, isFrozen: cardDetails.isFrozen }
+                                    }))
                                     }, null, 2)
                                 }
                             ]

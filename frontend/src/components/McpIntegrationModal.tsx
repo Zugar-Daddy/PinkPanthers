@@ -22,15 +22,8 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
     const claudeConfig = JSON.stringify({
         mcpServers: {
             "safeagent": {
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@safeagent/mcp-server",
-                    "--endpoint",
-                    "http://localhost:3000/api/mcp",
-                    "--agent-id",
-                    wallet.activeAgentId
-                ]
+                "command": "node",
+                "args": ["<absolute path to PinkPanthers>/mcp-server/index.js"]
             }
         }
     }, null, 2);
@@ -38,11 +31,11 @@ export const McpIntegrationModal: React.FC<McpIntegrationModalProps> = ({ wallet
     const cursorConfig = JSON.stringify({
         name: "SafeAgent Treasury MCP",
         type: "command",
-        command: "curl -X POST http://localhost:3000/api/mcp -H 'Content-Type: application/json'",
-        description: "Enables autonomous agent payments, virtual cards and policy checks"
+        command: "node <absolute path to PinkPanthers>/mcp-server/index.js",
+        description: "Local simulated agent payments and policy checks"
     }, null, 2);
 
-    const curlSnippet = `curl -X POST http://localhost:3000/api/mcp \\
+    const curlSnippet = `curl -u owner -X POST http://localhost:3000/api/mcp \\
   -H "Content-Type: application/json" \\
   -d '{
     "jsonrpc": "2.0",

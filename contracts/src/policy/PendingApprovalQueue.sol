@@ -32,7 +32,7 @@ contract PendingApprovalQueue {
         address agent,
         address target,
         uint256 value,
-        bytes calldata callData,
+        bytes memory callData,
         string memory reason
     ) internal returns (bytes32 id) {
         id = keccak256(abi.encodePacked(agent, target, value, callData, block.timestamp, allRequestIds.length));

@@ -326,7 +326,7 @@ export const TicketArtifactModal: React.FC<TicketArtifactModalProps> = ({ artifa
                     <div className="flex items-center justify-between text-[11px] text-stone-400 pb-1.5 border-b border-stone-800">
                         <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
                             <ShieldCheck className="w-3.5 h-3.5" />
-                            ERC-4337 Smart Account Proof
+                            Simulated account record
                         </span>
                         <span>EntryPoint v0.7</span>
                     </div>
@@ -338,11 +338,11 @@ export const TicketArtifactModal: React.FC<TicketArtifactModalProps> = ({ artifa
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-stone-500">Paymaster Gas Sponsorship:</span>
-                            <span className="text-emerald-400 font-semibold">100% Free (Gas Tank Active)</span>
+                            <span className="text-emerald-400 font-semibold">Demo estimate</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-stone-500">PolicyEngine Guardrail:</span>
-                            <span className="text-emerald-400 font-semibold">PASSED_ON_CHAIN</span>
+                            <span className="text-emerald-400 font-semibold">Passed in simulation</span>
                         </div>
                         {userOpHash && (
                             <div className="flex justify-between items-center pt-1 border-t border-stone-800">

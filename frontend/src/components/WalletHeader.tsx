@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Shield, Fingerprint, Copy, Check, Fuel, Key, Sparkles, ExternalLink } from 'lucide-react';
-import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
+import { Shield, Copy, Check, KeyRound, Inbox, PlugZap } from 'lucide-react';
+import { AgentWalletClient } from '../lib/web3/agentWalletClient';
 
 interface WalletHeaderProps {
     wallet: AgentWalletClient;
@@ -11,113 +11,45 @@ interface WalletHeaderProps {
     onOpenMcp: () => void;
 }
 
-export const WalletHeader: React.FC<WalletHeaderProps> = ({
-    wallet,
-    onOpenPolicyModal,
-    onOpenInbox,
-    onOpenMcp
-}) => {
+export const WalletHeader: React.FC<WalletHeaderProps> = ({ wallet, onOpenPolicyModal, onOpenInbox, onOpenMcp }) => {
     const [copied, setCopied] = useState(false);
-    const unreadCount = wallet.inboxMessages.filter(m => m.unread).length;
+    const unreadCount = wallet.inboxMessages.filter(message => message.unread).length;
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(wallet.smartAccountAddress);
+    const handleCopy = async () => {
+        await navigator.clipboard.writeText(wallet.smartAccountAddress);
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
     };
 
     return (
-        <nav className="bg-white/90 backdrop-blur-md border-b border-stone-200/80 sticky top-0 z-40 px-4 sm:px-8 py-3.5 transition-all">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                
-                {/* Brand Identity & Tags */}
+        <header className="sticky top-0 z-40 border-b border-stone-200/70 bg-[#faf9f6]/90 backdrop-blur-xl">
+            <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-8 lg:px-10">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-800 to-emerald-950 text-emerald-200 flex items-center justify-center shadow-sm select-none border border-emerald-700/40">
-                        <Shield className="w-5 h-5 text-emerald-300 stroke-[2.2]" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#123b32] text-white shadow-sm">
+                        <Shield className="h-5 w-5" strokeWidth={2} />
                     </div>
                     <div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-xl sm:text-2xl font-serif tracking-tight text-stone-900 font-semibold">
-                                Safe<span className="text-emerald-700 font-sans font-bold">Agent</span>
-                            </span>
-                            <span className="text-[10px] tracking-wider uppercase font-mono font-semibold bg-stone-100 text-stone-700 border border-stone-200 px-2 py-0.5 rounded-full">
-                                ERC-4337 v0.7
-                            </span>
-                            <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono font-medium bg-emerald-50 text-emerald-800 border border-emerald-200/80 px-2.5 py-0.5 rounded-full">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> Sepolia Live
-                            </span>
-                        </div>
-                        <p className="text-[11px] font-medium text-stone-500 hidden sm:block">
-                            Autonomous AI Financial Infrastructure • Agent Sub-Keys • Virtual Cards
-                        </p>
+                        <div className="text-[17px] font-semibold leading-5 tracking-[-0.04em] text-stone-950">SafeAgent</div>
+                        <div className="mt-0.5 text-[11px] font-medium text-stone-500">Treasury workspace</div>
                     </div>
                 </div>
 
-                {/* Right Action Chips & Primary CTA */}
                 <div className="flex flex-wrap items-center gap-2">
-                    
-                    {/* Smart Account Address Pill */}
-                    <button
-                        onClick={handleCopy}
-                        className="flex items-center gap-1.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/90 px-3 py-1.5 rounded-xl font-mono text-xs text-stone-700 transition shadow-subtle select-none"
-                        title="Click to copy Smart Account Address"
-                    >
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span className="font-sans font-medium text-stone-500 hidden lg:inline">Vault:</span>
-                        <span className="font-semibold text-stone-900">{wallet.smartAccountAddress.slice(0, 6)}...{wallet.smartAccountAddress.slice(-4)}</span>
-                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-stone-400" />}
+                    <button onClick={handleCopy} className="header-action font-mono" title="Copy smart account address" aria-label="Copy smart account address">
+                        <span className="hidden text-stone-500 sm:inline">Account</span>
+                        <span className="font-semibold text-stone-800">{wallet.smartAccountAddress.slice(0, 6)}…{wallet.smartAccountAddress.slice(-4)}</span>
+                        {copied ? <Check className="h-3.5 w-3.5 text-emerald-700" /> : <Copy className="h-3.5 w-3.5 text-stone-500" />}
                     </button>
-
-                    {/* Paymaster Gas Tank */}
-                    <div className="hidden xl:flex items-center gap-1.5 bg-amber-50/70 border border-amber-200/80 px-3 py-1.5 rounded-xl font-mono text-xs text-amber-900">
-                        <Fuel className="w-3.5 h-3.5 text-amber-600" />
-                        <span className="font-sans font-medium text-amber-700/80">Gas Tank:</span>
-                        <span className="font-semibold text-amber-950">{formatINR(wallet.paymasterGasTankUSD)}</span>
-                    </div>
-
-                    {/* Agent Inbox (2FA OTP) Button */}
-                    <button
-                        onClick={onOpenInbox}
-                        className="flex items-center gap-1.5 bg-white hover:bg-stone-50 border border-stone-200/90 px-3 py-1.5 rounded-xl font-sans text-xs font-medium text-stone-800 shadow-subtle relative select-none transition"
-                        title="Agent Comms: 2FA SMS & Receipts"
-                    >
-                        <span>Inbox</span>
-                        {unreadCount > 0 && (
-                            <span className="w-4 h-4 rounded-full bg-amber-600 text-white text-[10px] font-bold font-mono flex items-center justify-center">
-                                {unreadCount}
-                            </span>
-                        )}
+                    <button onClick={onOpenInbox} className="header-action" title="Open inbox">
+                        <Inbox className="h-4 w-4" /> <span className="hidden sm:inline">Inbox</span>
+                        {unreadCount > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#123b32] px-1 text-[10px] font-semibold text-white">{unreadCount}</span>}
                     </button>
-
-                    {/* MCP Hub Button */}
-                    <button
-                        onClick={onOpenMcp}
-                        className="flex items-center gap-1.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/90 px-3 py-1.5 rounded-xl font-sans text-xs font-medium text-stone-800 shadow-subtle select-none transition"
-                        title="Model Context Protocol Config & Tester"
-                    >
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-                        <span>MCP Hub</span>
+                    <button onClick={onOpenMcp} className="header-action" title="Open integrations"><PlugZap className="h-4 w-4" /><span className="hidden sm:inline">Integrations</span></button>
+                    <button onClick={onOpenPolicyModal} className="inline-flex min-h-9 items-center gap-2 rounded-xl bg-[#123b32] px-3.5 text-xs font-semibold text-white transition hover:bg-[#0b2d25] sm:px-4">
+                        <KeyRound className="h-4 w-4" /> Manage policy
                     </button>
-
-                    {/* Passkey Owner Chip */}
-                    <div className="hidden lg:flex items-center gap-1.5 bg-stone-100/80 border border-stone-200/70 px-3 py-1.5 rounded-xl font-mono text-xs text-stone-700">
-                        <Fingerprint className="w-3.5 h-3.5 text-stone-600" />
-                        <span className="text-stone-800 font-medium">TouchID (P-256)</span>
-                    </div>
-
-                    {/* Manage Policy Modal Trigger */}
-                    <button
-                        onClick={onOpenPolicyModal}
-                        className="bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium px-4 py-1.5 rounded-xl shadow-sm hover:shadow transition flex items-center gap-1.5 select-none"
-                    >
-                        <Key className="w-3.5 h-3.5 text-stone-300" />
-                        <span>Policy</span>
-                    </button>
-
                 </div>
-
             </div>
-        </nav>
+        </header>
     );
 };
-

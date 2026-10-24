@@ -11,6 +11,7 @@ interface PrincipalFleetOverviewProps {
 
 export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ wallet, onSelectAgent }) => {
     const [categoryFilter, setCategoryFilter] = React.useState<FleetCategory>('all');
+    const visibleFleetSpend = wallet.fleet.reduce((total, agent) => total + agent.spentToday, 0);
 
     const filteredFleet = wallet.fleet.filter(agent => {
         if (categoryFilter === 'all') return true;
@@ -23,20 +24,20 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-200/80">
                 <div>
                     <div className="text-[11px] font-mono font-semibold tracking-wider uppercase text-emerald-800 mb-1">
-                        ILLUSTRATIVE AGENT FLEET ARCHITECTURE
+                        AGENTS
                     </div>
                     <h2 className="text-xl sm:text-2xl font-serif text-stone-900 tracking-tight font-normal">
-                        One principal. An agent fleet. A unified control plane.
+                        Your team of agents
                     </h2>
                 </div>
 
                 <div className="flex items-center gap-2 text-xs font-mono flex-wrap">
                     <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200/80 px-3 py-1 rounded-full font-medium">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                        11 Active Agents
+                        {wallet.fleet.filter(agent => agent.status === 'active').length} active
                     </span>
                     <span className="flex items-center gap-1.5 bg-stone-100 text-stone-700 border border-stone-200 px-3 py-1 rounded-full font-medium">
-                        Fleet Spend: {formatINR(wallet.totalFleetSpendToday)}
+                        Shown agents: {formatINR(visibleFleetSpend)}
                     </span>
                 </div>
             </div>
@@ -48,7 +49,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                 <div className="lg:col-span-4 bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-200 space-y-5 relative">
                     <div className="flex items-start justify-between">
                         <div className="text-[10px] font-mono font-medium uppercase tracking-wider text-stone-600 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200/70">
-                            Master Principal
+                            Account owner
                         </div>
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                     </div>
@@ -65,7 +66,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                                 {wallet.principalRole}
                             </div>
                             <div className="text-[11px] font-mono text-stone-500 mt-1 flex items-center gap-1">
-                                <Shield className="w-3.5 h-3.5 text-emerald-700" /> 1 Master Key • {wallet.totalAgentsCount} Scoped Agents
+                                <Shield className="w-3.5 h-3.5 text-emerald-700" /> Owner of this workspace
                             </div>
                         </div>
                     </div>
@@ -73,37 +74,28 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                     {/* Spend Today Gauge */}
                     <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-4 space-y-1.5">
                         <div className="flex justify-between items-center text-xs font-mono">
-                            <span className="text-stone-500 uppercase text-[10px] font-medium tracking-wider">Fleet Spend Today:</span>
-                            <span className="text-emerald-700 font-semibold text-[10px] flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> LIVE
-                            </span>
+                            <span className="text-stone-500 uppercase text-[10px] font-medium tracking-wider">Spent today</span>
                         </div>
                         <div className="text-3xl font-serif font-semibold text-stone-900 tracking-tight">
-                            {formatINR(wallet.totalFleetSpendToday)}
+                            {formatINR(visibleFleetSpend)}
                         </div>
 
-                        {/* Visual SVG Mini Trend */}
-                        <div className="pt-2">
-                            <svg viewBox="0 0 100 24" className="w-full h-8 stroke-stone-800 fill-emerald-50" preserveAspectRatio="none">
-                                <path d="M0,24 L0,20 L15,16 L30,19 L45,12 L60,15 L75,8 L90,11 L100,2 L100,24 Z" strokeWidth="1.5" strokeLinejoin="round" />
-                            </svg>
-                        </div>
                     </div>
 
                     {/* Quick Stats Grid */}
                     <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                         <div className="bg-stone-50 border border-stone-200/80 p-2.5 rounded-xl">
-                            <div className="text-[10px] text-stone-500 uppercase font-medium">Active Sub-Keys</div>
-                            <div className="text-base font-semibold text-stone-900">11</div>
+                            <div className="text-[10px] text-stone-500 uppercase font-medium">Active agents</div>
+                            <div className="text-base font-semibold text-stone-900">{wallet.fleet.filter(agent => agent.status === 'active').length}</div>
                         </div>
                         <div className="bg-stone-50 border border-stone-200/80 p-2.5 rounded-xl">
                             <div className="text-[10px] text-stone-500 uppercase font-medium">Provisioning</div>
-                            <div className="text-base font-semibold text-amber-700">1</div>
+                            <div className="text-base font-semibold text-amber-700">{wallet.fleet.filter(agent => agent.status === 'provisioning').length}</div>
                         </div>
                     </div>
 
                     <div className="pt-2 border-t border-stone-200/60 text-[11px] font-sans text-stone-500">
-                        Human master key securely enforced via WebAuthn Passkeys (TouchID / Apple Secure Enclave).
+                        Manage agent permissions and spending from the policy panel.
                     </div>
                 </div>
 
@@ -113,7 +105,7 @@ export const PrincipalFleetOverview: React.FC<PrincipalFleetOverviewProps> = ({ 
                         <div className="flex items-center gap-2">
                             <Bot className="w-4 h-4 text-stone-700" />
                             <h3 className="text-base font-serif font-semibold text-stone-900">
-                                Managed Fleet Directory
+                                Agent directory
                             </h3>
                         </div>
 

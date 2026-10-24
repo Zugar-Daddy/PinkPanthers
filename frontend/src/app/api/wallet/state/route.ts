@@ -7,7 +7,9 @@ import {
     switchActiveAgent,
     updateCardLimit,
     approveQueuedAction,
-    rejectQueuedAction
+    rejectQueuedAction,
+    withWalletStateLock,
+    setCardFrozen
 } from '../../../../lib/state/walletStore';
 
 export const dynamic = 'force-dynamic';
@@ -41,6 +43,15 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ success: true, isFrozen, state: updatedState });
             }
 
+            case 'set_card_frozen': {
+                const { agentId, frozen } = payload || {};
+                if (typeof agentId !== 'string' || typeof frozen !== 'boolean') {
+                    return NextResponse.json({ success: false, error: 'Invalid card control request' }, { status: 400 });
+                }
+                const state = setCardFrozen(agentId, frozen);
+                return NextResponse.json({ success: true, state });
+            }
+
             case 'approve_queued': {
                 const { id } = payload;
                 const ok = approveQueuedAction(id);
@@ -63,33 +74,45 @@ export async function POST(req: NextRequest) {
 
             case 'update_policy': {
                 const { dailyBudget, maxPerTx, sessionExpiryHours } = payload;
-                const state = readWalletState();
-                state.policy.dailyBudget = dailyBudget;
-                state.policy.maxPerTx = maxPerTx;
-                state.policy.sessionExpiryHours = sessionExpiryHours;
-                state.activeAgent.sessionActive = true;
-                state.activeAgent.sessionExpiresAt = Date.now() + sessionExpiryHours * 3600 * 1000;
-                const activeAg = state.fleet.find(a => a.id === state.activeAgent.id);
-                if (activeAg) {
-                    activeAg.dailyBudget = dailyBudget;
-                    activeAg.maxPerTx = maxPerTx;
-                    if (activeAg.cardDetails) activeAg.cardDetails.dailyLimit = dailyBudget;
+                if (![dailyBudget, maxPerTx, sessionExpiryHours].every(v => typeof v === 'number' && Number.isFinite(v) && v > 0) || maxPerTx > dailyBudget || sessionExpiryHours > 24 * 30) {
+                    return NextResponse.json({ success: false, error: 'Invalid policy limits' }, { status: 400 });
                 }
-                writeWalletState(state);
-                return NextResponse.json({ success: true, state });
+                const updated = withWalletStateLock(() => {
+                    const current = readWalletState();
+                    current.policy.dailyBudget = dailyBudget;
+                    current.policy.maxPerTx = maxPerTx;
+                    current.policy.sessionExpiryHours = sessionExpiryHours;
+                    current.activeAgent.sessionActive = true;
+                    current.activeAgent.sessionExpiresAt = Date.now() + sessionExpiryHours * 3600 * 1000;
+                    const activeAg = current.fleet.find(a => a.id === current.activeAgent.id);
+                    if (activeAg) {
+                        activeAg.dailyBudget = dailyBudget;
+                        activeAg.maxPerTx = maxPerTx;
+                        if (activeAg.cardDetails) activeAg.cardDetails.dailyLimit = dailyBudget;
+                    }
+                    writeWalletState(current);
+                    return current;
+                });
+                return NextResponse.json({ success: true, state: updated });
             }
 
             case 'revoke_key': {
-                const state = readWalletState();
-                state.activeAgent.sessionActive = false;
-                writeWalletState(state);
+                const state = withWalletStateLock(() => {
+                    const current = readWalletState();
+                    current.activeAgent.sessionActive = false;
+                    writeWalletState(current);
+                    return current;
+                });
                 return NextResponse.json({ success: true, state });
             }
 
             case 'mark_read': {
-                const state = readWalletState();
-                state.inboxMessages.forEach(m => m.unread = false);
-                writeWalletState(state);
+                const state = withWalletStateLock(() => {
+                    const current = readWalletState();
+                    current.inboxMessages.forEach(m => m.unread = false);
+                    writeWalletState(current);
+                    return current;
+                });
                 return NextResponse.json({ success: true, state });
             }
 

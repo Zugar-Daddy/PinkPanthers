@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { randomUUID } from 'crypto';
 
 export interface CardDetails {
     cardNumber: string;
@@ -129,10 +130,15 @@ const DATA_FILE_PATH = path.resolve(process.cwd(), '../data/wallet-state.json');
 const ALT_DATA_FILE_PATH = path.resolve(process.cwd(), 'data/wallet-state.json');
 
 function getDataPath(): string {
-    if (fs.existsSync(DATA_FILE_PATH)) return DATA_FILE_PATH;
-    if (fs.existsSync(ALT_DATA_FILE_PATH)) return ALT_DATA_FILE_PATH;
+    if (fs.existsSync(DATA_FILE_PATH)) { fs.chmodSync(DATA_FILE_PATH, 0o600); return DATA_FILE_PATH; }
+    if (fs.existsSync(ALT_DATA_FILE_PATH)) { fs.chmodSync(ALT_DATA_FILE_PATH, 0o600); return ALT_DATA_FILE_PATH; }
     const rootData = path.resolve(process.cwd(), '../data');
     if (!fs.existsSync(rootData)) fs.mkdirSync(rootData, { recursive: true });
+    const examplePath = path.join(rootData, 'wallet-state.example.json');
+    if (fs.existsSync(examplePath)) {
+        fs.copyFileSync(examplePath, DATA_FILE_PATH, fs.constants.COPYFILE_EXCL);
+        fs.chmodSync(DATA_FILE_PATH, 0o600);
+    }
     return DATA_FILE_PATH;
 }
 
@@ -144,13 +150,39 @@ export function readWalletState(): WalletState {
 
 export function writeWalletState(state: WalletState): void {
     const filePath = getDataPath();
-    fs.writeFileSync(filePath, JSON.stringify(state, null, 2), 'utf-8');
+    const tempPath = `${filePath}.${process.pid}.${randomUUID()}.tmp`;
+    try {
+        fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), { encoding: 'utf-8', mode: 0o600 });
+        fs.renameSync(tempPath, filePath);
+    } finally {
+        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+    }
+}
+
+export function withWalletStateLock<T>(work: () => T): T {
+    const lockPath = `${getDataPath()}.lock`;
+    const start = Date.now();
+    while (true) {
+        try {
+            fs.mkdirSync(lockPath);
+            break;
+        } catch (error: any) {
+            if (error.code !== 'EEXIST') throw error;
+            if (Date.now() - start > 5000) throw new Error('Wallet state is busy');
+            Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+        }
+    }
+    try {
+        return work();
+    } finally {
+        fs.rmdirSync(lockPath);
+    }
 }
 
 /**
- * Execute an Agent Payment against the on-chain PolicyEngine guardrails
+ * Simulate an Agent Payment against local policy guardrails.
  */
-export function executeAgentPayment(
+function executeAgentPaymentUnlocked(
     targetName: string,
     targetAddress: string,
     functionCalled: string,
@@ -160,14 +192,24 @@ export function executeAgentPayment(
 ): { status: 'EXECUTED' | 'QUEUED' | 'REVERTED'; reason: string; userOpHash?: string } {
     const state = readWalletState();
     const targetAgentId = agentId || state.activeAgent.id;
-    const activeAg = state.fleet.find(a => a.id === targetAgentId) || state.fleet[0];
+    const activeAg = state.fleet.find(a => a.id === targetAgentId);
+
+    if (!activeAg || targetAgentId !== state.activeAgent.id || activeAg.status !== 'active') {
+        return { status: 'REVERTED', reason: 'Agent is not the active authorized session' };
+    }
+    if (!Number.isFinite(amount) || amount <= 0 || amount > state.balances.usdc) {
+        return { status: 'REVERTED', reason: 'Payment amount must be positive, finite, and within the available balance' };
+    }
+    if (typeof targetAddress !== 'string' || typeof functionCalled !== 'string') {
+        return { status: 'REVERTED', reason: 'Invalid payment target or function' };
+    }
 
     if (!state.activeAgent.sessionActive) {
         return { status: 'REVERTED', reason: 'Agent Session Key is Inactive/Revoked' };
     }
 
     if (Date.now() > state.activeAgent.sessionExpiresAt) {
-        return { status: 'REVERTED', reason: 'Session Expired on-chain (validUntil < block.timestamp)' };
+        return { status: 'REVERTED', reason: 'Session has expired in local simulation' };
     }
 
     // 1. Check if THIS SPECIFIC AGENT'S virtual card is frozen
@@ -180,23 +222,24 @@ export function executeAgentPayment(
     }
 
     // 2. Whitelist Check
-    const isContractAllowed = state.policy.allowedContracts.some(
-        c => c.address.toLowerCase() === targetAddress.toLowerCase()
+    const isContractAllowed = state.policy.allowedContracts.some(c =>
+        c.address.toLowerCase() === targetAddress.toLowerCase() &&
+        c.selector.match(/\(([^)]+)\)/)?.[1] === functionCalled.split('(')[0]
     );
     const isRecipientAllowed = state.policy.allowedRecipients.some(
         r => r.toLowerCase() === targetAddress.toLowerCase()
-    );
+    ) && functionCalled === 'transfer()';
 
     if (!isContractAllowed && !isRecipientAllowed) {
         return { status: 'REVERTED', reason: `Target address not allowlisted: ${targetAddress}` };
     }
 
     // 3. Per-Tx Cap Check (Scoped to active agent's policy)
-    const maxPerTx = activeAg.maxPerTx || state.policy.maxPerTx;
+    const maxPerTx = activeAg.maxPerTx ?? state.policy.maxPerTx;
     if (amount > maxPerTx) {
         const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds Per-Transaction Limit (₹${maxPerTx.toLocaleString('en-IN')})`;
         const approval = {
-            id: `req-${Date.now()}`,
+            id: `req-${randomUUID()}`,
             agent: activeAg.name,
             targetName,
             targetAddress,
@@ -212,12 +255,12 @@ export function executeAgentPayment(
     }
 
     // 4. Daily Budget Check (Scoped to active agent's daily allocation)
-    const dailyBudget = activeAg.dailyBudget || state.policy.dailyBudget;
+    const dailyBudget = activeAg.dailyBudget ?? state.policy.dailyBudget;
     if (activeAg.spentToday + amount > dailyBudget) {
         const remaining = Math.max(0, dailyBudget - activeAg.spentToday);
         const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds 24h Remaining Budget (₹${remaining.toLocaleString('en-IN')} remaining of ₹${dailyBudget.toLocaleString('en-IN')})`;
         const approval = {
-            id: `req-${Date.now()}`,
+            id: `req-${randomUUID()}`,
             agent: activeAg.name,
             targetName,
             targetAddress,
@@ -247,7 +290,7 @@ export function executeAgentPayment(
     state.balances.usdc -= amount;
     state.principal.totalFleetSpendToday += amount;
 
-    const opHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    const opHash = `sim-${randomUUID()}`;
     state.userOps.unshift({
         id: `op-${Date.now()}`,
         userOpHash: `${opHash.slice(0, 8)}...${opHash.slice(-6)}`,
@@ -260,7 +303,7 @@ export function executeAgentPayment(
         gasCostUSD: 10.00,
         status: 'EXECUTED',
         validationResult: 'IN_POLICY',
-        reason: `Autonomous in-policy payment: ${description}`,
+        reason: `Simulated in-policy payment: ${description}`,
         rawUserOp: {
             sender: state.smartAccountAddress,
             nonce: state.userOps.length + 1,
@@ -286,13 +329,13 @@ export function executeAgentPayment(
     });
 
     writeWalletState(state);
-    return { status: 'EXECUTED', reason: 'In-policy payment executed via ERC-4337 Smart Account', userOpHash: opHash };
+    return { status: 'EXECUTED', reason: 'Payment simulated in local wallet state; no blockchain transaction was submitted', userOpHash: opHash };
 }
 
 /**
  * Toggle Virtual Card Freeze for a specific agent (defaults to active agent)
  */
-export function toggleCardFreeze(agentId?: string): boolean {
+function toggleCardFreezeUnlocked(agentId?: string): boolean {
     const state = readWalletState();
     const targetId = agentId || state.activeAgent.id;
     const ag = state.fleet.find(a => a.id === targetId) || state.fleet[0];
@@ -328,7 +371,7 @@ export function toggleCardFreeze(agentId?: string): boolean {
 /**
  * Switch Active Fleet Agent & restore their specific card and policy state
  */
-export function switchActiveAgent(agentId: string): WalletState {
+function switchActiveAgentUnlocked(agentId: string): WalletState {
     const state = readWalletState();
     const ag = state.fleet.find(a => a.id === agentId);
     if (ag) {
@@ -353,7 +396,8 @@ export function switchActiveAgent(agentId: string): WalletState {
     return state;
 }
 
-export function updateCardLimit(limit: number, agentId?: string): void {
+function updateCardLimitUnlocked(limit: number, agentId?: string): void {
+    if (!Number.isFinite(limit) || limit < 0) throw new Error('Invalid card limit');
     const state = readWalletState();
     const targetId = agentId || state.activeAgent.id;
     const ag = state.fleet.find(a => a.id === targetId);
@@ -371,17 +415,27 @@ export function updateCardLimit(limit: number, agentId?: string): void {
     writeWalletState(state);
 }
 
-export function approveQueuedAction(id: string): boolean {
+function approveQueuedActionUnlocked(id: string): boolean {
     const state = readWalletState();
     const req = state.queuedApprovals.find(q => q.id === id);
-    if (!req) return false;
+    if (!req || req.status !== 'PENDING' || !Number.isFinite(req.amount) || req.amount <= 0 || req.amount > state.balances.usdc) return false;
     req.status = 'APPROVED';
 
     state.balances.usdc -= req.amount;
-    state.dailySpent += req.amount;
+    const spendingAgent = state.fleet.find(agent => agent.name === req.agent);
+    if (spendingAgent) {
+        spendingAgent.spentToday += req.amount;
+        spendingAgent.cardDetails.spentToday += req.amount;
+        if (spendingAgent.id === state.activeAgent.id) {
+            state.dailySpent = spendingAgent.spentToday;
+            state.virtualCard.spentToday = spendingAgent.spentToday;
+        }
+    } else {
+        state.dailySpent += req.amount;
+    }
     state.principal.totalFleetSpendToday += req.amount;
 
-    const opHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    const opHash = `sim-${randomUUID()}`;
     state.userOps.unshift({
         id: `op-appr-${Date.now()}`,
         userOpHash: `${opHash.slice(0, 8)}...${opHash.slice(-6)}`,
@@ -394,7 +448,7 @@ export function approveQueuedAction(id: string): boolean {
         gasCostUSD: 10.00,
         status: 'EXECUTED',
         validationResult: 'OUT_OF_POLICY',
-        reason: `Passkey Biometric Authorized by Principal ${state.principal.name}`,
+        reason: `Owner approved local simulation; no blockchain transaction was submitted`,
         rawUserOp: {
             sender: state.smartAccountAddress,
             nonce: state.userOps.length + 1,
@@ -411,12 +465,47 @@ export function approveQueuedAction(id: string): boolean {
     return true;
 }
 
-export function rejectQueuedAction(id: string): boolean {
+function rejectQueuedActionUnlocked(id: string): boolean {
     const state = readWalletState();
     const req = state.queuedApprovals.find(q => q.id === id);
-    if (!req) return false;
+    if (!req || req.status !== 'PENDING') return false;
     req.status = 'REJECTED';
     state.queuedApprovals = state.queuedApprovals.filter(q => q.id !== id);
     writeWalletState(state);
     return true;
 }
+
+function queueAgentApprovalUnlocked(targetName: string, targetAddress: string, amount: number, reason: string): string {
+    if (!Number.isFinite(amount) || amount <= 0 || amount > Number.MAX_SAFE_INTEGER) throw new Error('Invalid approval amount');
+    if (typeof targetName !== 'string' || !targetName.trim() || typeof targetAddress !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(targetAddress)) throw new Error('Invalid approval target');
+    const state = readWalletState();
+    const id = `req-${randomUUID()}`;
+    state.queuedApprovals.unshift({
+        id, agent: state.activeAgent.name, targetName, targetAddress, amount,
+        actionName: 'ownerOverride', reason: String(reason || 'Owner approval requested').slice(0, 1000),
+        timestamp: new Date().toISOString(), status: 'PENDING'
+    });
+    writeWalletState(state);
+    return id;
+}
+
+function setCardFrozenUnlocked(agentId: string, frozen: boolean): WalletState {
+    if (typeof frozen !== 'boolean') throw new Error('Invalid card state');
+    const state = readWalletState();
+    const agent = state.fleet.find(item => item.id === agentId);
+    if (!agent) throw new Error('Unknown agent');
+    if (agent.cardDetails.isFrozen !== frozen) {
+        toggleCardFreezeUnlocked(agentId);
+        return readWalletState();
+    }
+    return state;
+}
+
+export const executeAgentPayment = (...args: Parameters<typeof executeAgentPaymentUnlocked>) => withWalletStateLock(() => executeAgentPaymentUnlocked(...args));
+export const toggleCardFreeze = (...args: Parameters<typeof toggleCardFreezeUnlocked>) => withWalletStateLock(() => toggleCardFreezeUnlocked(...args));
+export const switchActiveAgent = (...args: Parameters<typeof switchActiveAgentUnlocked>) => withWalletStateLock(() => switchActiveAgentUnlocked(...args));
+export const updateCardLimit = (...args: Parameters<typeof updateCardLimitUnlocked>) => withWalletStateLock(() => updateCardLimitUnlocked(...args));
+export const approveQueuedAction = (...args: Parameters<typeof approveQueuedActionUnlocked>) => withWalletStateLock(() => approveQueuedActionUnlocked(...args));
+export const rejectQueuedAction = (...args: Parameters<typeof rejectQueuedActionUnlocked>) => withWalletStateLock(() => rejectQueuedActionUnlocked(...args));
+export const queueAgentApproval = (...args: Parameters<typeof queueAgentApprovalUnlocked>) => withWalletStateLock(() => queueAgentApprovalUnlocked(...args));
+export const setCardFrozen = (...args: Parameters<typeof setCardFrozenUnlocked>) => withWalletStateLock(() => setCardFrozenUnlocked(...args));

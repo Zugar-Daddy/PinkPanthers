@@ -40,12 +40,12 @@ export const AgentInboxModal: React.FC<AgentInboxModalProps> = ({ wallet, isOpen
                         </div>
                         <div>
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight flex items-center gap-2">
-                                <span>Agent Communications Inbox</span>
+                                <span>Agent inbox</span>
                                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">
-                                    LIVE 2FA / OTP
+                                    DEMO MESSAGES
                                 </span>
                             </h2>
-                            <p className="text-xs text-stone-500 font-sans">Agent-linked phone (+1 415 555 0173) & email comms</p>
+                            <p className="text-xs text-stone-500 font-sans">Verification codes and receipts in this simulation</p>
                         </div>
                     </div>
 

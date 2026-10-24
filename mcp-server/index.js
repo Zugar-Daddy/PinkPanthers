@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const { randomUUID } = require('crypto');
 
 // Locate authoritative persistent state file
 const STATE_PATHS = [
@@ -20,12 +21,17 @@ const STATE_PATHS = [
 
 function getStatePath() {
     for (const p of STATE_PATHS) {
-        if (fs.existsSync(p)) return p;
+        if (fs.existsSync(p)) { fs.chmodSync(p, 0o600); return p; }
     }
     // Fallback default
     const defaultPath = path.resolve(__dirname, '../data/wallet-state.json');
     const parentDir = path.dirname(defaultPath);
     if (!fs.existsSync(parentDir)) fs.mkdirSync(parentDir, { recursive: true });
+    const example = path.join(parentDir, 'wallet-state.example.json');
+    if (fs.existsSync(example)) {
+        fs.copyFileSync(example, defaultPath, fs.constants.COPYFILE_EXCL);
+        fs.chmodSync(defaultPath, 0o600);
+    }
     return defaultPath;
 }
 
@@ -39,7 +45,29 @@ function readState() {
 
 function writeState(state) {
     const p = getStatePath();
-    fs.writeFileSync(p, JSON.stringify(state, null, 2), 'utf-8');
+    const temp = `${p}.${process.pid}.${randomUUID()}.tmp`;
+    try {
+        fs.writeFileSync(temp, JSON.stringify(state, null, 2), { encoding: 'utf-8', mode: 0o600 });
+        fs.renameSync(temp, p);
+    } finally {
+        if (fs.existsSync(temp)) fs.unlinkSync(temp);
+    }
+}
+
+function withStateLock(work) {
+    const lock = `${getStatePath()}.lock`;
+    const start = Date.now();
+    while (true) {
+        try {
+            fs.mkdirSync(lock);
+            break;
+        } catch (error) {
+            if (error.code !== 'EEXIST') throw error;
+            if (Date.now() - start > 5000) throw new Error('Wallet state is busy');
+            Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+        }
+    }
+    try { return work(); } finally { fs.rmdirSync(lock); }
 }
 
 /**
@@ -48,14 +76,23 @@ function writeState(state) {
 function executePayment(vendor, targetAddress, functionCalled, amount, description, agentId) {
     const state = readState();
     const targetAgentId = agentId || state.activeAgent.id;
-    const activeAg = state.fleet.find(a => a.id === targetAgentId) || state.activeAgent;
+    const activeAg = state.fleet.find(a => a.id === targetAgentId);
+    if (!activeAg || targetAgentId !== state.activeAgent.id || activeAg.status !== 'active') {
+        return { status: 'REVERTED', reason: 'Agent is not the active authorized session' };
+    }
+    if (!Number.isFinite(amount) || amount <= 0 || amount > state.balances.usdc) {
+        return { status: 'REVERTED', reason: 'Payment amount must be positive, finite, and within available balance' };
+    }
+    if (typeof targetAddress !== 'string' || typeof functionCalled !== 'string') {
+        return { status: 'REVERTED', reason: 'Invalid payment target or function' };
+    }
 
     if (!state.activeAgent.sessionActive) {
         return { status: 'REVERTED', reason: 'Agent Session Key is Inactive or Revoked' };
     }
 
     if (Date.now() > state.activeAgent.sessionExpiresAt) {
-        return { status: 'REVERTED', reason: 'Session Key has Expired on-chain (validUntil passed)' };
+        return { status: 'REVERTED', reason: 'Session has expired in local simulation' };
     }
 
     // 1. Check if target agent's specific card is frozen
@@ -68,23 +105,24 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
     }
 
     // 2. Whitelist Check
-    const isContractAllowed = state.policy.allowedContracts.some(
-        c => c.address.toLowerCase() === targetAddress.toLowerCase()
+    const isContractAllowed = state.policy.allowedContracts.some(c =>
+        c.address.toLowerCase() === targetAddress.toLowerCase() &&
+        c.selector.match(/\(([^)]+)\)/)?.[1] === functionCalled.split('(')[0]
     );
     const isRecipientAllowed = state.policy.allowedRecipients.some(
         r => r.toLowerCase() === targetAddress.toLowerCase()
-    );
+    ) && functionCalled === 'transfer()';
 
     if (!isContractAllowed && !isRecipientAllowed) {
         return { status: 'REVERTED', reason: `Target address not allowlisted: ${targetAddress}` };
     }
 
     // 3. Per-Tx Cap Check (Scoped to active agent's role policy)
-    const agentMaxPerTx = activeAg.maxPerTx || state.policy.maxPerTx;
+    const agentMaxPerTx = activeAg.maxPerTx ?? state.policy.maxPerTx;
     if (amount > agentMaxPerTx) {
         const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds Per-Tx Cap (₹${agentMaxPerTx.toLocaleString('en-IN')})`;
         state.queuedApprovals.unshift({
-            id: `req-mcp-${Date.now()}`,
+            id: `req-mcp-${randomUUID()}`,
             agent: activeAg.name,
             targetName: vendor,
             targetAddress,
@@ -99,13 +137,13 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
     }
 
     // 4. Daily Budget Check (Scoped to agent's budget)
-    const agentBudget = activeAg.dailyBudget || state.policy.dailyBudget;
+    const agentBudget = activeAg.dailyBudget ?? state.policy.dailyBudget;
     const agentSpent = activeAg.spentToday || 0;
     if (agentSpent + amount > agentBudget) {
         const remaining = Math.max(0, agentBudget - agentSpent);
         const reason = `Amount (₹${amount.toLocaleString('en-IN')}) exceeds 24h Remaining Budget (₹${remaining.toLocaleString('en-IN')} remaining of ₹${agentBudget.toLocaleString('en-IN')})`;
         state.queuedApprovals.unshift({
-            id: `req-mcp-${Date.now()}`,
+            id: `req-mcp-${randomUUID()}`,
             agent: activeAg.name,
             targetName: vendor,
             targetAddress,
@@ -134,7 +172,7 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
     state.balances.usdc -= amount;
     state.principal.totalFleetSpendToday += amount;
 
-    const opHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    const opHash = `sim-${randomUUID()}`;
     state.userOps.unshift({
         id: `op-mcp-${Date.now()}`,
         userOpHash: `${opHash.slice(0, 8)}...${opHash.slice(-6)}`,
@@ -147,7 +185,7 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
         gasCostUSD: 10.00,
         status: 'EXECUTED',
         validationResult: 'IN_POLICY',
-        reason: `MCP Autonomous Agent payment: ${description}`,
+        reason: `Simulated MCP Agent payment: ${description}`,
         rawUserOp: {
             sender: state.smartAccountAddress,
             nonce: state.userOps.length + 1,
@@ -175,7 +213,7 @@ function executePayment(vendor, targetAddress, functionCalled, amount, descripti
     writeState(state);
     return {
         status: 'EXECUTED',
-        reason: 'In-policy payment executed successfully on-chain via ERC-4337 Smart Account',
+        reason: 'Payment simulated in local wallet state; no blockchain transaction was submitted',
         userOpHash: opHash
     };
 }
@@ -229,7 +267,7 @@ const MCP_TOOLS = [
     },
     {
         name: 'wallet_pay',
-        description: 'Execute an autonomous payment on-chain via ERC-4337 Smart Account strictly verified against PolicyEngine guardrails.',
+        description: 'Simulate an agent payment in local wallet state under configured guardrails.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -244,21 +282,8 @@ const MCP_TOOLS = [
         }
     },
     {
-        name: 'wallet_freeze_card',
-        description: 'Immediately freeze or unfreeze the agent-linked virtual debit card on-chain.',
-        inputSchema: {
-            type: 'object',
-            properties: {
-                freeze: { type: 'boolean', description: 'True to freeze, false to unfreeze' },
-                agent_id: { type: 'string', description: 'Optional: ID of the fleet agent whose card should be toggled' },
-                reason: { type: 'string', description: 'Security or operational reason' }
-            },
-            required: ['freeze']
-        }
-    },
-    {
         name: 'wallet_request_approval',
-        description: 'Submit an out-of-policy transaction to the Principal for Biometric Passkey (TouchID) approval.',
+        description: 'Stage an out-of-policy payment for owner review in local state.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -271,14 +296,6 @@ const MCP_TOOLS = [
         }
     },
     {
-        name: 'wallet_get_inbox_otp',
-        description: 'Retrieve real-time 2FA OTP verification codes received by the agent for 3DS merchant checkout.',
-        inputSchema: {
-            type: 'object',
-            properties: {}
-        }
-    },
-    {
         name: 'wallet_list_agents',
         description: 'List all agents in the fleet, their assigned virtual cards, daily budgets, and spend totals.',
         inputSchema: {
@@ -288,7 +305,7 @@ const MCP_TOOLS = [
     }
 ];
 
-function handleMcpRequest(req) {
+function handleMcpRequestUnlocked(req) {
     const { id, method, params } = req;
 
     if (method === 'initialize') {
@@ -427,38 +444,13 @@ function handleMcpRequest(req) {
                             {
                                 type: 'text',
                                 text: JSON.stringify({
-                                    status: 'EXECUTED_ON_CHAIN',
-                                    protocol: 'ERC-4337 v0.7',
+                                    status: 'SIMULATED',
+                                    protocol: 'local-state',
                                     vendor,
                                     amount_paid: amount,
                                     user_op_hash: result.userOpHash,
                                     gas_sponsored: true,
-                                    policy_check: 'PASSED_ON_CHAIN'
-                                }, null, 2)
-                            }
-                        ]
-                    }
-                };
-            }
-
-            case 'wallet_freeze_card': {
-                const targetAgentId = args.agent_id || args.agent;
-                const isNowFrozen = toggleCardFreeze(args.freeze, targetAgentId);
-                const ag = targetAgentId ? state.fleet.find(a => a.id === targetAgentId) : null;
-                const cardMasked = ag?.cardDetails?.maskedNumber || state.virtualCard.maskedNumber;
-                return {
-                    jsonrpc: '2.0',
-                    id,
-                    result: {
-                        content: [
-                            {
-                                type: 'text',
-                                text: JSON.stringify({
-                                    agent_id: ag ? ag.id : state.activeAgent.id,
-                                    agent_name: ag ? ag.name : state.activeAgent.name,
-                                    card: cardMasked,
-                                    is_frozen: isNowFrozen,
-                                    message: isNowFrozen ? `Card ${cardMasked} FROZEN successfully on-chain` : `Card ${cardMasked} REACTIVATED on-chain`
+                                    policy_check: 'PASSED_IN_SIMULATION'
                                 }, null, 2)
                             }
                         ]
@@ -472,14 +464,20 @@ function handleMcpRequest(req) {
                 const targetAddress = args.target_address || '0x00000000000000000000000000000000000A1A1A';
                 const just = args.justification || 'Emergency spending request';
 
+                if (!Number.isFinite(amount) || amount <= 0 || amount > Number.MAX_SAFE_INTEGER || typeof vendor !== 'string' || typeof targetAddress !== 'string' || !/^0x[0-9a-fA-F]{40}$/.test(targetAddress)) {
+                    return { jsonrpc: '2.0', id, error: { code: -32602, message: 'Invalid approval request' } };
+                }
+
+                const requestId = `req-mcp-${randomUUID()}`;
+
                 state.queuedApprovals.unshift({
-                    id: `req-mcp-${Date.now()}`,
+                    id: requestId,
                     agent: state.activeAgent.name,
                     targetName: vendor,
                     targetAddress,
                     amount,
                     actionName: 'requestOverride()',
-                    reason: just,
+                    reason: String(just).slice(0, 1000),
                     timestamp: new Date().toLocaleTimeString(),
                     status: 'PENDING'
                 });
@@ -494,29 +492,10 @@ function handleMcpRequest(req) {
                                 type: 'text',
                                 text: JSON.stringify({
                                     status: 'STAGED_FOR_APPROVAL',
+                                    request_id: requestId,
                                     vendor,
                                     amount,
-                                    message: 'Escalation alert dispatched to Principal device (TouchID / WebAuthn).'
-                                }, null, 2)
-                            }
-                        ]
-                    }
-                };
-            }
-
-            case 'wallet_get_inbox_otp': {
-                const otpMessages = state.inboxMessages.filter(m => m.category === '2fa');
-                return {
-                    jsonrpc: '2.0',
-                    id,
-                    result: {
-                        content: [
-                            {
-                                type: 'text',
-                                text: JSON.stringify({
-                                    count: otpMessages.length,
-                                    latest_otp: otpMessages[0]?.code || null,
-                                    messages: otpMessages
+                                    message: 'Request stored for owner review in local state.'
                                 }, null, 2)
                             }
                         ]
@@ -534,7 +513,10 @@ function handleMcpRequest(req) {
                                 type: 'text',
                                 text: JSON.stringify({
                                     total_agents: state.fleet.length,
-                                    fleet: state.fleet
+                                    fleet: state.fleet.map(({ cardDetails, ...agent }) => ({
+                                        ...agent,
+                                        cardDetails: { maskedNumber: cardDetails.maskedNumber, isFrozen: cardDetails.isFrozen }
+                                    }))
                                 }, null, 2)
                             }
                         ]
@@ -556,6 +538,10 @@ function handleMcpRequest(req) {
         id,
         error: { code: -32601, message: `Method not found: ${method}` }
     };
+}
+
+function handleMcpRequest(req) {
+    return req.method === 'tools/call' ? withStateLock(() => handleMcpRequestUnlocked(req)) : handleMcpRequestUnlocked(req);
 }
 
 // -------------------------------------------------------------

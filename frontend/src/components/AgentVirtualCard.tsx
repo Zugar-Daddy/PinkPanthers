@@ -177,7 +177,7 @@ export const AgentVirtualCard: React.FC<AgentVirtualCardProps> = ({ wallet, onTo
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono text-xs">
                         <div className="bg-white border border-stone-200/80 p-3 rounded-xl shadow-subtle flex items-center gap-2.5">
                             <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-                            <span className="text-stone-700 font-medium text-[11px] font-sans">Zero Fraud Liability Policy</span>
+                            <span className="text-stone-700 font-medium text-[11px] font-sans">Spending follows agent policy</span>
                         </div>
                         <div className="bg-white border border-stone-200/80 p-3 rounded-xl shadow-subtle flex items-center gap-2.5">
                             <Zap className="w-4 h-4 text-amber-600 shrink-0" />

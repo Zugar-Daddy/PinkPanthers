@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --background: #FAF8F5;
+  --background: #faf9f6;
   --foreground: #18181B;
 }
 
 html {
-  font-size: 17px;
+  font-size: 16px;
 }
 
 body {
@@ -16,22 +16,84 @@ body {
   background: var(--background);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Micro text legibility bump */
-[class*="text-[9px]"] {
-  font-size: 10.5px !important;
-}
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+:focus-visible { outline: 2px solid #087657; outline-offset: 3px; }
 
-[class*="text-[10px]"] {
-  font-size: 11.5px !important;
+.header-action {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 0.75rem;
+  background: white;
+  padding: 0 0.75rem;
+  color: #44403c;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: background-color .15s, border-color .15s;
 }
+.header-action:hover { background: #f5f5f4; border-color: #d6d3d1; }
 
-[class*="text-[11px]"] {
-  font-size: 12.5px !important;
+.dashboard-sidebar {
+  display: flex;
+  gap: .35rem;
+  overflow-x: auto;
+  padding-bottom: .25rem;
 }
+@media (min-width: 1024px) {
+  .dashboard-sidebar {
+    display: block;
+    overflow: visible;
+    padding: .25rem 0;
+  }
+}
+.dashboard-panel,
+.dashboard-kpi,
+.dashboard-quick-action {
+  border: 1px solid #e8e6e2;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(30, 39, 35, .025);
+}
+.dashboard-panel {
+  min-width: 0;
+  border-radius: 22px;
+  padding: 24px;
+}
+@media (min-width: 640px) { .dashboard-panel { padding: 28px; } }
+.dashboard-kpi {
+  min-height: 164px;
+  border-radius: 20px;
+  padding: 22px;
+}
+.dashboard-kpi-primary {
+  border-color: #123b32;
+  background: linear-gradient(135deg, #123b32, #1d6554);
+  color: white;
+}
+.dashboard-kpi-label { font-size: 12px; font-weight: 600; color: #78716c; }
+.dashboard-eyebrow { font-size: 10px; font-weight: 750; letter-spacing: .15em; color: #14725a; }
+.dashboard-panel-title { margin-top: 8px; color: #1c1917; font-size: 20px; font-weight: 650; letter-spacing: -.035em; line-height: 1.2; }
+.dashboard-panel-subtitle { margin-top: 7px; color: #78716c; font-size: 13px; line-height: 1.5; }
+.dashboard-quick-action {
+  display: flex;
+  min-height: 88px;
+  align-items: center;
+  gap: 13px;
+  border-radius: 18px;
+  padding: 16px;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.dashboard-quick-action:hover { border-color: #b2d1c3; transform: translateY(-2px); box-shadow: 0 9px 22px rgba(26, 68, 54, .08); }
+.dashboard-quick-action strong { display: block; font-size: 13px; color: #292524; }
+.dashboard-quick-action small { display: block; margin-top: 3px; font-size: 11px; color: #78716c; }
+.dashboard-field-label { display: block; font-size: 11px; font-weight: 650; color: #78716c; }
+.dashboard-field-value { margin-top: 6px; font-size: 14px; font-weight: 600; color: #292524; overflow-wrap: anywhere; }
 
 /* Elegant Editorial Serif Font */
 .font-editorial {
@@ -145,14 +207,3 @@ body {
 .tab-glow {
   box-shadow: 0 4px 14px 0 rgba(24, 24, 27, 0.08);
 }
-
-/* Hide Next.js Development Error Overlay Badge & Toast */
-nextjs-portal,
-#nextjs__container,
-[data-nextjs-dialog-overlay],
-[data-nextjs-toast] {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-

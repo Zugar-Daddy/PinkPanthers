@@ -47,7 +47,7 @@ contract SimplePaymaster is IPaymaster {
         PackedUserOperation calldata userOp,
         bytes32 /* userOpHash */,
         uint256 maxCost
-    ) external view returns (bytes memory context, uint256 validationData) {
+    ) external returns (bytes memory context, uint256 validationData) {
         require(msg.sender == address(entryPoint), "Only EntryPoint");
 
         // Check 1: Account must be whitelisted
@@ -65,7 +65,11 @@ contract SimplePaymaster is IPaymaster {
             return ("", 1); // Quota exceeded: reject gas sponsorship to protect paymaster tank
         }
 
-        return (abi.encode(userOp.sender, maxCost), 0); // Sponsor gas
+        // Reserve the maximum cost now so later operations in the same bundle
+        // see the quota already committed to earlier operations.
+        agentDailyGasSpent[userOp.sender] = currentSpent + maxCost;
+        if (currentSpent == 0) agentLastGasEpoch[userOp.sender] = block.timestamp;
+        return (abi.encode(userOp.sender, maxCost), 0);
     }
 
     function postOp(
@@ -76,13 +80,11 @@ contract SimplePaymaster is IPaymaster {
     ) external {
         require(msg.sender == address(entryPoint), "Only EntryPoint");
         if (mode != PostOpMode.postOpReverted) {
-            (address sender, ) = abi.decode(context, (address, uint256));
-
-            if (block.timestamp > agentLastGasEpoch[sender] + 1 days) {
-                agentDailyGasSpent[sender] = actualGasCost;
-                agentLastGasEpoch[sender] = block.timestamp;
+            (address sender, uint256 reservedCost) = abi.decode(context, (address, uint256));
+            if (actualGasCost < reservedCost) {
+                agentDailyGasSpent[sender] -= reservedCost - actualGasCost;
             } else {
-                agentDailyGasSpent[sender] += actualGasCost;
+                agentDailyGasSpent[sender] += actualGasCost - reservedCost;
             }
 
             emit GasSponsored(sender, actualGasCost);

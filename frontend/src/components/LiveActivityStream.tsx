@@ -28,11 +28,11 @@ export const LiveActivityStream: React.FC<LiveActivityStreamProps> = ({ wallet }
                     <div>
                         <div className="flex items-center gap-2">
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
-                                Real-Time Activity Stream
+                                Recent activity
                             </h2>
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         </div>
-                        <p className="text-xs text-stone-500 font-sans">Autonomous payment execution trace across all agent fleet members</p>
+                        <p className="text-xs text-stone-500 font-sans">Latest actions across your agents</p>
                     </div>
                 </div>
 

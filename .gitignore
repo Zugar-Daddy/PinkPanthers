@@ -1,6 +1,13 @@
 node_modules/
 .next/
+.next-dev/
 dist/
 artifacts/
 .DS_Store
 *.log
+.env
+.env.*
+**/.env
+**/.env.*
+data/wallet-state.json
+data/wallet-state.json.lock/

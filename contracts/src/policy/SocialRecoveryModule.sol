@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+interface IRecoverableAgentAccount {
+    function ownerAddress() external view returns (address);
+    function recoveryModule() external view returns (address);
+    function recoverOwner(address newOwner) external;
+}
+
 /**
  * @title SocialRecoveryModule
  * @notice 3-of-5 Guardian Social Recovery with a 48-hour delay timelock and Biometric Owner Veto.
@@ -14,6 +20,7 @@ contract SocialRecoveryModule {
 
     // Smart account binding
     address public accountOwner;
+    IRecoverableAgentAccount public smartAccount;
     address[5] public guardians;
     mapping(address => bool) public isGuardian;
 
@@ -59,6 +66,14 @@ contract SocialRecoveryModule {
         }
     }
 
+    function bindAccount(address account) external onlyAccountOwner {
+        require(address(smartAccount) == address(0), "Already bound");
+        require(account != address(0), "Invalid account");
+        require(IRecoverableAgentAccount(account).ownerAddress() == accountOwner, "Owner mismatch");
+        require(IRecoverableAgentAccount(account).recoveryModule() == address(this), "Module not registered");
+        smartAccount = IRecoverableAgentAccount(account);
+    }
+
     /**
      * @notice A guardian initiates or supports a recovery proposal for a new owner.
      * When 3 of 5 guardians approve, a 48-hour timelock countdown begins.
@@ -101,6 +116,7 @@ contract SocialRecoveryModule {
      * @notice Finalize recovery after the 48-hour delay has elapsed without an owner veto.
      */
     function executeRecovery() external {
+        require(address(smartAccount) != address(0), "Account not bound");
         require(activeRecovery.isActive, "No active recovery");
         require(activeRecovery.approvalCount >= RECOVERY_THRESHOLD, "Quorum not reached");
         require(block.timestamp >= activeRecovery.executionTime, "48-hour timelock delay pending");
@@ -109,6 +125,7 @@ contract SocialRecoveryModule {
         activeRecovery.isExecuted = true;
         address oldOwner = accountOwner;
         accountOwner = activeRecovery.proposedNewOwner;
+        smartAccount.recoverOwner(accountOwner);
 
         emit RecoveryExecuted(oldOwner, activeRecovery.proposedNewOwner);
         _resetApprovals();

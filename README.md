@@ -1,5 +1,15 @@
 # 🛡️ AgentSafe: The Autonomous AI Agent Financial Infrastructure
 
+> **Security and deployment status:** The dashboard and MCP payment tools are a local simulator. They update private JSON state and do not submit blockchain transactions, move real funds, issue cards, or verify biometrics. The Solidity contracts are separate and require deployment and integration before live use. The P-256 verifier's test bypass remains enabled and must never be used with real funds.
+
+For local access, set a random `WALLET_ADMIN_TOKEN` of at least 32 characters in `frontend/.env.local`, then enter `owner` as the browser username and that token as the password. The HTTP API is locked when this variable is absent. Copy `data/wallet-state.example.json` to `data/wallet-state.json` for a fresh local state; the live state and all `.env` files are ignored by Git.
+
+For on-chain recovery, deploy `SocialRecoveryModule` for the account owner, call `AgentSmartAccount.setRecoveryModule(module)` as the owner, then call `SocialRecoveryModule.bindAccount(account)` as the owner. Agent contract calls are currently limited to plain native transfers to allowlisted externally owned recipients; token and protocol calls require owner authorization until asset-specific policy decoders are implemented.
+
+### Live copilot
+
+The dashboard copilot uses `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_BASE_URL`, and `AZURE_OPENAI_MODEL` from `frontend/.env.local`. The Azure deployment must support Responses with `web_search_preview` or `web_search`. A normal lookup makes one model request to search and return up to three cited listings. Successful research is cached in each server process for 60 seconds with its original lookup time; **Refresh prices** bypasses the cache. All upstream work shares a 25-second deadline, with at most one retry for an explicit compatibility error. **Cancel lookup** aborts the request. Selecting a listing opens the merchant website for checkout. If search is unavailable, the copilot reports the error without substituting catalog prices or mock tickets. Card controls require an owner click and are never cached.
+
 > **Track 02: Web3 & Blockchain (W3-02) — "Agent Wallet: Letting AI Agents Pay Safely"**  
 > *A production-accurate ERC-4337 Account Abstraction smart-contract wallet and financial infrastructure providing autonomous AI agents with restricted, owner-defined session keys, virtual cards, connected inboxes, and Model Context Protocol (MCP) endpoints. Inspired by and compatible with [AgentWallet.ai](https://agentwallet.ai/), styled in the [EdVR](https://edvr.vercel.app/) Neo-Brutalist design language.*
 
@@ -126,7 +136,7 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 ### 3. Model Context Protocol (MCP) Endpoint
 Test the MCP endpoint with curl:
 ```bash
-curl -X POST http://localhost:3000/api/mcp \
+curl -u owner -X POST http://localhost:3000/api/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
 ```

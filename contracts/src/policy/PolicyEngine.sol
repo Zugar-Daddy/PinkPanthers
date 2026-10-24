@@ -112,7 +112,7 @@ contract PolicyEngine {
         address agent,
         address target,
         uint256 value,
-        bytes calldata callData,
+        bytes memory callData,
         uint8 requestedLeverage,
         bool hasStopLoss
     ) public view returns (bool) {
@@ -129,7 +129,8 @@ contract PolicyEngine {
 
         // Check Selector if calldata is present
         if (callData.length >= 4) {
-            bytes4 sel = bytes4(callData[:4]);
+            bytes4 sel;
+            assembly { sel := mload(add(callData, 32)) }
             if (!allowedSelectors[agent][sel]) {
                 revert SelectorNotAllowed(sel);
             }

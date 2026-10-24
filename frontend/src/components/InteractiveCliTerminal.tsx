@@ -30,7 +30,7 @@ export const InteractiveCliTerminal: React.FC<InteractiveCliTerminalProps> = ({ 
             response = `[VIRTUAL CARD CONTROLLER]\n` +
                 `Active Agent: ${wallet.agentName}\n` +
                 `Card: ${wallet.virtualCard.maskedNumber}\n` +
-                `Action: ${isNow ? 'FROZEN on-chain' : 'UNFROZEN & REACTIVATED'}\n` +
+                `Action: ${isNow ? 'FROZEN in local simulation' : 'UNFROZEN & REACTIVATED'}\n` +
                 `PolicyEngine.sol validation guardrail updated.`;
         } else if (trimmed.includes('fleet')) {
             response = `[AGENT FLEET]\n` +

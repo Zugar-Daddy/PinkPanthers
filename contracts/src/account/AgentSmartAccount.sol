@@ -21,6 +21,7 @@ contract AgentSmartAccount is IAccount, PolicyEngine, PendingApprovalQueue {
     uint256 public passkeyQx;
     uint256 public passkeyQy;
     bool public hasPasskey;
+    address public recoveryModule;
 
     // Capital Partitioning (Accounting)
     uint256 public freeCapital;
@@ -100,6 +101,19 @@ contract AgentSmartAccount is IAccount, PolicyEngine, PendingApprovalQueue {
         emit EmergencyHaltToggled(agent, halt);
     }
 
+    function setRecoveryModule(address module) external onlyOwner {
+        require(module != address(0) && recoveryModule == address(0), "Recovery module already set");
+        recoveryModule = module;
+    }
+
+    function recoverOwner(address newOwner) external {
+        require(msg.sender == recoveryModule && newOwner != address(0), "Unauthorized recovery");
+        ownerAddress = newOwner;
+        hasPasskey = false;
+        passkeyQx = 0;
+        passkeyQy = 0;
+    }
+
     /**
      * @notice ERC-4337 validateUserOp
      */
@@ -117,48 +131,64 @@ contract AgentSmartAccount is IAccount, PolicyEngine, PendingApprovalQueue {
             return 0; // Success
         }
 
-        // Validate Agent Session Key and Policy
-        if (agentSigner != address(0) && agentPolicies[agentSigner].isActive) {
-            // Parse target and value from callData
-            (address target, uint256 value, bytes calldata innerData) = _parseCallData(userOp.callData);
-
-            // Validate against PolicyEngine
-            try this.checkPolicy(agentSigner, target, value, innerData) returns (bool valid) {
-                if (valid) {
-                    recordSpend(agentSigner, value);
-                    _payPrefund(missingAccountFunds);
-                    // Pack validUntil and validAfter
-                    uint48 validUntil = agentPolicies[agentSigner].validUntil;
-                    uint48 validAfter = agentPolicies[agentSigner].validAfter;
-                    return _packValidationData(false, validUntil, validAfter);
+        // Agent signatures authorize only these two explicitly decoded methods.
+        if (agentSigner != address(0) && agentPolicies[agentSigner].isActive && !agentPolicies[agentSigner].isEmergencyHalted) {
+            if (userOp.callData.length < 4) return 1;
+            bytes4 selector = bytes4(userOp.callData[:4]);
+            if (selector == this.execute.selector) {
+                (address declaredAgent, address target, uint256 value, bytes memory innerData) =
+                    abi.decode(userOp.callData[4:], (address, address, uint256, bytes));
+                if (declaredAgent != agentSigner) return 1;
+                try this.checkPolicy(agentSigner, target, value, innerData) returns (bool valid) {
+                    if (!valid) return 1;
+                } catch {
+                    return 1;
                 }
-            } catch Error(string memory reason) {
-                // Policy failed: stage in PendingApprovalQueue for Owner Approval
-                _queueRequest(agentSigner, target, value, innerData, reason);
-                emit OutOfPolicyInterception(agentSigner, target, value, reason);
-                return 1; // SIG_VALIDATION_FAILED
+            } else if (selector == this.queueOutOfPolicyRequest.selector) {
+                (address declaredAgent,,,) = abi.decode(userOp.callData[4:], (address, address, uint256, bytes));
+                if (declaredAgent != agentSigner) return 1;
+            } else {
+                return 1;
             }
+            _payPrefund(missingAccountFunds);
+            return _packValidationData(false, agentPolicies[agentSigner].validUntil, agentPolicies[agentSigner].validAfter);
         }
 
         return 1; // SIG_VALIDATION_FAILED
     }
 
-    function checkPolicy(address agent, address target, uint256 value, bytes calldata data) external view returns (bool) {
+    function checkPolicy(address agent, address target, uint256 value, bytes memory data) external view returns (bool) {
+        // Generic contract calls can move tokens or encode recipients outside ETH value.
+        // Agent execution is restricted to plain native transfers until method-specific
+        // parsers for those assets are implemented.
+        require(data.length == 0 && target.code.length == 0 && allowedRecipients[agent][target], "Unsupported agent call");
         return validateAction(agent, target, value, data, 1, true);
     }
 
     /**
      * @notice Execute an authorized transaction
      */
-    function execute(address target, uint256 value, bytes calldata data) external {
+    function execute(address agent, address target, uint256 value, bytes calldata data) external {
         require(msg.sender == entryPoint || msg.sender == ownerAddress, "Unauthorized");
+        if (agent != address(0)) {
+            require(msg.sender == entryPoint, "Agent execution requires EntryPoint");
+            require(this.checkPolicy(agent, target, value, data), "Agent policy failed");
+        }
         (bool success, bytes memory result) = target.call{value: value}(data);
         if (!success) {
             assembly {
                 revert(add(result, 32), mload(result))
             }
         }
+        if (agent != address(0)) recordSpend(agent, value);
         emit ExecutionExecuted(target, value, data);
+    }
+
+    function queueOutOfPolicyRequest(address agent, address target, uint256 value, bytes calldata data) external onlyEntryPoint {
+        // An active signed agent may submit this call as its UserOperation.
+        // The rejected execution itself cannot persist writes made during validation.
+        require(agentPolicies[agent].isActive && !agentPolicies[agent].isEmergencyHalted, "Inactive agent");
+        _queueRequest(agent, target, value, data, "Agent requested owner approval");
     }
 
     /**
@@ -213,16 +243,6 @@ contract AgentSmartAccount is IAccount, PolicyEngine, PendingApprovalQueue {
             }
         }
         return (false, address(0));
-    }
-
-    function _parseCallData(bytes calldata callData) internal pure returns (address target, uint256 value, bytes calldata innerData) {
-        if (callData.length >= 68 && bytes4(callData[:4]) == this.execute.selector) {
-            target = address(bytes20(callData[16:36]));
-            value = uint256(bytes32(callData[36:68]));
-            innerData = callData[68:];
-        } else {
-            innerData = callData[0:0];
-        }
     }
 
     function _payPrefund(uint256 missingAccountFunds) internal {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Activity, Fuel, CheckCircle2, ShieldAlert, ArrowUpRight, Code, Eye } from 'lucide-react';
-import { UserOperationLog } from '../lib/web3/agentWalletClient';
+import { UserOperationLog, formatINR } from '../lib/web3/agentWalletClient';
 
 interface UserOpActivityTableProps {
     userOps: UserOperationLog[];
@@ -19,15 +19,15 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                     </div>
                     <div>
                         <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
-                            ERC-4337 UserOperation Log
+                            Operation history
                         </h2>
-                        <p className="text-xs text-stone-500 font-sans">On-chain validation and bundler execution history</p>
+                        <p className="text-xs text-stone-500 font-sans">Recent results from the local simulator</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-1.5 text-xs font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-full">
                     <Fuel className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Gasless via Paymaster</span>
+                    <span>Demo records</span>
                 </div>
             </div>
 
@@ -60,7 +60,7 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                                                 : 'bg-amber-50 text-amber-800 border-amber-200'
                                         }`}
                                     >
-                                        {op.status}
+                                        {isExecuted ? 'SIMULATED' : isReverted ? 'BLOCKED IN SIMULATION' : 'QUEUED'}
                                     </span>
                                     <span className="font-semibold text-stone-900 text-xs font-sans">{op.targetName}</span>
                                     <span className="text-[11px] text-stone-500 font-mono">({op.functionCalled})</span>
@@ -69,7 +69,7 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                                 <div className="flex items-center gap-3 text-[11px]">
                                     {op.amount > 0 && (
                                         <span className="font-medium text-stone-900 font-mono bg-white px-2 py-0.5 rounded-md border border-stone-200 shadow-subtle">
-                                            ${op.amount.toFixed(2)} USDC
+                                            {formatINR(op.amount)}
                                         </span>
                                     )}
                                     <span className="text-stone-400 font-mono text-[10px]" suppressHydrationWarning>{op.timestamp}</span>
@@ -83,7 +83,7 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                                     <span>UserOp: <span className="font-mono text-stone-800 font-medium">{op.userOpHash}</span></span>
                                     {op.gasSponsored && (
                                         <span className="text-emerald-700 font-medium flex items-center gap-1">
-                                            <Fuel className="w-3 h-3 text-emerald-600" /> Gas Sponsored ($0.10)
+                                            <Fuel className="w-3 h-3 text-emerald-600" /> Estimated gas only
                                         </span>
                                     )}
                                 </div>
@@ -93,7 +93,7 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                                     className="flex items-center gap-1.5 text-stone-700 hover:text-stone-900 font-medium font-mono transition-colors"
                                 >
                                     <Code className="w-3.5 h-3.5 text-stone-500" />
-                                    <span>Inspect Raw UserOp</span>
+                                    <span>Inspect Demo Data</span>
                                 </button>
                             </div>
                         </div>

@@ -6,7 +6,7 @@ import { QueuedApproval, formatINR } from '../lib/web3/agentWalletClient';
 
 interface OwnerApprovalModalProps {
     request: QueuedApproval | null;
-    onApprove: (id: string) => Promise<void>;
+    onApprove: (id: string) => Promise<boolean>;
     onReject: (id: string) => void;
     onClose: () => void;
 }
@@ -19,16 +19,20 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
 }) => {
     const [isAuthenticating, setIsAuthenticating] = useState(false);
     const [authSuccess, setAuthSuccess] = useState(false);
+    const [authError, setAuthError] = useState(false);
 
     if (!request) return null;
 
     const handlePasskeyAuth = async () => {
         setIsAuthenticating(true);
-        // Simulate hardware WebAuthn biometric prompt (0.7s)
-        await new Promise(r => setTimeout(r, 700));
-        setAuthSuccess(true);
-        await onApprove(request.id);
+        setAuthError(false);
+        const approved = await onApprove(request.id);
         setIsAuthenticating(false);
+        if (!approved) {
+            setAuthError(true);
+            return;
+        }
+        setAuthSuccess(true);
         setTimeout(() => {
             setAuthSuccess(false);
             onClose();
@@ -91,6 +95,7 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
 
                 {/* Passkey Biometric Button */}
                 <div className="space-y-2">
+                    {authError && <p className="text-xs text-rose-700">Approval failed. The request is still pending.</p>}
                     <button
                         onClick={handlePasskeyAuth}
                         disabled={isAuthenticating || authSuccess}
@@ -102,15 +107,15 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
                     >
                         {authSuccess ? (
                             <>
-                                <Check className="w-4 h-4 text-emerald-300" /> TouchID Verified! Executed on-chain
+                                <Check className="w-4 h-4 text-emerald-300" /> Local simulation approved
                             </>
                         ) : isAuthenticating ? (
                             <>
-                                <Fingerprint className="w-4 h-4 animate-spin text-stone-300" /> Verifying TouchID / FaceID...
+                                <Fingerprint className="w-4 h-4 animate-spin text-stone-300" /> Recording approval...
                             </>
                         ) : (
                             <>
-                                <Fingerprint className="w-4 h-4 text-stone-300" /> Authorize via Biometric Passkey
+                                <Fingerprint className="w-4 h-4 text-stone-300" /> Approve local simulation
                             </>
                         )}
                     </button>

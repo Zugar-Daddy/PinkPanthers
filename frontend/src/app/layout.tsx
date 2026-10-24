@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SafeAgent Treasury | Autonomous AI Smart Account & Policy Engine',
-  description: 'Owner-constrained ERC-4337 smart account giving AI agents restricted sub-keys enforced by on-chain policies.',
+  title: 'SafeAgent Treasury',
+  description: 'Local demo of an agent wallet and policy controls; no blockchain transactions are submitted.',
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-[#FAF8F5] text-stone-900 min-h-screen antialiased selection:bg-stone-900 selection:text-white" suppressHydrationWarning>
+      <body className="bg-[#faf9f6] text-stone-900 min-h-screen antialiased selection:bg-[#123b32] selection:text-white" suppressHydrationWarning>
         {children}
       </body>
     </html>

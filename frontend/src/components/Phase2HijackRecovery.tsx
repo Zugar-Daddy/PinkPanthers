@@ -67,22 +67,22 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
             }
 
             setHijackLoss(prev => prev + addedSpend);
-            logMsg = `[ATTACK 1: RAPID MICRO-DRAIN] Attacker tried 20x ₹1,500 txs (₹30,000 total). ${passedCount} passed (₹${addedSpend.toLocaleString()}), ${blockedCount} REVERTED on-chain with DailyBudgetExceeded. Total spend: ₹${(currentSpent + addedSpend).toLocaleString()} <= Daily Cap (₹${dailyCap.toLocaleString()}).`;
+            logMsg = `[ATTACK 1: RAPID MICRO-DRAIN] Attacker tried 20x ₹1,500 txs (₹30,000 total). ${passedCount} passed (₹${addedSpend.toLocaleString()}), ${blockedCount} REVERTED in local simulation with DailyBudgetExceeded. Total spend: ₹${(currentSpent + addedSpend).toLocaleString()} <= Daily Cap (₹${dailyCap.toLocaleString()}).`;
         } else if (attackId === 2) {
             // Calldata & Re-entrancy
-            logMsg = `[ATTACK 2: CALLDATA INJECTION] Attacker injected malicious selector 0x23b872dd (transferFrom). PolicyEngine.sol checked allowedSelectors. REVERTED ON-CHAIN: SelectorNotAllowed. Losses: ₹0.`;
+            logMsg = `[ATTACK 2: CALLDATA INJECTION] Attacker injected malicious selector 0x23b872dd (transferFrom). PolicyEngine.sol checked allowedSelectors. REVERTED IN SIMULATION: SelectorNotAllowed. Losses: ₹0.`;
         } else if (attackId === 3) {
             // Large DEX Flash-Swap
-            logMsg = `[ATTACK 3: TREASURY FLASH-SWAP] Attacker attempted ₹2,50,000 swap on Uniswap Router. REVERTED ON-CHAIN: PerTxLimitExceeded (attempted ₹2,50,000 > ₹2,500 cap). Staged in approval queue. Losses: ₹0.`;
+            logMsg = `[ATTACK 3: TREASURY FLASH-SWAP] Attacker attempted ₹2,50,000 swap on Uniswap Router. REVERTED IN SIMULATION: PerTxLimitExceeded (attempted ₹2,50,000 > ₹2,500 cap). Staged in approval queue. Losses: ₹0.`;
         } else if (attackId === 4) {
             // Sybil Recipient Sweep
-            logMsg = `[ATTACK 4: SYBIL RECIPIENT SWEEP] Attacker cycled through 15 unauthorized burner addresses. REVERTED ON-CHAIN: RecipientNotAllowed for all 15 addresses. Losses: ₹0.`;
+            logMsg = `[ATTACK 4: SYBIL RECIPIENT SWEEP] Attacker cycled through 15 unauthorized burner addresses. REVERTED IN SIMULATION: RecipientNotAllowed for all 15 addresses. Losses: ₹0.`;
         } else if (attackId === 5) {
             // Epoch Rollover Sniping
             logMsg = `[ATTACK 5: MIDNIGHT EPOCH SNIPING] Attacker attempted to double-spend across 24h boundary. Atomic lastEpochTimestamp enforcement ensured rolling 24h cap held strictly. Losses bounded <= ₹10,000.`;
         } else if (attackId === 6) {
             // Target Provider Address Substitution
-            logMsg = `[ATTACK 6: PHISHING CONTRACT DIVERSION] Attacker substituted compute provider address with phishing contract 0xDead...Beef. REVERTED ON-CHAIN: TargetNotAllowed. Losses: ₹0.`;
+            logMsg = `[ATTACK 6: PHISHING CONTRACT DIVERSION] Attacker substituted compute provider address with phishing contract 0xDead...Beef. REVERTED IN SIMULATION: TargetNotAllowed. Losses: ₹0.`;
         }
 
         setTimeout(() => {
@@ -130,7 +130,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                 wallet.toggleCardFreeze();
             }
             setAnomalyAuditLogs(prev => [
-                `🚨 [AUTO-FREEZE TRIGGERED] Anomaly Score: 88% >= Threshold (${anomalyThreshold}%). High velocity detected: 5 txs in 2.1s, 4.8x amount spike. Agent sub-key automatically HALTED on-chain via toggleEmergencyHalt(). Virtual Card FROZEN.`,
+                `🚨 [AUTO-FREEZE TRIGGERED] Anomaly Score: 88% >= Threshold (${anomalyThreshold}%). High velocity detected: 5 txs in 2.1s, 4.8x amount spike. Agent sub-key automatically HALTED in local simulation via toggleEmergencyHalt(). Virtual Card FROZEN.`,
                 ...prev
             ]);
         } else {
@@ -161,7 +161,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
         { id: 'g2', name: 'Institutional Custody Vault', address: '0x2222...FireSafe', role: 'Cold Custody' },
         { id: 'g3', name: 'Executive Co-Founder', address: '0x3333...CoFound', role: 'Co-Principal' },
         { id: 'g4', name: 'Hardware Security Key', address: '0x4444...YubiCold', role: 'YubiKey P-256' },
-        { id: 'g5', name: 'Automated AI Sentinel', address: '0x5555...Sentinel', role: 'On-Chain Monitor' }
+        { id: 'g5', name: 'Automated AI Sentinel', address: '0x5555...Sentinel', role: 'Simulated Monitor' }
     ];
 
     const [guardianVotes, setGuardianVotes] = useState<{ [key: string]: boolean }>({
@@ -454,7 +454,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                                 <Users className="w-4 h-4 text-blue-600 group-hover:scale-105 transition" />
                                 <span>4. Sybil Recipient Sweep</span>
                             </div>
-                            <p className="text-[11px] text-stone-500 font-sans">Cycles 15 randomized hacker addresses. Reverts on-chain.</p>
+                            <p className="text-[11px] text-stone-500 font-sans">Cycles 15 randomized hacker addresses. Reverts in local simulation.</p>
                         </div>
                         <span className="text-[10px] font-mono text-emerald-700 bg-white px-2 py-0.5 rounded border border-stone-200 mt-2.5 w-fit">
                             Recipient Allowlist
@@ -753,7 +753,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                                 : recoveryStatus === 'EXECUTABLE'
                                 ? '48-hour delay finished without owner veto. Recovery proposal is now executable.'
                                 : recoveryStatus === 'VETOED'
-                                ? 'Owner veto was recorded on-chain. Proposal is terminated.'
+                                ? 'Owner veto was recorded in local simulation. Proposal is terminated.'
                                 : 'Select 3 of 5 guardians to initiate recovery proposal.'}
                         </p>
                     </div>
@@ -788,7 +788,7 @@ export const Phase2HijackRecovery: React.FC<Phase2HijackRecoveryProps> = ({ wall
                                 className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-mono text-xs font-medium flex items-center gap-1.5 shadow-sm transition"
                             >
                                 <RefreshCw className="w-3.5 h-3.5" />
-                                <span>Execute Key Rotation On-Chain</span>
+                                <span>Execute Key Rotation Simulated</span>
                             </button>
                         )}
 

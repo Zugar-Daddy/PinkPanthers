@@ -19,9 +19,9 @@ export const AgentKeyPolicyCard: React.FC<AgentKeyPolicyCardProps> = ({ wallet, 
                     </div>
                     <div>
                         <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">
-                            Smart Account Policy Engine
+                            Spending policy
                         </h2>
-                        <p className="text-xs text-stone-500 font-sans">Cryptographically verified on-chain by PolicyEngine.sol</p>
+                        <p className="text-xs text-stone-500 font-sans">Policy settings used by the local simulator</p>
                     </div>
                 </div>
 
@@ -29,7 +29,7 @@ export const AgentKeyPolicyCard: React.FC<AgentKeyPolicyCardProps> = ({ wallet, 
                     onClick={onEditPolicy}
                     className="px-3.5 py-1.5 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-stone-800 text-xs font-mono font-medium shadow-subtle transition"
                 >
-                    Configure Policy
+                    Edit policy
                 </button>
             </div>
 
@@ -63,7 +63,7 @@ export const AgentKeyPolicyCard: React.FC<AgentKeyPolicyCardProps> = ({ wallet, 
             {/* Whitelisted Vendor Protocols */}
             <div>
                 <div className="text-xs font-mono font-semibold text-stone-900 mb-3 flex items-center justify-between">
-                    <span className="tracking-wider">WHITELISTED PROTOCOL TARGETS & ABI SELECTORS</span>
+                    <span className="tracking-wider">APPROVED DESTINATIONS</span>
                     <span className="text-[11px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> All others blocked
                     </span>

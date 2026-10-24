@@ -58,7 +58,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         </div>
                         <div>
                             <h2 className="text-base font-serif font-semibold text-stone-900 tracking-tight">Agent Policy Controls</h2>
-                            <p className="text-xs text-stone-500 font-sans">Owner-enforced on-chain spending guardrails for <span className="font-semibold text-stone-700">{wallet.agentName}</span></p>
+                            <p className="text-xs text-stone-500 font-sans">Owner-enforced in local simulation spending guardrails for <span className="font-semibold text-stone-700">{wallet.agentName}</span></p>
                         </div>
                     </div>
                     <button
@@ -177,8 +177,8 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         onClick={handleSave}
                         className="flex-1 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition"
                     >
-                        {isSaved ? <Check className="w-4 h-4 text-emerald-300" /> : <Fingerprint className="w-4 h-4 text-stone-300" />}
-                        <span>{isSaved ? 'Updated on Chain!' : 'Sign & Update with TouchID'}</span>
+                        <Check className="w-4 h-4 text-emerald-300" />
+                        <span>{isSaved ? 'Policy updated' : 'Save policy'}</span>
                     </button>
                 </div>
 

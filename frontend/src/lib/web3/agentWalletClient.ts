@@ -493,7 +493,7 @@ export class AgentWalletClient {
             gasCostUSD: 10.00,
             status: 'EXECUTED',
             validationResult: 'IN_POLICY',
-            reason: 'Autonomous top-up of API credits (₹1,500 < ₹2,500 limit). Verified on-chain.',
+            reason: 'Autonomous top-up of API credits (₹1,500 < ₹2,500 limit). Recorded in local simulation.',
             rawUserOp: {
                 sender: '0x884337bA94D25Ac2c488b394B7f8D44e1D328C39',
                 nonce: 1,
@@ -516,7 +516,7 @@ export class AgentWalletClient {
             gasCostUSD: 8.00,
             status: 'EXECUTED',
             validationResult: 'IN_POLICY',
-            reason: 'Daily grocery re-order (₹950 < ₹2,500 limit). Verified on-chain.',
+            reason: 'Daily grocery re-order (₹950 < ₹2,500 limit). Recorded in local simulation.',
             rawUserOp: {
                 sender: '0x884337bA94D25Ac2c488b394B7f8D44e1D328C39',
                 nonce: 2,
@@ -706,113 +706,7 @@ export class AgentWalletClient {
             }
         }
 
-        if (!this.sessionActive) {
-            this._logFailedOp(targetName, targetAddress, functionCalled, amount, 'EXPIRED_BLOCKED', 'Session Key is Revoked or Inactive');
-            return { status: 'REVERTED', reason: 'Agent Session Key is Inactive/Revoked' };
-        }
-
-        if (Date.now() > this.sessionExpiresAt) {
-            this._logFailedOp(targetName, targetAddress, functionCalled, amount, 'EXPIRED_BLOCKED', 'Session Key has Expired (validUntil timestamp passed)');
-            return { status: 'REVERTED', reason: 'Session Expired on-chain (validUntil < block.timestamp)' };
-        }
-
-        // Check if virtual card is frozen if this is a card/checkout action
-        if (this.virtualCard.isFrozen && (functionCalled.includes('orderCheckout') || functionCalled.includes('bookTicket'))) {
-            this._logFailedOp(targetName, targetAddress, functionCalled, amount, 'MALICIOUS_BLOCKED', 'Virtual Card is FROZEN by Principal');
-            return { status: 'REVERTED', reason: 'Virtual Card is currently FROZEN' };
-        }
-
-        // Check 1: Target Whitelist
-        const isContractAllowed = this.policy.allowedContracts.some(
-            c => c.address.toLowerCase() === targetAddress.toLowerCase()
-        );
-        const isRecipientAllowed = this.policy.allowedRecipients.some(
-            r => r.toLowerCase() === targetAddress.toLowerCase()
-        );
-
-        if (!isContractAllowed && !isRecipientAllowed) {
-            this._logFailedOp(targetName, targetAddress, functionCalled, amount, 'MALICIOUS_BLOCKED', `REVERT: Target ${targetAddress} not on approved contract whitelist`);
-            return { status: 'REVERTED', reason: `Target address not allowlisted: ${targetAddress}` };
-        }
-
-        // Check 2: Per-Transaction Limit
-        if (amount > this.policy.maxPerTx) {
-            const reason = `Amount (₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}) exceeds Per-Transaction Limit (₹${this.policy.maxPerTx.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`;
-            this._queueForApproval(targetName, targetAddress, functionCalled, amount, reason);
-            return { status: 'QUEUED', reason };
-        }
-
-        // Check 3: Daily Rolling Budget
-        if (this.dailySpent + amount > this.policy.dailyBudget) {
-            const remaining = Math.max(0, this.policy.dailyBudget - this.dailySpent);
-            const reason = `Amount (₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}) exceeds 24-Hour Remaining Budget (₹${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} remaining of ₹${this.policy.dailyBudget.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`;
-            this._queueForApproval(targetName, targetAddress, functionCalled, amount, reason);
-            return { status: 'QUEUED', reason };
-        }
-
-        // In-Policy Success!
-        this.dailySpent += amount;
-        this.usdcBalance -= amount;
-        this.totalFleetSpendToday += amount;
-
-        // Update active agent record
-        const activeAg = this.fleet.find(a => a.id === this.activeAgentId);
-        if (activeAg) {
-            activeAg.spentToday += amount;
-            activeAg.lastAction = `${functionCalled} · ${targetName} (₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`;
-        }
-
-        const opHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
-        this.userOps.unshift({
-            id: `op-${Date.now()}`,
-            userOpHash: `${opHash.slice(0, 8)}...${opHash.slice(-6)}`,
-            timestamp: new Date().toLocaleTimeString(),
-            targetName,
-            targetAddress,
-            functionCalled,
-            amount,
-            gasSponsored: true,
-            gasCostUSD: 10.00,
-            status: 'EXECUTED',
-            validationResult: 'IN_POLICY',
-            reason: `Autonomous in-policy payment: ${actionDescription}`,
-            rawUserOp: {
-                sender: this.smartAccountAddress,
-                nonce: this.userOps.length + 1,
-                callData: `0x${functionCalled.slice(0, 8)}...`,
-                callGasLimit: '0x186a0',
-                verificationGasLimit: '0x249f0',
-                paymasterAndData: `${this.paymasterAddress}...`,
-                signature: '0xAgentECDSA...'
-            }
-        });
-
-        // Add to live activity stream
-        this.activityStream.unshift({
-            id: `stream-${Date.now()}`,
-            agentId: this.activeAgentId,
-            agentName: this.agentName,
-            category: activeAg ? activeAg.category : 'finance',
-            tag: activeAg ? activeAg.tag : 'AG',
-            action: functionCalled.split('(')[0],
-            vendor: targetName,
-            amount,
-            timeAgo: 'now',
-            timestamp: Date.now()
-        });
-
-        // Add receipt to inbox
-        this.inboxMessages.unshift({
-            id: `msg-${Date.now()}`,
-            sender: `${targetName} System`,
-            subject: `Payment Receipt: ₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-            body: `Agent ${this.agentName} completed autonomous payment of ₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} for ${actionDescription}.`,
-            timestamp: 'Just now',
-            unread: true,
-            category: 'receipt'
-        });
-
-        return { status: 'EXECUTED', reason: 'Autonomous transaction executed within policy' };
+        return { status: 'REVERTED', reason: 'Wallet state service unavailable; no payment was submitted' };
     }
 
     private _queueForApproval(
@@ -912,58 +806,20 @@ export class AgentWalletClient {
      * Admin Biometric Passkey Approval
      */
     async approveQueued(id: string): Promise<boolean> {
-        const req = this.queuedApprovals.find(q => q.id === id);
-        if (!req) return false;
-
-        req.status = 'APPROVED';
-        this.usdcBalance -= req.amount;
-        this.totalFleetSpendToday += req.amount;
-
-        const opHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
-        this.userOps.unshift({
-            id: `op-passkey-${Date.now()}`,
-            userOpHash: `${opHash.slice(0, 8)}...${opHash.slice(-6)}`,
-            timestamp: new Date().toLocaleTimeString(),
-            targetName: req.targetName,
-            targetAddress: req.targetAddress,
-            functionCalled: req.actionName,
-            amount: req.amount,
-            gasSponsored: false,
-            gasCostUSD: 12.00,
-            status: 'EXECUTED',
-            validationResult: 'IN_POLICY',
-            reason: `Owner Biometric TouchID Passkey Override executed for request ${id} (₹${req.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })})`,
-            rawUserOp: {
-                sender: this.smartAccountAddress,
-                nonce: this.userOps.length + 1,
-                callData: '0xApproved...',
-                callGasLimit: '0x186a0',
-                verificationGasLimit: '0x249f0',
-                paymasterAndData: '0x',
-                signature: '0xOwnerPasskeyP256Verified...'
-            }
-        });
-
-        // Add receipt to inbox
-        this.inboxMessages.unshift({
-            id: `msg-appr-${Date.now()}`,
-            sender: 'Principal Passkey Authenticator',
-            subject: `Out-of-Policy Request ${id} APPROVED`,
-            body: `Biometric TouchID approved ₹${req.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} to ${req.targetName}. Funds executed on-chain.`,
-            timestamp: 'Just now',
-            unread: true,
-            category: 'receipt'
-        });
-
-        if (typeof window !== 'undefined') {
-            fetch('/api/wallet/state', {
+        if (typeof window === 'undefined') return false;
+        try {
+            const response = await fetch('/api/wallet/state', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'approve_queued', payload: { id } })
-            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) return false;
+            this._applyState(result.state);
+            return true;
+        } catch {
+            return false;
         }
-
-        return true;
     }
 
     rejectQueued(id: string) {

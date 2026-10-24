@@ -113,12 +113,12 @@ export const ThreatDefensePlayground: React.FC<ThreatDefensePlaygroundProps> = (
             <div className="bg-stone-50/70 border border-stone-200/80 rounded-xl p-4 space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-mono font-medium text-stone-700 pb-2 border-b border-stone-200/60">
                     <span className="uppercase text-[10px] tracking-wider text-stone-500">SECURITY EVENT AUDIT TRAIL</span>
-                    <span className="text-emerald-800 text-[10px] font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">ON-CHAIN VERIFIED</span>
+                    <span className="text-emerald-800 text-[10px] font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">IN SIMULATION VERIFIED</span>
                 </div>
 
                 <div className="space-y-2 max-h-40 overflow-y-auto font-mono text-xs">
                     {threatLogs.length === 0 ? (
-                        <div className="text-stone-400 py-3 text-center text-xs font-sans">Click any scenario above to verify on-chain smart wallet defenses</div>
+                        <div className="text-stone-400 py-3 text-center text-xs font-sans">Click any scenario above to verify in local simulation smart wallet defenses</div>
                     ) : (
                         threatLogs.map((log) => (
                             <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-2 px-3 rounded-lg bg-white border border-stone-200/80 gap-2 shadow-subtle">

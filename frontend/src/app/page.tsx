@@ -2,12 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { WalletHeader } from '../components/WalletHeader';
-import { WalletBalancesCard } from '../components/WalletBalancesCard';
+import { DashboardOverview } from '../components/DashboardOverview';
 import { AgentKeyPolicyCard } from '../components/AgentKeyPolicyCard';
 import { AgentActionSimulator } from '../components/AgentActionSimulator';
-import { OmniAgentCopilot } from '../components/OmniAgentCopilot';
-import { TicketArtifactModal } from '../components/TicketArtifactModal';
-import { RealWorldArtifact } from '../lib/sandbox/realWorldApis';
+import { LiveOmniAgentCopilot } from '../components/LiveOmniAgentCopilot';
 import { ThreatDefensePlayground } from '../components/ThreatDefensePlayground';
 import { UserOpActivityTable } from '../components/UserOpActivityTable';
 import { OwnerApprovalModal } from '../components/OwnerApprovalModal';
@@ -24,9 +22,33 @@ import { InteractiveCliTerminal } from '../components/InteractiveCliTerminal';
 import { Phase2HijackRecovery } from '../components/Phase2HijackRecovery';
 
 import { agentWalletClient, QueuedApproval, UserOperationLog, formatINR } from '../lib/web3/agentWalletClient';
-import { LayoutGrid, Bot, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users, Skull } from 'lucide-react';
+import { LayoutGrid, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users, LifeBuoy, Play } from 'lucide-react';
 
-type ActiveTab = 'overview' | 'fleet' | 'card' | 'simulator' | 'stream' | 'cli' | 'threats' | 'phase2';
+type ActiveTab = 'overview' | 'fleet' | 'card' | 'lab' | 'simulator' | 'stream' | 'cli' | 'threats' | 'phase2';
+
+const navigation = [
+    { id: 'overview', label: 'Overview', icon: LayoutGrid, group: 'Workspace' },
+    { id: 'fleet', label: 'Agents', icon: Users, group: 'Workspace' },
+    { id: 'card', label: 'Cards & policy', icon: CreditCard, group: 'Workspace' },
+    { id: 'stream', label: 'Activity', icon: Activity, group: 'Workspace' },
+    { id: 'lab', label: 'Simulate', icon: Play, group: 'Tools' },
+    { id: 'simulator', label: 'Copilot', icon: Sparkles, group: 'Tools' },
+    { id: 'threats', label: 'Security tests', icon: ShieldAlert, group: 'Tools' },
+    { id: 'phase2', label: 'Recovery', icon: LifeBuoy, group: 'Tools' },
+    { id: 'cli', label: 'Terminal', icon: Terminal, group: 'Tools' },
+] as const;
+
+const sectionIntro: Record<ActiveTab, { title: string; description: string }> = {
+    overview: { title: 'Treasury overview', description: 'Manage agent access, spending, and approvals in one place.' },
+    fleet: { title: 'Agents', description: 'See who is active and switch between agents.' },
+    card: { title: 'Cards & policy', description: 'Review card controls and spending limits.' },
+    lab: { title: 'Simulation lab', description: 'Test an agent action and see how the current policy responds.' },
+    simulator: { title: 'Copilot', description: 'Ask for live listings and review sourced options before visiting a merchant.' },
+    stream: { title: 'Activity', description: 'Follow recent agent actions and account operations.' },
+    cli: { title: 'Terminal', description: 'Explore account actions in the local terminal.' },
+    threats: { title: 'Security tests', description: 'Try common attacks against the simulated policy.' },
+    phase2: { title: 'Recovery', description: 'Explore the simulated account recovery flow.' },
+};
 
 export default function Home() {
     // Wallet Client Instance
@@ -52,7 +74,6 @@ export default function Home() {
     const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
     const [activeApprovalRequest, setActiveApprovalRequest] = useState<QueuedApproval | null>(null);
     const [selectedUserOp, setSelectedUserOp] = useState<UserOperationLog | null>(null);
-    const [activeArtifact, setActiveArtifact] = useState<{ artifact: RealWorldArtifact; userOpHash?: string } | null>(null);
 
     // Threat Defense Logs
     const [threatLogs, setThreatLogs] = useState<{ id: string; time: string; attackType: string; result: string; defenseMechanism: string }[]>([
@@ -83,7 +104,7 @@ export default function Home() {
     };
 
     // Handle Agent Action Dispatch
-    const handleExecuteAction = async (
+    const handleSimulateAction = async (
         targetName: string,
         targetAddress: string,
         functionCalled: string,
@@ -95,13 +116,15 @@ export default function Home() {
             setActiveApprovalRequest(wallet.queuedApprovals[0] || null);
         }
         forceUpdate();
+        return result;
     };
 
     // Owner Passkey Approval Handlers
     const handleApproveRequest = async (id: string) => {
-        await wallet.approveQueued(id);
-        setActiveApprovalRequest(null);
+        const approved = await wallet.approveQueued(id);
+        if (approved) setActiveApprovalRequest(null);
         forceUpdate();
+        return approved;
     };
 
     const handleRejectRequest = (id: string) => {
@@ -134,7 +157,7 @@ export default function Home() {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
             attackType: 'Leaked Key Drain (₹1,00,000)',
-            result: 'REVERTED ON-CHAIN',
+            result: 'REVERTED IN SIMULATION',
             defenseMechanism: 'Recipient Allowlist Rejection'
         };
         setThreatLogs(prev => [newLog, ...prev]);
@@ -153,7 +176,7 @@ export default function Home() {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
             attackType: 'Prompt Injection / Jailbreak (₹25,000)',
-            result: 'REVERTED ON-CHAIN',
+            result: 'REVERTED IN SIMULATION',
             defenseMechanism: 'Contract Whitelist Rejection'
         };
         setThreatLogs(prev => [newLog, ...prev]);
@@ -196,7 +219,7 @@ export default function Home() {
             id: `threat-${Date.now()}`,
             time: new Date().toLocaleTimeString(),
             attackType: 'Expired Sub-Key Call (₹1,000)',
-            result: 'REVERTED ON-CHAIN',
+            result: 'REVERTED IN SIMULATION',
             defenseMechanism: 'validUntil Block Timestamp Check'
         };
         setThreatLogs(prev => [newLog, ...prev]);
@@ -204,7 +227,10 @@ export default function Home() {
     };
 
     return (
-        <main className="min-h-screen flex flex-col bg-[#FAF8F5] text-stone-900 selection:bg-emerald-600 selection:text-white">
+        <main className="min-h-screen flex flex-col bg-[#faf9f6] text-stone-900 selection:bg-[#123b32] selection:text-white">
+            <div className="border-b border-amber-200 bg-amber-50 px-5 py-2 text-center text-xs text-amber-900">
+                Demo workspace · Balances and actions are simulated; no blockchain transaction or biometric verification occurs.
+            </div>
             {/* Top Navigation */}
             <WalletHeader
                 wallet={wallet}
@@ -213,271 +239,102 @@ export default function Home() {
                 onOpenMcp={() => setIsMcpModalOpen(true)}
             />
 
-            {/* Main Application Container */}
-            <div className="flex-1 p-4 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
-                
-                {/* 1. Primary Treasury & 24h Spend Tracking */}
-                <WalletBalancesCard
-                    wallet={wallet}
-                    onRevokeKey={handleRevokeKey}
-                />
-
-                {/* 2. Interactive View Switcher / Tab Bar */}
-                <div className="flex items-center justify-between pb-1 gap-3 flex-wrap">
-                    <div className="flex items-center bg-white/80 backdrop-blur-md border border-stone-200/80 rounded-2xl p-1.5 gap-1 shadow-subtle flex-wrap">
-                        
-                        <button
-                            onClick={() => setActiveTab('overview')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'overview'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <LayoutGrid className="w-3.5 h-3.5" />
-                            <span>Workspace</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveTab('fleet')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'fleet'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <Users className="w-3.5 h-3.5" />
-                            <span>Agent Fleet</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveTab('card')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'card'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <CreditCard className="w-3.5 h-3.5" />
-                            <span>Virtual Card</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveTab('simulator')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'simulator'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                            <span>AI Copilot</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveTab('stream')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'stream'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <Activity className="w-3.5 h-3.5" />
-                            <span>Live Activity</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveTab('cli')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'cli'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <Terminal className="w-3.5 h-3.5" />
-                            <span>CLI Terminal</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveTab('threats')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'threats'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <ShieldAlert className="w-3.5 h-3.5" />
-                            <span>Threat Defense</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveTab('phase2')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
-                                activeTab === 'phase2'
-                                    ? 'bg-stone-900 text-white shadow-xs'
-                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
-                            }`}
-                        >
-                            <Skull className="w-3.5 h-3.5 text-rose-500" />
-                            <span>Hijack & Recovery</span>
-                        </button>
-
-                    </div>
-
-                    <div className="hidden sm:flex items-center gap-2 text-xs font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3.5 py-2 rounded-xl shadow-xs">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>MCP + PolicyEngine.sol Active</span>
-                    </div>
-                </div>
-
-                {/* 3. Main Workspace Display */}
-                {activeTab === 'overview' && (
-                    <div key="overview" className="space-y-6 tab-panel-enter">
-                        {/* Heroic Omni-Agent Autonomous Command Center */}
-                        <OmniAgentCopilot
-                            wallet={wallet}
-                            onExecuteAction={handleExecuteAction}
-                            onViewArtifact={(artifact, userOpHash) => setActiveArtifact({ artifact, userOpHash })}
-                        />
-
-                        {/* 1. Principal & Fleet Banner */}
-                        <PrincipalFleetOverview
-                            wallet={wallet}
-                            onSelectAgent={handleSelectAgent}
-                        />
-
-                        {/* 2. Interactive Card + Activity Stream */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            <div className="lg:col-span-6 space-y-6">
-                                <AgentVirtualCard
-                                    wallet={wallet}
-                                    onToggleFreeze={handleToggleCardFreeze}
-                                    onUpdateLimit={handleUpdateCardLimit}
-                                />
-                                <AgentKeyPolicyCard
-                                    wallet={wallet}
-                                    onEditPolicy={() => setIsPolicyModalOpen(true)}
-                                />
+            <div className="mx-auto grid w-full max-w-[1600px] flex-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-9 lg:px-8 lg:py-9">
+                <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start" aria-label="Main navigation">
+                    <div className="dashboard-sidebar">
+                        {(['Workspace', 'Tools'] as const).map(group => (
+                            <div key={group} className="lg:mb-6">
+                                <p className="hidden px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-stone-400 lg:block">{group}</p>
+                                <nav className="flex gap-1 overflow-x-auto lg:flex-col" aria-label={group}>
+                                    {navigation.filter(item => item.group === group).map(({ id, label, icon: Icon }) => (
+                                        <button key={id} onClick={() => setActiveTab(id)} aria-current={activeTab === id ? 'page' : undefined}
+                                            className={`flex min-h-10 shrink-0 items-center gap-3 rounded-xl px-3 text-left text-[13px] font-medium transition-colors lg:w-full ${
+                                                activeTab === id ? 'bg-[#e8f3ee] text-[#105b49]' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-950'
+                                            }`}>
+                                            <Icon className="h-[17px] w-[17px]" />
+                                            {label}
+                                        </button>
+                                    ))}
+                                </nav>
                             </div>
+                        ))}
+                    </div>
+                </aside>
 
-                            <div className="lg:col-span-6 space-y-6">
-                                <LiveActivityStream
-                                    wallet={wallet}
-                                />
+                <div className="min-w-0 space-y-7">
+                    <div className="flex flex-wrap items-end justify-between gap-4">
+                        <div>
+                            <p className="dashboard-eyebrow">SAFEAGENT / {sectionIntro[activeTab].title.toUpperCase()}</p>
+                            <h1 className="mt-2 text-[32px] font-semibold leading-tight tracking-[-0.045em] text-stone-950 sm:text-[38px]">{sectionIntro[activeTab].title}</h1>
+                            <p className="mt-2 text-sm text-stone-500">{sectionIntro[activeTab].description}</p>
+                        </div>
+                        <span className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600">{activeTab === 'simulator' ? 'Live research · merchant checkout' : `Selected: ${wallet.agentName}`}</span>
+                    </div>
+
+                    {activeTab === 'overview' && (
+                        <div className="space-y-6 tab-panel-enter">
+                            <DashboardOverview wallet={wallet} onSelectAgent={handleSelectAgent} onOpenSimulator={() => setActiveTab('lab')} onOpenActivity={() => setActiveTab('stream')} onOpenPolicy={() => setActiveTab('card')} />
+                            <div className="grid gap-5 xl:grid-cols-2">
+                                <LiveActivityStream wallet={wallet} />
+                                <UserOpActivityTable userOps={wallet.userOps} onInspectUserOp={setSelectedUserOp} />
                             </div>
                         </div>
+                    )}
 
-                        {/* 3. UserOp History Log */}
-                        <UserOpActivityTable
-                            userOps={wallet.userOps}
-                            onInspectUserOp={(op) => setSelectedUserOp(op)}
-                        />
-                    </div>
-                )}
+                    {activeTab === 'fleet' && (
+                        <div className="space-y-6 tab-panel-enter">
+                            <PrincipalFleetOverview wallet={wallet} onSelectAgent={handleSelectAgent} />
+                            <LiveActivityStream wallet={wallet} />
+                        </div>
+                    )}
 
-                {activeTab === 'fleet' && (
-                    <div key="fleet" className="space-y-6 tab-panel-enter">
-                        <PrincipalFleetOverview
-                            wallet={wallet}
-                            onSelectAgent={handleSelectAgent}
-                        />
-                        <LiveActivityStream
-                            wallet={wallet}
-                        />
-                    </div>
-                )}
+                    {activeTab === 'card' && (
+                        <div className="grid gap-6 tab-panel-enter xl:grid-cols-2">
+                            <AgentVirtualCard wallet={wallet} onToggleFreeze={handleToggleCardFreeze} onUpdateLimit={handleUpdateCardLimit} />
+                            <AgentKeyPolicyCard wallet={wallet} onEditPolicy={() => setIsPolicyModalOpen(true)} />
+                        </div>
+                    )}
 
-                {activeTab === 'card' && (
-                    <div key="card" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
-                        <AgentVirtualCard
-                            wallet={wallet}
-                            onToggleFreeze={handleToggleCardFreeze}
-                            onUpdateLimit={handleUpdateCardLimit}
-                        />
-                        <AgentKeyPolicyCard
-                            wallet={wallet}
-                            onEditPolicy={() => setIsPolicyModalOpen(true)}
-                        />
-                    </div>
-                )}
+                    {activeTab === 'lab' && (
+                        <div className="space-y-6 tab-panel-enter">
+                            <AgentActionSimulator wallet={wallet} onExecuteAction={handleSimulateAction} />
+                            <UserOpActivityTable userOps={wallet.userOps} onInspectUserOp={setSelectedUserOp} />
+                        </div>
+                    )}
 
-                {activeTab === 'simulator' && (
-                    <div key="simulator" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
-                        <OmniAgentCopilot
-                            wallet={wallet}
-                            onExecuteAction={handleExecuteAction}
-                            onViewArtifact={(artifact, userOpHash) => setActiveArtifact({ artifact, userOpHash })}
-                        />
-                        <UserOpActivityTable
-                            userOps={wallet.userOps}
-                            onInspectUserOp={(op) => setSelectedUserOp(op)}
-                        />
-                    </div>
-                )}
+                    {activeTab === 'simulator' && (
+                        <div className="space-y-6 tab-panel-enter">
+                            <LiveOmniAgentCopilot wallet={wallet} />
+                            <UserOpActivityTable userOps={wallet.userOps} onInspectUserOp={setSelectedUserOp} />
+                        </div>
+                    )}
 
-                {activeTab === 'stream' && (
-                    <div key="stream" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
-                        <LiveActivityStream
-                            wallet={wallet}
-                        />
-                        <UserOpActivityTable
-                            userOps={wallet.userOps}
-                            onInspectUserOp={(op) => setSelectedUserOp(op)}
-                        />
-                    </div>
-                )}
+                    {activeTab === 'stream' && (
+                        <div className="grid gap-6 tab-panel-enter xl:grid-cols-2">
+                            <LiveActivityStream wallet={wallet} />
+                            <UserOpActivityTable userOps={wallet.userOps} onInspectUserOp={setSelectedUserOp} />
+                        </div>
+                    )}
 
-                {activeTab === 'cli' && (
-                    <div key="cli" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
-                        <InteractiveCliTerminal
-                            wallet={wallet}
-                        />
-                    </div>
-                )}
+                    {activeTab === 'cli' && (
+                        <div className="tab-panel-enter"><InteractiveCliTerminal wallet={wallet} /></div>
+                    )}
 
-                {activeTab === 'threats' && (
-                    <div key="threats" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
-                        <ThreatDefensePlayground
-                            onTriggerDrain={handleTriggerDrain}
-                            onTriggerPromptInjection={handleTriggerPromptInjection}
-                            onTriggerOverspend={handleTriggerOverspend}
-                            onTriggerExpired={handleTriggerExpired}
-                            threatLogs={threatLogs}
-                        />
-                    </div>
-                )}
+                    {activeTab === 'threats' && (
+                        <div className="tab-panel-enter">
+                            <ThreatDefensePlayground onTriggerDrain={handleTriggerDrain} onTriggerPromptInjection={handleTriggerPromptInjection} onTriggerOverspend={handleTriggerOverspend} onTriggerExpired={handleTriggerExpired} threatLogs={threatLogs} />
+                        </div>
+                    )}
 
-                {activeTab === 'phase2' && (
-                    <div key="phase2" className="max-w-6xl mx-auto space-y-6 tab-panel-enter">
-                        <Phase2HijackRecovery wallet={wallet} />
-                    </div>
-                )}
+                    {activeTab === 'phase2' && (
+                        <div className="tab-panel-enter"><Phase2HijackRecovery wallet={wallet} /></div>
+                    )}
 
-                {/* Sleek Editorial Footer */}
-                <footer className="mt-12 pt-6 border-t border-stone-200/80 flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs text-stone-500 pb-8">
-                    <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                        <span className="font-serif font-bold text-stone-900 tracking-tight">SafeAgent Treasury</span>
-                        <span>•</span>
-                        <span>Autonomous Agent Financial Infrastructure</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-[11px] flex-wrap justify-center">
-                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
-                            ERC-4337 v0.7
-                        </span>
-                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
-                            MCP Protocol
-                        </span>
-                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
-                            WebAuthn P-256
-                        </span>
-                        <span className="bg-white px-2.5 py-1 rounded-lg border border-stone-200/80 font-mono text-stone-700 shadow-xs">
-                            PolicyEngine.sol
-                        </span>
-                    </div>
-                </footer>
-
+                    <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 pt-6 text-xs text-stone-400">
+                        <span>SafeAgent Treasury</span>
+                        <span>Local simulation · No blockchain transactions</span>
+                    </footer>
+                </div>
             </div>
 
             {/* Modals */}
@@ -517,13 +374,6 @@ export default function Home() {
                 onClose={() => setSelectedUserOp(null)}
             />
 
-            {activeArtifact && (
-                <TicketArtifactModal
-                    artifact={activeArtifact.artifact}
-                    userOpHash={activeArtifact.userOpHash}
-                    onClose={() => setActiveArtifact(null)}
-                />
-            )}
         </main>
     );
 }

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "test:live-copilot": "node test/liveCopilot.test.js",
     "start": "next start -p 3000"
   },
   "dependencies": {
