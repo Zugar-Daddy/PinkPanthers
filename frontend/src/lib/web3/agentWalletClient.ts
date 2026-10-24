@@ -403,7 +403,7 @@ export class AgentWalletClient {
         {
             id: 'op-init-1',
             userOpHash: '0x4f8a29c1...9e02',
-            timestamp: new Date(Date.now() - 1800000).toLocaleTimeString(),
+            timestamp: '11:15 AM',
             targetName: 'OpenAI Billing API',
             targetAddress: '0x0000...A1A1',
             functionCalled: 'payInvoice(amount: 1500)',
@@ -426,7 +426,7 @@ export class AgentWalletClient {
         {
             id: 'op-init-2',
             userOpHash: '0x8b321a0f...77d1',
-            timestamp: new Date(Date.now() - 900000).toLocaleTimeString(),
+            timestamp: '11:30 AM',
             targetName: 'Blinkit Grocery Delivery',
             targetAddress: '0x0000...B2B2',
             functionCalled: 'orderCheckout(cartId: 4421, amount: 950)',

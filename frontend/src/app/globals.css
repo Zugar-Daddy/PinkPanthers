@@ -146,3 +146,13 @@ body {
   box-shadow: 0 4px 14px 0 rgba(24, 24, 27, 0.08);
 }
 
+/* Hide Next.js Development Error Overlay Badge & Toast */
+nextjs-portal,
+#nextjs__container,
+[data-nextjs-dialog-overlay],
+[data-nextjs-toast] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+

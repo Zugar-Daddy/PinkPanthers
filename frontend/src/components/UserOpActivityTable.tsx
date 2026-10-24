@@ -72,7 +72,7 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                                             ${op.amount.toFixed(2)} USDC
                                         </span>
                                     )}
-                                    <span className="text-stone-400 font-mono text-[10px]">{op.timestamp}</span>
+                                    <span className="text-stone-400 font-mono text-[10px]" suppressHydrationWarning>{op.timestamp}</span>
                                 </div>
                             </div>
 
