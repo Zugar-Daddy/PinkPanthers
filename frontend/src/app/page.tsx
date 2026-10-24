@@ -11,10 +11,17 @@ import { OwnerApprovalModal } from '../components/OwnerApprovalModal';
 import { PolicyConfigModal } from '../components/PolicyConfigModal';
 import { UserOpInspectorModal } from '../components/UserOpInspectorModal';
 
-import { agentWalletClient, QueuedApproval, UserOperationLog } from '../lib/web3/agentWalletClient';
-import { LayoutGrid, Bot, Sliders, ShieldAlert, Activity, Sparkles } from 'lucide-react';
+import { PrincipalFleetOverview } from '../components/PrincipalFleetOverview';
+import { AgentVirtualCard } from '../components/AgentVirtualCard';
+import { AgentInboxModal } from '../components/AgentInboxModal';
+import { McpIntegrationModal } from '../components/McpIntegrationModal';
+import { LiveActivityStream } from '../components/LiveActivityStream';
+import { InteractiveCliTerminal } from '../components/InteractiveCliTerminal';
 
-type ActiveTab = 'overview' | 'simulator' | 'policies' | 'threats' | 'activity';
+import { agentWalletClient, QueuedApproval, UserOperationLog } from '../lib/web3/agentWalletClient';
+import { LayoutGrid, Bot, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users } from 'lucide-react';
+
+type ActiveTab = 'overview' | 'fleet' | 'card' | 'simulator' | 'stream' | 'cli' | 'threats';
 
 export default function Home() {
     // Wallet Client Instance
@@ -27,6 +34,8 @@ export default function Home() {
 
     // Modals
     const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+    const [isInboxModalOpen, setIsInboxModalOpen] = useState(false);
+    const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
     const [activeApprovalRequest, setActiveApprovalRequest] = useState<QueuedApproval | null>(null);
     const [selectedUserOp, setSelectedUserOp] = useState<UserOperationLog | null>(null);
 
@@ -40,6 +49,23 @@ export default function Home() {
             defenseMechanism: 'PolicyEngine.validateAction'
         }
     ]);
+
+    // Handle Agent Fleet Switch
+    const handleSelectAgent = (agentId: string) => {
+        wallet.switchAgent(agentId);
+        forceUpdate();
+    };
+
+    // Handle Virtual Card Freeze Toggle
+    const handleToggleCardFreeze = () => {
+        wallet.toggleCardFreeze();
+        forceUpdate();
+    };
+
+    const handleUpdateCardLimit = (limit: number) => {
+        wallet.updateCardLimit(limit);
+        forceUpdate();
+    };
 
     // Handle Agent Action Dispatch
     const handleExecuteAction = async (
@@ -167,6 +193,8 @@ export default function Home() {
             <WalletHeader
                 wallet={wallet}
                 onOpenPolicyModal={() => setIsPolicyModalOpen(true)}
+                onOpenInbox={() => setIsInboxModalOpen(true)}
+                onOpenMcp={() => setIsMcpModalOpen(true)}
             />
 
             {/* Main Application Container */}
@@ -181,9 +209,10 @@ export default function Home() {
                 {/* 2. Interactive View Switcher / Tab Bar */}
                 <div className="flex items-center justify-between pb-1 gap-3 flex-wrap">
                     <div className="flex items-center bg-white border-2 border-black rounded-2xl p-1.5 gap-1.5 shadow-brutal-sm flex-wrap">
+                        
                         <button
                             onClick={() => setActiveTab('overview')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
                                 activeTab === 'overview'
                                     ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
                                     : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
@@ -194,8 +223,32 @@ export default function Home() {
                         </button>
 
                         <button
+                            onClick={() => setActiveTab('fleet')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                                activeTab === 'fleet'
+                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
+                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                            }`}
+                        >
+                            <Users className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>Agent Fleet</span>
+                        </button>
+
+                        <button
+                            onClick={() => setActiveTab('card')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                                activeTab === 'card'
+                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
+                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                            }`}
+                        >
+                            <CreditCard className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>Virtual Card</span>
+                        </button>
+
+                        <button
                             onClick={() => setActiveTab('simulator')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
                                 activeTab === 'simulator'
                                     ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
                                     : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
@@ -206,20 +259,32 @@ export default function Home() {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('policies')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
-                                activeTab === 'policies'
+                            onClick={() => setActiveTab('stream')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                                activeTab === 'stream'
                                     ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
                                     : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
                             }`}
                         >
-                            <Sliders className="w-3.5 h-3.5 stroke-[2.5]" />
-                            <span>On-Chain Policies</span>
+                            <Activity className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>Live Activity</span>
+                        </button>
+
+                        <button
+                            onClick={() => setActiveTab('cli')}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                                activeTab === 'cli'
+                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
+                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
+                            }`}
+                        >
+                            <Terminal className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>CLI Terminal</span>
                         </button>
 
                         <button
                             onClick={() => setActiveTab('threats')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
+                            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
                                 activeTab === 'threats'
                                     ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
                                     : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
@@ -229,54 +294,79 @@ export default function Home() {
                             <span>Threat Defense</span>
                         </button>
 
-                        <button
-                            onClick={() => setActiveTab('activity')}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all brutal-btn ${
-                                activeTab === 'activity'
-                                    ? 'bg-black text-white border-2 border-black shadow-brutal-xs'
-                                    : 'bg-white text-zinc-700 hover:text-black border-2 border-transparent hover:border-black'
-                            }`}
-                        >
-                            <Activity className="w-3.5 h-3.5 stroke-[2.5]" />
-                            <span>UserOp Feed</span>
-                        </button>
                     </div>
 
                     <div className="hidden sm:flex items-center gap-2 text-xs font-mono font-bold text-black bg-neoYellow border-2 border-black px-3.5 py-2 rounded-xl shadow-brutal-sm">
                         <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>PolicyEngine.sol Guardrails Active</span>
+                        <span>MCP + PolicyEngine.sol Active</span>
                     </div>
                 </div>
 
                 {/* 3. Main Workspace Display */}
                 {activeTab === 'overview' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in duration-300">
-                        {/* Left Column: Simulator + Policies (7 cols) */}
-                        <div className="lg:col-span-7 space-y-6">
-                            <AgentActionSimulator
-                                wallet={wallet}
-                                onExecuteAction={handleExecuteAction}
-                            />
-                            <AgentKeyPolicyCard
-                                wallet={wallet}
-                                onEditPolicy={() => setIsPolicyModalOpen(true)}
-                            />
+                    <div className="space-y-6 animate-in fade-in duration-300">
+                        {/* 1. Principal & Fleet Banner */}
+                        <PrincipalFleetOverview
+                            wallet={wallet}
+                            onSelectAgent={handleSelectAgent}
+                        />
+
+                        {/* 2. Interactive Card + Simulator row */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <div className="lg:col-span-6 space-y-6">
+                                <AgentVirtualCard
+                                    wallet={wallet}
+                                    onToggleFreeze={handleToggleCardFreeze}
+                                    onUpdateLimit={handleUpdateCardLimit}
+                                />
+                                <AgentKeyPolicyCard
+                                    wallet={wallet}
+                                    onEditPolicy={() => setIsPolicyModalOpen(true)}
+                                />
+                            </div>
+
+                            <div className="lg:col-span-6 space-y-6">
+                                <AgentActionSimulator
+                                    wallet={wallet}
+                                    onExecuteAction={handleExecuteAction}
+                                />
+                                <LiveActivityStream
+                                    wallet={wallet}
+                                />
+                            </div>
                         </div>
 
-                        {/* Right Column: Threat Sandbox + UserOp Stream (5 cols) */}
-                        <div className="lg:col-span-5 space-y-6">
-                            <ThreatDefensePlayground
-                                onTriggerDrain={handleTriggerDrain}
-                                onTriggerPromptInjection={handleTriggerPromptInjection}
-                                onTriggerOverspend={handleTriggerOverspend}
-                                onTriggerExpired={handleTriggerExpired}
-                                threatLogs={threatLogs}
-                            />
-                            <UserOpActivityTable
-                                userOps={wallet.userOps}
-                                onInspectUserOp={(op) => setSelectedUserOp(op)}
-                            />
-                        </div>
+                        {/* 3. UserOp History Log */}
+                        <UserOpActivityTable
+                            userOps={wallet.userOps}
+                            onInspectUserOp={(op) => setSelectedUserOp(op)}
+                        />
+                    </div>
+                )}
+
+                {activeTab === 'fleet' && (
+                    <div className="space-y-6 animate-in fade-in duration-300">
+                        <PrincipalFleetOverview
+                            wallet={wallet}
+                            onSelectAgent={handleSelectAgent}
+                        />
+                        <LiveActivityStream
+                            wallet={wallet}
+                        />
+                    </div>
+                )}
+
+                {activeTab === 'card' && (
+                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+                        <AgentVirtualCard
+                            wallet={wallet}
+                            onToggleFreeze={handleToggleCardFreeze}
+                            onUpdateLimit={handleUpdateCardLimit}
+                        />
+                        <AgentKeyPolicyCard
+                            wallet={wallet}
+                            onEditPolicy={() => setIsPolicyModalOpen(true)}
+                        />
                     </div>
                 )}
 
@@ -293,11 +383,22 @@ export default function Home() {
                     </div>
                 )}
 
-                {activeTab === 'policies' && (
+                {activeTab === 'stream' && (
                     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
-                        <AgentKeyPolicyCard
+                        <LiveActivityStream
                             wallet={wallet}
-                            onEditPolicy={() => setIsPolicyModalOpen(true)}
+                        />
+                        <UserOpActivityTable
+                            userOps={wallet.userOps}
+                            onInspectUserOp={(op) => setSelectedUserOp(op)}
+                        />
+                    </div>
+                )}
+
+                {activeTab === 'cli' && (
+                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+                        <InteractiveCliTerminal
+                            wallet={wallet}
                         />
                     </div>
                 )}
@@ -314,27 +415,21 @@ export default function Home() {
                     </div>
                 )}
 
-                {activeTab === 'activity' && (
-                    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
-                        <UserOpActivityTable
-                            userOps={wallet.userOps}
-                            onInspectUserOp={(op) => setSelectedUserOp(op)}
-                        />
-                    </div>
-                )}
-
                 {/* Neo-Brutalist Footer Banner */}
                 <footer className="mt-12 pt-6 border-t-2 border-black flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs text-zinc-600 pb-8">
                     <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-neoMint border border-black inline-block"></span>
-                        <span className="font-black text-black font-sans">PinkPanthers</span>
+                        <span className="font-black text-black font-sans">AgentSafe</span>
                         <span>•</span>
-                        <span>Track 02: Letting AI Agents Pay Safely</span>
+                        <span>Financial Infrastructure for AI Agents (AgentWallet.ai Compatible)</span>
                     </div>
 
                     <div className="flex items-center gap-2.5 text-[11px] flex-wrap justify-center">
                         <span className="bg-white px-2.5 py-1 rounded-md border-2 border-black font-bold text-black shadow-brutal-xs">
                             ERC-4337 v0.7
+                        </span>
+                        <span className="bg-white px-2.5 py-1 rounded-md border-2 border-black font-bold text-black shadow-brutal-xs">
+                            MCP Protocol
                         </span>
                         <span className="bg-white px-2.5 py-1 rounded-md border-2 border-black font-bold text-black shadow-brutal-xs">
                             WebAuthn P-256
@@ -361,6 +456,22 @@ export default function Home() {
                 onClose={() => setIsPolicyModalOpen(false)}
                 onUpdatePolicy={handleUpdatePolicy}
                 onRevokeKey={handleRevokeKey}
+            />
+
+            <AgentInboxModal
+                wallet={wallet}
+                isOpen={isInboxModalOpen}
+                onClose={() => setIsInboxModalOpen(false)}
+                onMarkAllRead={() => {
+                    wallet.markAllInboxRead();
+                    forceUpdate();
+                }}
+            />
+
+            <McpIntegrationModal
+                wallet={wallet}
+                isOpen={isMcpModalOpen}
+                onClose={() => setIsMcpModalOpen(false)}
             />
 
             <UserOpInspectorModal

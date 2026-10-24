@@ -1,7 +1,7 @@
-# 🛡️ AgentSafe: The ERC-4337 Smart Wallet for Autonomous AI Agents
+# 🛡️ AgentSafe: The Autonomous AI Agent Financial Infrastructure
 
 > **Track 02: Web3 & Blockchain (W3-02) — "Agent Wallet: Letting AI Agents Pay Safely"**  
-> *A production-accurate ERC-4337 Account Abstraction smart-contract wallet providing AI agents with restricted, owner-defined session keys. Secures autonomous payments (API credits, groceries, travel tickets) on-chain with WebAuthn Biometric Passkeys (TouchID / FaceID) and owner escalation.*
+> *A production-accurate ERC-4337 Account Abstraction smart-contract wallet and financial infrastructure providing autonomous AI agents with restricted, owner-defined session keys, virtual cards, connected inboxes, and Model Context Protocol (MCP) endpoints. Inspired by and compatible with [AgentWallet.ai](https://agentwallet.ai/), styled in the [EdVR](https://edvr.vercel.app/) Neo-Brutalist design language.*
 
 ---
 
@@ -12,18 +12,21 @@ AI agents increasingly buy real goods and services for users: **OpenAI inference
 2. **Prompt Injection & Model Jailbreaks**: Malicious webpages or inputs can manipulate an LLM into calling unapproved phishing contracts.
 3. **Runaway Overspending**: Buggy or looped agent workflows can rapidly drain funds.
 
-**AgentSafe** solves this on-chain at the smart contract level using **ERC-4337 Account Abstraction**:
-- **Delegated Session Keys**: The agent holds an ephemeral, restricted sub-key.
-- **On-Chain Policy Engine**: Non-bypassable Solidity guardrails check every `UserOperation` before execution:
-  1. **Allowed Contracts Whitelist** (e.g. OpenAI Billing, Instacart/Blinkit, Ticket Booking only)
-  2. **Allowed Function Selectors** (e.g. only `payInvoice`, `orderCheckout`, `bookTicket`)
+**AgentSafe** solves this through full-stack financial infrastructure for AI agents backed on-chain by **ERC-4337 Account Abstraction**:
+- **Human Principal (Master Admin)**: The verified owner (`Yoav K. · Chief Executive`) holding hardware-backed WebAuthn Biometric Passkeys (TouchID / Apple Secure Enclave / P-256 curve).
+- **Multi-Agent Fleet**: Scoped sub-keys for specialized autonomous agents (`finance-agent-07`, `concierge-08`, `media-buyer-10`, `devops-bot-04`).
+- **On-Chain Policy Engine (`PolicyEngine.sol`)**: Non-bypassable Solidity guardrails check every `UserOperation` before execution:
+  1. **Allowed Contracts Whitelist** (OpenAI Billing, Instacart/Blinkit, Ticket Booking only)
+  2. **Allowed Function Selectors** (only `payInvoice`, `orderCheckout`, `bookTicket`)
   3. **Max Per-Transaction Limit** ($25.00 cap)
-  4. **Rolling 24-Hour Daily Budget** with automatic epoch resets ($100.00 cap)
+  4. **Rolling 24-Hour Daily Budget** with automatic epoch resets ($100.00 default cap)
   5. **Allowed Recipient Whitelist** (blocks unauthorized external transfers)
-  6. **Session Key Expiration** (`validUntil` timestamp enforcement)
-- **WebAuthn Biometric Passkeys (P-256 Curve)**: The Human Owner holds the master key backed by device hardware security (Apple Secure Enclave, TouchID, FaceID).
-- **Two-Tier Escalation Queue**: Out-of-policy actions (e.g. attempting to book a $145 flight on a $25 per-tx cap) are halted on-chain and staged in `PendingApprovalQueue.sol`, requesting the Owner's TouchID biometric authorization.
-- **Gasless Paymaster**: The agent needs zero native ETH; all valid transactions are sponsored by `SimplePaymaster.sol`.
+  6. **Session Key Expiration** (`validUntil` block timestamp enforcement)
+- **Agent-Linked Virtual Cards**: Tokenized Visa Business cards (`4242 0815 ···· 1126`) with programmable daily limits and instant freeze/unfreeze controls.
+- **Model Context Protocol (MCP) Endpoint (`/api/mcp`)**: Standards-compliant Anthropic MCP JSON-RPC 2.0 server supporting `tools/list` and `tools/call` for Claude Desktop, Cursor, Devin, and LangChain.
+- **Agent Communications Inbox**: Real-time 2FA SMS / OTP code receiver and merchant payment receipt log.
+- **Two-Tier Escalation Queue (`PendingApprovalQueue.sol`)**: Out-of-policy actions halt execution and request Human Principal Passkey authorization.
+- **Gasless Paymaster (`SimplePaymaster.sol`)**: Sponsoring gas in USDC so agents need zero native ETH.
 
 ---
 
@@ -31,29 +34,42 @@ AI agents increasingly buy real goods and services for users: **OpenAI inference
 
 ```mermaid
 flowchart TB
-    subgraph Owner["🔐 Human Owner (Master Passkey)"]
+    subgraph Owner["🔐 Human Principal (Master Passkey)"]
         Passkey["Biometric Passkey (TouchID / FaceID / P-256)"]
-        Dashboard["AgentSafe Wallet Dashboard\n- Smart Account Treasury ($1,250 USDC)\n- 24h Budget Spent Gauge\n- Policy Configurator\n- Out-of-Policy Passkey Approval Modal"]
+        Dashboard["AgentSafe Financial Dashboard\n- Principal Overview ($28,284 Fleet Spend)\n- Multi-Agent Fleet Switcher\n- Virtual Debit Card Controls\n- Agent Inbox (2FA / OTP Codes)\n- Out-of-Policy TouchID Escalation Modal"]
         Passkey --> Dashboard
     end
 
-    subgraph Agent["🤖 Autonomous AI Agent"]
-        Intent["Agent Decision Engine\n- Buy API Credits\n- Order Groceries\n- Book Tickets"]
-        SessionKey["Restricted Session Key\n(0xAgent...1023)"]
-        Intent --> SessionKey
+    subgraph LLM["🤖 AI Frameworks & Clients"]
+        Claude["Claude Desktop"]
+        Cursor["Cursor IDE"]
+        LangChain["LangChain / CrewAI"]
+        MCP["MCP Endpoint (/api/mcp)\n- wallet_get_balance\n- wallet_pay\n- wallet_freeze_card\n- wallet_request_approval"]
+        Claude --> MCP
+        Cursor --> MCP
+        LangChain --> MCP
     end
 
-    subgraph ERC4337["🛡️ ERC-4337 Account Abstraction Core"]
+    subgraph Fleet["👥 Multi-Agent Fleet"]
+        FinanceAgent["finance-agent-07\n(Datadog/Cloud)"]
+        ConciergeAgent["concierge-08\n(Travel/Zoom)"]
+        MediaAgent["media-buyer-10\n(Google/LinkedIn Ads)"]
+        DevOpsAgent["devops-bot-04\n(Replicate/OpenAI)"]
+        VirtualCard["Virtual Debit Card\n(4242 0815 ···· 1126)"]
+    end
+
+    subgraph ERC4337["🛡️ On-Chain Smart Contract Core"]
         UserOp["PackedUserOperation v0.7\n(sender, nonce, callData, limits, signature)"]
-        Bundler["Bundler (handleOps)"]
         EntryPoint["EntryPoint (0x0000000071727De22E5E9d8BAf0edAc6f37da032)"]
         Paymaster["SimplePaymaster.sol\n(Gasless Sponsorship: $48.50 Tank)"]
         SmartAccount["AgentSmartAccount.sol (Smart Account)\n├── Owner: TouchID (P-256)\n└── Delegated: Agent Sub-Key"]
-        PolicyEngine["PolicyEngine.sol\n├── Whitelist: Target & Selectors\n├── Per-Tx Cap: $25.00\n├── 24h Budget: $100.00\n└── Session Expiry: validUntil"]
+        PolicyEngine["PolicyEngine.sol\n├── Whitelist: Targets & Selectors\n├── Per-Tx Cap: $25.00\n├── 24h Budget: $100.00\n└── Session Expiry: validUntil"]
         Queue["PendingApprovalQueue.sol\n(Staged Out-of-Policy Calls)"]
         Vendors["Approved Protocols\n├── OpenAI Billing\n├── Instacart Groceries\n└── Ticket Booking API"]
 
-        SessionKey -->|Signs| UserOp --> Bundler --> EntryPoint
+        MCP --> UserOp
+        Fleet --> UserOp
+        UserOp --> EntryPoint
         EntryPoint --> Paymaster
         EntryPoint -->|validateUserOp| SmartAccount
         SmartAccount --> PolicyEngine
@@ -61,6 +77,22 @@ flowchart TB
         PolicyEngine -->|❌ Out-of-Policy| Queue --> Dashboard
     end
 ```
+
+---
+
+## 🎨 Visual Identity: EdVR Neo-Brutalism
+
+- **Warm Ivory Canvas**: `#FDFBF7` canvas background.
+- **Solid High-Contrast Borders**: Thick `border-2 border-black` and `border-3 border-black`.
+- **Hard Offset Drop Shadows**: Zero-blur physical shadows (`shadow-[4px_4px_0px_#09090b]`, `shadow-[6px_6px_0px_#09090b]`, `shadow-[8px_8px_0px_#09090b]`).
+- **Tactile Clay Buttons**: Real press physics (`brutal-btn`).
+- **Punchy EdVR Color Palette**:
+  - Crimson Red (`#E11D48` / `neoRed`)
+  - Pastel Mint (`#A7F3D0` / `neoMint`)
+  - Sunflower Yellow (`#FEF08A` / `neoYellow`)
+  - Pastel Sky (`#BAE6FD` / `neoSky`)
+  - Pastel Lavender (`#DDD6FE` / `neoPurple`)
+  - Pastel Rose (`#FECDD3` / `neoRose`)
 
 ---
 
@@ -83,13 +115,21 @@ cd contracts
 npm test
 ```
 
-### 2. Frontend Wallet Dashboard
+### 2. Frontend Wallet Dashboard & MCP Server
 Run the Next.js 14 interactive agent wallet interface:
 ```bash
 cd frontend
 npm run dev
 ```
 Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+### 3. Model Context Protocol (MCP) Endpoint
+Test the MCP endpoint with curl:
+```bash
+curl -X POST http://localhost:3000/api/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}'
+```
 
 ---
 
@@ -119,12 +159,19 @@ PinkPathers/
 ├── frontend/                      # Next.js 14+ Wallet Dashboard
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── layout.tsx                 # Root layout & dark styling
-│   │   │   ├── page.tsx                   # Main Agent Wallet workspace
-│   │   │   └── globals.css                # Tailwind CSS
+│   │   │   ├── api/mcp/route.ts           # Model Context Protocol (MCP) JSON-RPC 2.0 endpoint
+│   │   │   ├── layout.tsx                 # Root layout & neo-brutalist styling
+│   │   │   ├── page.tsx                   # Main Agent Wallet workspace & tabs
+│   │   │   └── globals.css                # Tailwind CSS & EdVR brutal utilities
 │   │   ├── components/
 │   │   │   ├── WalletHeader.tsx           # Smart Account address, Paymaster tank & Passkey
 │   │   │   ├── WalletBalancesCard.tsx     # Treasury balances & 24h budget meter
+│   │   │   ├── PrincipalFleetOverview.tsx # Master Principal & Multi-Agent Fleet Directory
+│   │   │   ├── AgentVirtualCard.tsx       # 3D Neo-Brutalist virtual card with freeze toggle
+│   │   │   ├── AgentInboxModal.tsx        # 2FA SMS / OTP code receiver and receipts
+│   │   │   ├── McpIntegrationModal.tsx    # Claude Desktop & Cursor MCP config & tool runner
+│   │   │   ├── LiveActivityStream.tsx     # Real-time streaming activity feed
+│   │   │   ├── InteractiveCliTerminal.tsx # ~/agentwallet — bash terminal sequence
 │   │   │   ├── AgentKeyPolicyCard.tsx     # 6-dimension on-chain policy guardrails
 │   │   │   ├── AgentActionSimulator.tsx   # Interactive simulator (API, Groceries, Tickets)
 │   │   │   ├── ThreatDefensePlayground.tsx# Chaos & exploit tests (Drain, Prompt Injection)
@@ -134,7 +181,9 @@ PinkPathers/
 │   │   │   └── UserOpInspectorModal.tsx   # Raw packed ERC-4337 struct inspector
 │   │   └── lib/
 │   │       └── web3/
-│   │           └── agentWalletClient.ts   # WebAuthn Passkeys & UserOperation dispatcher
+│   │           └── agentWalletClient.ts   # WebAuthn Passkeys, Fleet, Cards & UserOp dispatcher
+│   ├── tailwind.config.js
+│   └── tsconfig.json
 └── README.md
 ```
 

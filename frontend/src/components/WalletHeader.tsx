@@ -7,10 +7,18 @@ import { AgentWalletClient } from '../lib/web3/agentWalletClient';
 interface WalletHeaderProps {
     wallet: AgentWalletClient;
     onOpenPolicyModal: () => void;
+    onOpenInbox: () => void;
+    onOpenMcp: () => void;
 }
 
-export const WalletHeader: React.FC<WalletHeaderProps> = ({ wallet, onOpenPolicyModal }) => {
+export const WalletHeader: React.FC<WalletHeaderProps> = ({
+    wallet,
+    onOpenPolicyModal,
+    onOpenInbox,
+    onOpenMcp
+}) => {
     const [copied, setCopied] = useState(false);
+    const unreadCount = wallet.inboxMessages.filter(m => m.unread).length;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(wallet.smartAccountAddress);
@@ -40,13 +48,13 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({ wallet, onOpenPolicy
                             </span>
                         </div>
                         <p className="text-[11px] font-bold text-zinc-600 hidden sm:block">
-                            Owner-Constrained Account Abstraction for Autonomous AI Agents
+                            Autonomous AI Financial Infrastructure • MCP Endpoint • Virtual Cards
                         </p>
                     </div>
                 </div>
 
                 {/* Right Action Chips & Primary CTA */}
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2">
                     
                     {/* Smart Account Address Pill */}
                     <button
@@ -55,32 +63,55 @@ export const WalletHeader: React.FC<WalletHeaderProps> = ({ wallet, onOpenPolicy
                         title="Click to copy Smart Account Address"
                     >
                         <span className="w-2 h-2 rounded-full bg-emerald-500 border border-black"></span>
-                        <span className="font-sans font-bold text-zinc-700">Account:</span>
+                        <span className="font-sans font-bold text-zinc-700 hidden lg:inline">Account:</span>
                         <span>{wallet.smartAccountAddress.slice(0, 6)}...{wallet.smartAccountAddress.slice(-4)}</span>
                         {copied ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5 text-zinc-700" />}
                     </button>
 
                     {/* Paymaster Gas Tank */}
-                    <div className="hidden sm:flex items-center gap-1.5 bg-neoYellow border-2 border-black px-3 py-1.5 rounded-xl font-mono text-xs font-black text-zinc-900 shadow-brutal-sm">
+                    <div className="hidden xl:flex items-center gap-1.5 bg-neoYellow border-2 border-black px-3 py-1.5 rounded-xl font-mono text-xs font-black text-zinc-900 shadow-brutal-sm">
                         <Fuel className="w-3.5 h-3.5 text-amber-700" />
-                        <span className="font-sans font-bold text-zinc-700">Gas Tank:</span>
+                        <span className="font-sans font-bold text-zinc-700">Gas:</span>
                         <span className="text-amber-900">${wallet.paymasterGasTankUSD.toFixed(2)}</span>
                     </div>
 
+                    {/* Agent Inbox (2FA OTP) Button */}
+                    <button
+                        onClick={onOpenInbox}
+                        className="flex items-center gap-1.5 bg-white hover:bg-zinc-100 border-2 border-black px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-zinc-900 shadow-brutal-xs brutal-btn relative select-none"
+                        title="Agent Comms: 2FA SMS & Receipts"
+                    >
+                        <span>Inbox</span>
+                        {unreadCount > 0 && (
+                            <span className="w-5 h-5 rounded-full bg-neoRed text-white text-[10px] font-black flex items-center justify-center border border-black">
+                                {unreadCount}
+                            </span>
+                        )}
+                    </button>
+
+                    {/* MCP Hub Button */}
+                    <button
+                        onClick={onOpenMcp}
+                        className="flex items-center gap-1.5 bg-neoPurple hover:bg-purple-200 border-2 border-black px-3 py-1.5 rounded-xl font-mono text-xs font-black text-zinc-950 shadow-brutal-xs brutal-btn select-none"
+                        title="Model Context Protocol Config & Tester"
+                    >
+                        <Sparkles className="w-3.5 h-3.5 text-purple-900" />
+                        <span>MCP Hub</span>
+                    </button>
+
                     {/* Passkey Owner Chip */}
-                    <div className="flex items-center gap-1.5 bg-neoPurple border-2 border-black px-3 py-1.5 rounded-xl font-mono text-xs font-black text-zinc-900 shadow-brutal-sm">
+                    <div className="hidden lg:flex items-center gap-1.5 bg-zinc-100 border-2 border-black px-3 py-1.5 rounded-xl font-mono text-xs font-black text-zinc-900 shadow-brutal-xs">
                         <Fingerprint className="w-3.5 h-3.5 text-purple-800" />
-                        <span className="font-sans font-bold text-zinc-700 hidden lg:inline">Owner:</span>
                         <span className="text-purple-950">TouchID (P-256)</span>
                     </div>
 
                     {/* Manage Policy Modal Trigger */}
                     <button
                         onClick={onOpenPolicyModal}
-                        className="bg-neoRed text-white border-2 border-black text-xs font-black uppercase px-4 py-2 rounded-xl shadow-brutal hover:bg-red-700 transition-all active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1.5 select-none"
+                        className="bg-neoRed text-white border-2 border-black text-xs font-black uppercase px-3.5 py-1.5 rounded-xl shadow-brutal-sm hover:bg-red-700 transition-all active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1.5 select-none brutal-btn"
                     >
                         <Key className="w-3.5 h-3.5" />
-                        <span>Manage Policy</span>
+                        <span>Policy</span>
                     </button>
 
                 </div>
