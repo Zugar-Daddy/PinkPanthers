@@ -1,0 +1,22 @@
+{
+  "name": "@safeagent/mcp-server",
+  "version": "1.0.0",
+  "description": "SafeAgent Treasury Model Context Protocol (MCP) Server for Autonomous AI Agents",
+  "main": "index.js",
+  "bin": {
+    "safeagent-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {},
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-agents",
+    "erc-4337",
+    "smart-wallet"
+  ],
+  "author": "SafeAgent Treasury",
+  "license": "MIT"
+}

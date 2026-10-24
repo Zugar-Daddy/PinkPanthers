@@ -449,6 +449,54 @@ export class AgentWalletClient {
     ];
 
     /**
+     * Apply authoritative state from server
+     */
+    public _applyState(s: any) {
+        if (!s) return;
+        if (s.balances) {
+            this.usdcBalance = s.balances.usdc;
+            this.ethBalance = s.balances.eth;
+            this.paymasterGasTankUSD = s.balances.paymasterGasTankINR;
+        }
+        if (s.policy) this.policy = s.policy;
+        if (s.virtualCard) this.virtualCard = s.virtualCard;
+        if (s.fleet) this.fleet = s.fleet;
+        if (s.dailySpent !== undefined) this.dailySpent = s.dailySpent;
+        if (s.activeAgent) {
+            this.activeAgentId = s.activeAgent.id;
+            this.agentName = s.activeAgent.name;
+            this.agentAddress = s.activeAgent.address;
+            this.sessionActive = s.activeAgent.sessionActive;
+            this.sessionExpiresAt = s.activeAgent.sessionExpiresAt;
+        }
+        if (s.inboxMessages) this.inboxMessages = s.inboxMessages;
+        if (s.activityStream) this.activityStream = s.activityStream;
+        if (s.queuedApprovals) this.queuedApprovals = s.queuedApprovals;
+        if (s.userOps) this.userOps = s.userOps;
+        if (s.principal?.totalFleetSpendToday !== undefined) {
+            this.totalFleetSpendToday = s.principal.totalFleetSpendToday;
+        }
+    }
+
+    /**
+     * Synchronize with the live backend state store
+     */
+    async syncFromServer(): Promise<boolean> {
+        if (typeof window === 'undefined') return false;
+        try {
+            const res = await fetch('/api/wallet/state');
+            const data = await res.json();
+            if (data.success && data.state) {
+                this._applyState(data.state);
+                return true;
+            }
+        } catch {
+            // Ignore offline fallback
+        }
+        return false;
+    }
+
+    /**
      * Switch Active Fleet Agent
      */
     switchAgent(agentId: string) {
@@ -459,8 +507,15 @@ export class AgentWalletClient {
             this.agentAddress = ag.address;
             this.policy.dailyBudget = ag.dailyBudget;
             this.dailySpent = ag.spentToday;
-            this.virtualCard.holder = `${ag.name.toUpperCase()} / AGENTWALLET`;
+            this.virtualCard.holder = `${ag.name.toUpperCase()} / SAFEAGENT`;
             this.virtualCard.maskedNumber = ag.assignedCard;
+        }
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'switch_agent', payload: { agentId } })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
         }
     }
 
@@ -479,6 +534,13 @@ export class AgentWalletClient {
             unread: true,
             category: 'alert'
         });
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'toggle_freeze', payload: {} })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
+        }
         return this.virtualCard.isFrozen;
     }
 
@@ -487,6 +549,13 @@ export class AgentWalletClient {
      */
     updateCardLimit(limit: number) {
         this.virtualCard.dailyLimit = limit;
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update_card_limit', payload: { limit } })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
+        }
     }
 
     /**
@@ -494,6 +563,13 @@ export class AgentWalletClient {
      */
     markAllInboxRead() {
         this.inboxMessages.forEach(m => m.unread = false);
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'mark_read', payload: {} })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
+        }
     }
 
     /**
@@ -506,6 +582,26 @@ export class AgentWalletClient {
         amount: number,
         actionDescription: string
     ): Promise<{ status: 'EXECUTED' | 'QUEUED' | 'REVERTED'; reason: string }> {
+        if (typeof window !== 'undefined') {
+            try {
+                const res = await fetch('/api/wallet/state', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'submit_payment',
+                        payload: { targetName, targetAddress, functionCalled, amount, description: actionDescription }
+                    })
+                });
+                const data = await res.json();
+                if (data.success && data.state) {
+                    this._applyState(data.state);
+                    return data.result;
+                }
+            } catch {
+                // Fallback to local execution if server is unreachable
+            }
+        }
+
         if (!this.sessionActive) {
             this._logFailedOp(targetName, targetAddress, functionCalled, amount, 'EXPIRED_BLOCKED', 'Session Key is Revoked or Inactive');
             return { status: 'REVERTED', reason: 'Agent Session Key is Inactive/Revoked' };
@@ -755,6 +851,14 @@ export class AgentWalletClient {
             category: 'receipt'
         });
 
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'approve_queued', payload: { id } })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
+        }
+
         return true;
     }
 
@@ -762,6 +866,13 @@ export class AgentWalletClient {
         const req = this.queuedApprovals.find(q => q.id === id);
         if (req) {
             req.status = 'REJECTED';
+        }
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'reject_queued', payload: { id } })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
         }
     }
 
@@ -772,10 +883,24 @@ export class AgentWalletClient {
         this.policy.maxPerTx = maxPerTx;
         this.policy.sessionExpiryHours = durationHours;
         this.dailySpent = 0;
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update_policy', payload: { dailyBudget, maxPerTx, sessionExpiryHours: durationHours } })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
+        }
     }
 
     revokeSubKey() {
         this.sessionActive = false;
+        if (typeof window !== 'undefined') {
+            fetch('/api/wallet/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'revoke_key', payload: {} })
+            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
+        }
     }
 }
 

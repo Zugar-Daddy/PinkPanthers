@@ -1,0 +1,346 @@
+{
+  "smartAccountAddress": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+  "entryPointAddress": "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
+  "paymasterAddress": "0x9999000011112222333344445555666677778888",
+  "principal": {
+    "name": "Madhav B.",
+    "role": "Chief Executive",
+    "initials": "MB",
+    "ownerAddress": "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",
+    "passkeyEnabled": true,
+    "passkeyCredentialId": "credential-p256-apple-secure-enclave",
+    "passkeyDeviceName": "TouchID / FaceID (WebAuthn P-256)",
+    "totalAgentsCount": 12,
+    "totalFleetSpendToday": 2486600
+  },
+  "balances": {
+    "usdc": 1248800,
+    "eth": 0.45,
+    "paymasterGasTankINR": 4850
+  },
+  "activeAgent": {
+    "id": "support-02",
+    "name": "support-bot-02",
+    "address": "0xAgent3310cB11aA33281bA9281a829188aA3310",
+    "sessionActive": true,
+    "sessionExpiresAt": 1792882638591
+  },
+  "policy": {
+    "dailyBudget": 50000,
+    "maxPerTx": 2500,
+    "sessionExpiryHours": 6,
+    "allowedContracts": [
+      {
+        "name": "OpenAI Billing API",
+        "address": "0x00000000000000000000000000000000000A1A1A",
+        "selector": "0x12345678 (payInvoice)",
+        "description": "Prepay API inference credits for autonomous research"
+      },
+      {
+        "name": "Grocery & Delivery Service (Blinkit/Zepto/Instamart)",
+        "address": "0x00000000000000000000000000000000000B2B2B",
+        "selector": "0x87654321 (orderCheckout)",
+        "description": "Weekly grocery purchases and automated pantry restocking"
+      },
+      {
+        "name": "Travel & Ticket Booking API (IRCTC/Metro/IndiGo)",
+        "address": "0x00000000000000000000000000000000000C3C3C",
+        "selector": "0xabcdef12 (bookTicket)",
+        "description": "Metro, train, and flight ticket reservations"
+      },
+      {
+        "name": "Cloud Infrastructure API (AWS/Cloudflare)",
+        "address": "0x00000000000000000000000000000000000D4D4D",
+        "selector": "0x4321fedc (topUpCompute)",
+        "description": "Serverless compute & edge workers balance top-up"
+      },
+      {
+        "name": "Corporate Catering (Swiggy/Zomato)",
+        "address": "0x00000000000000000000000000000000000E5E5E",
+        "selector": "0x99887766 (orderCatering)",
+        "description": "Automated team meal & pantry orders"
+      },
+      {
+        "name": "Uniswap V3 Swap Router",
+        "address": "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+        "selector": "0x414bf389 (exactInputSingle)",
+        "description": "Automated micro-DCA token swaps"
+      }
+    ],
+    "allowedRecipients": [
+      "0x00000000000000000000000000000000000A1A1A",
+      "0x00000000000000000000000000000000000B2B2B",
+      "0x00000000000000000000000000000000000C3C3C",
+      "0x00000000000000000000000000000000000D4D4D",
+      "0x00000000000000000000000000000000000E5E5E",
+      "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+    ]
+  },
+  "dailySpent": 18700,
+  "lastEpochReset": 1729792800000,
+  "virtualCard": {
+    "cardNumber": "4242 0815 9012 1126",
+    "maskedNumber": "4242 0815 ···· 8840",
+    "expiry": "08/28",
+    "cvv": "842",
+    "holder": "SUPPORT-BOT-02 / SAFEAGENT",
+    "isFrozen": false,
+    "dailyLimit": 500000,
+    "spentToday": 299000,
+    "brand": "VISA BUSINESS"
+  },
+  "fleet": [
+    {
+      "id": "finance-07",
+      "name": "finance-agent-07",
+      "role": "Finance Operations",
+      "category": "finance",
+      "tag": "FI",
+      "address": "0xAgent92F1c30E682cB72a6A20C57aD7858D0aA4481023",
+      "dailyBudget": 500000,
+      "spentToday": 299000,
+      "status": "active",
+      "assignedCard": "4242 0815 ···· 1126",
+      "lastAction": "paid invoice · Datadog (₹2,99,000)"
+    },
+    {
+      "id": "concierge-08",
+      "name": "concierge-08",
+      "role": "Concierge & Ops",
+      "category": "ops",
+      "tag": "CO",
+      "address": "0xAgent8821bA41c8dF291a82E92aC5718a381920B8821",
+      "dailyBudget": 50000,
+      "spentToday": 14600,
+      "status": "active",
+      "assignedCard": "4242 0815 ···· 8840",
+      "lastAction": "paid vendor · Zoom (₹14,600)"
+    },
+    {
+      "id": "media-10",
+      "name": "media-buyer-10",
+      "role": "Growth & Ads",
+      "category": "growth",
+      "tag": "ME",
+      "address": "0xAgent4419eD92cA01f8271a39d891A928bA339124419",
+      "dailyBudget": 250000,
+      "spentToday": 108600,
+      "status": "active",
+      "assignedCard": "4242 0815 ···· 3391",
+      "lastAction": "bought placement · Google Ads (₹1,08,600)"
+    },
+    {
+      "id": "devops-04",
+      "name": "devops-bot-04",
+      "role": "Cloud & AI Inference",
+      "category": "eng",
+      "tag": "DE",
+      "address": "0xAgent7702fB12aC90281bA9281a829188aA910237702",
+      "dailyBudget": 100000,
+      "spentToday": 22000,
+      "status": "active",
+      "assignedCard": "4242 0815 ···· 9102",
+      "lastAction": "paid API credit · Replicate (₹22,000)"
+    },
+    {
+      "id": "qa-11",
+      "name": "qa-tester-11",
+      "role": "Testing & CI/CD",
+      "category": "eng",
+      "tag": "QA",
+      "address": "0xAgent9923aE11bF99281bA9281a829188aA9923",
+      "dailyBudget": 25000,
+      "spentToday": 9000,
+      "status": "active",
+      "assignedCard": "4242 0815 ···· 1126",
+      "lastAction": "paid API credit · BrowserStack (₹9,000)"
+    },
+    {
+      "id": "support-02",
+      "name": "support-bot-02",
+      "role": "Support & Refunds",
+      "category": "ops",
+      "tag": "SU",
+      "address": "0xAgent3310cB11aA33281bA9281a829188aA3310",
+      "dailyBudget": 50000,
+      "spentToday": 18700,
+      "status": "active",
+      "assignedCard": "4242 0815 ···· 8840",
+      "lastAction": "payInvoice(amount: 1200) · OpenAI Billing API (₹1,200)"
+    }
+  ],
+  "inboxMessages": [
+    {
+      "id": "msg-1792861047805",
+      "sender": "Card Control System",
+      "subject": "Virtual Card ACTIVE",
+      "body": "Agent virtual card ···· 1126 status changed to ACTIVE via MCP Tool by Agent support-bot-02.",
+      "timestamp": "Just now",
+      "unread": true,
+      "category": "alert"
+    },
+    {
+      "id": "msg-1792860891942",
+      "sender": "Card Control System",
+      "subject": "Virtual Card FROZEN",
+      "body": "Agent virtual card ···· 1126 status changed to FROZEN by Principal Madhav B..",
+      "timestamp": "Just now",
+      "unread": true,
+      "category": "alert"
+    },
+    {
+      "id": "msg-1792860885269",
+      "sender": "Card Control System",
+      "subject": "Virtual Card ACTIVE",
+      "body": "Agent virtual card ···· 1126 status changed to ACTIVE by Principal Madhav B..",
+      "timestamp": "Just now",
+      "unread": true,
+      "category": "alert"
+    },
+    {
+      "id": "msg-1792860877531",
+      "sender": "Card Control System",
+      "subject": "Virtual Card FROZEN",
+      "body": "Agent virtual card ···· 1126 status changed to FROZEN by Principal Madhav B..",
+      "timestamp": "Just now",
+      "unread": true,
+      "category": "alert"
+    },
+    {
+      "id": "msg-1",
+      "sender": "Stripe 3DS Security",
+      "subject": "One-Time Passcode (OTP)",
+      "code": "849201",
+      "body": "Use 849201 to authorize ₹2,99,000.00 payment to Datadog on card ···· 1126. Valid for 10 minutes.",
+      "timestamp": "Just now",
+      "unread": true,
+      "category": "2fa"
+    },
+    {
+      "id": "msg-2",
+      "sender": "Datadog Billing",
+      "subject": "Invoice #DD-90214 Paid",
+      "body": "Payment of ₹2,99,000.00 was successfully processed via SafeAgent Smart Account.",
+      "timestamp": "2m ago",
+      "unread": false,
+      "category": "receipt"
+    },
+    {
+      "id": "msg-3",
+      "sender": "OpenAI Platform",
+      "subject": "API Credit Balance Top-Up",
+      "body": "Prepayment of ₹1,500.00 completed successfully. Your credit balance is now ₹6,500.00.",
+      "timestamp": "15m ago",
+      "unread": false,
+      "category": "receipt"
+    },
+    {
+      "id": "msg-4",
+      "sender": "Visa Fraud Prevention",
+      "subject": "Card Control Policy Activated",
+      "body": "Agent virtual card ···· 1126 successfully bound to PolicyEngine.sol guardrails.",
+      "timestamp": "1h ago",
+      "unread": false,
+      "category": "alert"
+    }
+  ],
+  "activityStream": [
+    {
+      "id": "stream-mcp-1792861053316",
+      "agentId": "support-02",
+      "agentName": "support-bot-02",
+      "category": "ops",
+      "tag": "SU",
+      "action": "payInvoice",
+      "vendor": "OpenAI Billing API",
+      "amount": 1200,
+      "timeAgo": "now",
+      "timestamp": 1792861053316
+    },
+    {
+      "id": "stream-1",
+      "agentId": "finance-07",
+      "agentName": "finance-agent-07",
+      "category": "finance",
+      "tag": "FI",
+      "action": "paid invoice",
+      "vendor": "Datadog",
+      "amount": 299000,
+      "timeAgo": "now",
+      "timestamp": 1729795000000
+    },
+    {
+      "id": "stream-2",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "paid vendor",
+      "vendor": "Zoom",
+      "amount": 14600,
+      "timeAgo": "11s",
+      "timestamp": 1729794989000
+    },
+    {
+      "id": "stream-3",
+      "agentId": "support-02",
+      "agentName": "support-bot-02",
+      "category": "ops",
+      "tag": "SU",
+      "action": "approved expense",
+      "vendor": "Freshworks",
+      "amount": 6100,
+      "timeAgo": "27s",
+      "timestamp": 1729794973000
+    }
+  ],
+  "queuedApprovals": [],
+  "userOps": [
+    {
+      "id": "op-mcp-1792861053293",
+      "userOpHash": "0xe4d3f3...957d02",
+      "timestamp": "10:27:33 pm",
+      "targetName": "OpenAI Billing API",
+      "targetAddress": "0x00000000000000000000000000000000000A1A1A",
+      "functionCalled": "payInvoice(amount: 1200)",
+      "amount": 1200,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "MCP Autonomous Agent payment: Top up GPT-4o autonomous evaluation credits",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 2,
+        "callData": "0xpayInvoi...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-init-1",
+      "userOpHash": "0x4f8a29c1...9e02",
+      "timestamp": "11:15 AM",
+      "targetName": "OpenAI Billing API",
+      "targetAddress": "0x0000...A1A1",
+      "functionCalled": "payInvoice(amount: 1500)",
+      "amount": 1500,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous top-up of API credits (₹1,500 < ₹2,500 limit). Verified on-chain.",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 1,
+        "callData": "0x1234567800000000000000000000000000000000000000000000000000000000000005dc",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    }
+  ]
+}

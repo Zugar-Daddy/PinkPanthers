@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WalletHeader } from '../components/WalletHeader';
 import { WalletBalancesCard } from '../components/WalletBalancesCard';
 import { AgentKeyPolicyCard } from '../components/AgentKeyPolicyCard';
@@ -30,6 +30,15 @@ export default function Home() {
     const [wallet, setWallet] = useState(agentWalletClient);
     const [renderTick, setRenderTick] = useState(0);
     const forceUpdate = () => setRenderTick(t => t + 1);
+
+    // Auto-sync with live shared state bridge (MCP and backend updates)
+    useEffect(() => {
+        wallet.syncFromServer().then(ok => { if (ok) forceUpdate(); });
+        const interval = setInterval(() => {
+            wallet.syncFromServer().then(ok => { if (ok) forceUpdate(); });
+        }, 2500);
+        return () => clearInterval(interval);
+    }, [wallet]);
 
     // Active View Tab
     const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
