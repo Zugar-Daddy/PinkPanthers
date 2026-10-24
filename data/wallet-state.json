@@ -11,23 +11,23 @@
     "passkeyCredentialId": "credential-p256-apple-secure-enclave",
     "passkeyDeviceName": "TouchID / FaceID (WebAuthn P-256)",
     "totalAgentsCount": 12,
-    "totalFleetSpendToday": 2513100
+    "totalFleetSpendToday": 2641950
   },
   "balances": {
-    "usdc": 1222300,
+    "usdc": 1093450,
     "eth": 0.45,
     "paymasterGasTankINR": 4850
   },
   "activeAgent": {
-    "id": "finance-07",
-    "name": "finance-agent-07",
-    "address": "0xAgent92F1c30E682cB72a6A20C57aD7858D0aA4481023",
+    "id": "concierge-08",
+    "name": "concierge-08",
+    "address": "0xAgent8821bA41c8dF291a82E92aC5718a381920B8821",
     "sessionActive": true,
     "sessionExpiresAt": 1792882638591
   },
   "policy": {
-    "dailyBudget": 500000,
-    "maxPerTx": 300000,
+    "dailyBudget": 50000,
+    "maxPerTx": 20000,
     "sessionExpiryHours": 6,
     "allowedContracts": [
       {
@@ -65,6 +65,12 @@
         "address": "0xE592427A0AEce92De3Edee1F18E0157C05861564",
         "selector": "0x414bf389 (exactInputSingle)",
         "description": "Automated micro-DCA token swaps"
+      },
+      {
+        "name": "RedBus Intercity Mobility",
+        "address": "0x00000000000000000000000000000000000F6F6F",
+        "selector": "0x4b7c89a0 (bookBusTicket)",
+        "description": "Intercity Volvo sleeper and multi-axle bus bookings"
       }
     ],
     "allowedRecipients": [
@@ -73,20 +79,21 @@
       "0x00000000000000000000000000000000000C3C3C",
       "0x00000000000000000000000000000000000D4D4D",
       "0x00000000000000000000000000000000000E5E5E",
-      "0xE592427A0AEce92De3Edee1F18E0157C05861564"
+      "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+      "0x00000000000000000000000000000000000F6F6F"
     ]
   },
-  "dailySpent": 325500,
+  "dailySpent": 26500,
   "lastEpochReset": 1729792800000,
   "virtualCard": {
-    "cardNumber": "4242 0815 9012 1126",
-    "maskedNumber": "4242 0815 ···· 1126",
-    "expiry": "08/28",
-    "cvv": "842",
-    "holder": "FINANCE-AGENT-07 / SAFEAGENT",
+    "cardNumber": "4242 0815 3390 8840",
+    "maskedNumber": "4242 0815 ···· 8840",
+    "expiry": "11/27",
+    "cvv": "319",
+    "holder": "CONCIERGE-08 / SAFEAGENT",
     "isFrozen": false,
-    "dailyLimit": 500000,
-    "spentToday": 325500,
+    "dailyLimit": 50000,
+    "spentToday": 26500,
     "brand": "VISA BUSINESS"
   },
   "fleet": [
@@ -99,10 +106,10 @@
       "address": "0xAgent92F1c30E682cB72a6A20C57aD7858D0aA4481023",
       "dailyBudget": 500000,
       "maxPerTx": 300000,
-      "spentToday": 325500,
+      "spentToday": 342450,
       "status": "active",
       "assignedCard": "4242 0815 ···· 1126",
-      "lastAction": "payInvoice() · OpenAI Billing API (₹25,000)",
+      "lastAction": "orderCheckout(uint256 950) · Grocery & Delivery Service (Blinkit/Zepto/Instamart) (₹950)",
       "cardDetails": {
         "cardNumber": "4242 0815 9012 1126",
         "maskedNumber": "4242 0815 ···· 1126",
@@ -111,7 +118,7 @@
         "holder": "FINANCE-AGENT-07 / SAFEAGENT",
         "isFrozen": false,
         "dailyLimit": 500000,
-        "spentToday": 325500,
+        "spentToday": 342450,
         "brand": "VISA BUSINESS"
       }
     },
@@ -124,10 +131,10 @@
       "address": "0xAgent8821bA41c8dF291a82E92aC5718a381920B8821",
       "dailyBudget": 50000,
       "maxPerTx": 20000,
-      "spentToday": 14600,
+      "spentToday": 26500,
       "status": "active",
       "assignedCard": "4242 0815 ···· 8840",
-      "lastAction": "paid vendor · Zoom (₹14,600)",
+      "lastAction": "bookBusTicket(uint256 1850) · RedBus Intercity Mobility (₹1,850)",
       "cardDetails": {
         "cardNumber": "4242 0815 3390 8840",
         "maskedNumber": "4242 0815 ···· 8840",
@@ -136,7 +143,7 @@
         "holder": "CONCIERGE-08 / SAFEAGENT",
         "isFrozen": false,
         "dailyLimit": 50000,
-        "spentToday": 14600,
+        "spentToday": 26500,
         "brand": "VISA BUSINESS"
       }
     },
@@ -300,6 +307,78 @@
   ],
   "activityStream": [
     {
+      "id": "stream-1792864538942",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "orderCheckout",
+      "vendor": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "amount": 950,
+      "timeAgo": "now",
+      "timestamp": 1792864538942
+    },
+    {
+      "id": "stream-1792864532969",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "orderCheckout",
+      "vendor": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "amount": 950,
+      "timeAgo": "now",
+      "timestamp": 1792864532969
+    },
+    {
+      "id": "stream-1792863746632",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "payInvoice",
+      "vendor": "Employee Salaray",
+      "amount": 10000,
+      "timeAgo": "now",
+      "timestamp": 1792863746632
+    },
+    {
+      "id": "stream-1792863559322",
+      "agentId": "finance-07",
+      "agentName": "finance-agent-07",
+      "category": "finance",
+      "tag": "FI",
+      "action": "orderCheckout",
+      "vendor": "Grocery & Delivery Service (Blinkit/Zepto/Instamart)",
+      "amount": 950,
+      "timeAgo": "now",
+      "timestamp": 1792863559322
+    },
+    {
+      "id": "stream-1792863309479",
+      "agentId": "finance-07",
+      "agentName": "finance-agent-07",
+      "category": "finance",
+      "tag": "FI",
+      "action": "bookTicket",
+      "vendor": "Travel & Ticket Booking API (IRCTC/Metro/IndiGo)",
+      "amount": 14500,
+      "timeAgo": "now",
+      "timestamp": 1792863309479
+    },
+    {
+      "id": "stream-1792863305563",
+      "agentId": "finance-07",
+      "agentName": "finance-agent-07",
+      "category": "finance",
+      "tag": "FI",
+      "action": "payInvoice",
+      "vendor": "OpenAI Billing API",
+      "amount": 1500,
+      "timeAgo": "now",
+      "timestamp": 1792863305563
+    },
+    {
       "id": "stream-mcp-1792862086439",
       "agentId": "finance-07",
       "agentName": "finance-agent-07",
@@ -374,6 +453,167 @@
     }
   ],
   "userOps": [
+    {
+      "id": "op-1792864538942",
+      "userOpHash": "0x38e4d3...7755f8",
+      "timestamp": "11:25:38 pm",
+      "targetName": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "targetAddress": "0x00000000000000000000000000000000000B2B2B",
+      "functionCalled": "orderCheckout(uint256 950)",
+      "amount": 950,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: 10-minute office pantry groceries restock on Blinkit",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 10,
+        "callData": "0xorderChe...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792864532960",
+      "userOpHash": "0x2887f0...1375d7",
+      "timestamp": "11:25:32 pm",
+      "targetName": "Grocery & Delivery Service (Blinkit/Zepto)",
+      "targetAddress": "0x00000000000000000000000000000000000B2B2B",
+      "functionCalled": "orderCheckout(uint256 950)",
+      "amount": 950,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: 10-minute office pantry groceries restock on Blinkit",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 9,
+        "callData": "0xorderChe...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-appr-1792863800696",
+      "userOpHash": "0xcfc7bb...66df1d",
+      "timestamp": "11:13:20 pm",
+      "targetName": "Employee Salaray",
+      "targetAddress": "0x00000000000000000000000000000000000A1A1A",
+      "functionCalled": "payInvoice(uint256 1800)",
+      "amount": 100000,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "OUT_OF_POLICY",
+      "reason": "Passkey Biometric Authorized by Principal Madhav B.",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 8,
+        "callData": "0xpayInvoi...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xOwnerPasskeyP256Sig..."
+      }
+    },
+    {
+      "id": "op-1792863746632",
+      "userOpHash": "0x6a576f...7d28e7",
+      "timestamp": "11:12:26 pm",
+      "targetName": "Employee Salaray",
+      "targetAddress": "0x00000000000000000000000000000000000A1A1A",
+      "functionCalled": "payInvoice(uint256 1800)",
+      "amount": 10000,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Autonomous agent API top-up",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 7,
+        "callData": "0xpayInvoi...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792863559322",
+      "userOpHash": "0x592fbe...33114e",
+      "timestamp": "11:09:19 pm",
+      "targetName": "Grocery & Delivery Service (Blinkit/Zepto/Instamart)",
+      "targetAddress": "0x00000000000000000000000000000000000B2B2B",
+      "functionCalled": "orderCheckout(uint256 950)",
+      "amount": 950,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Agent orders office milk, coffee beans & fruit",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 6,
+        "callData": "0xorderChe...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792863309479",
+      "userOpHash": "0x8867c8...f279ab",
+      "timestamp": "11:05:09 pm",
+      "targetName": "Travel & Ticket Booking API (IRCTC/Metro/IndiGo)",
+      "targetAddress": "0x00000000000000000000000000000000000C3C3C",
+      "functionCalled": "bookTicket(uint256 14500)",
+      "amount": 14500,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Agent tries to book conference flight exceeding per-tx cap",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 5,
+        "callData": "0xbookTick...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792863305549",
+      "userOpHash": "0xfe56d6...42af31",
+      "timestamp": "11:05:05 pm",
+      "targetName": "OpenAI Billing API",
+      "targetAddress": "0x00000000000000000000000000000000000A1A1A",
+      "functionCalled": "payInvoice(uint256 1500)",
+      "amount": 1500,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Agent autonomously replenishes LLM inference credits",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 4,
+        "callData": "0xpayInvoi...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
     {
       "id": "op-mcp-1792862086430",
       "userOpHash": "0x04cffe...b61c21",

@@ -460,6 +460,12 @@ export class AgentWalletClient {
                 address: '0xE592427A0AEce92De3Edee1F18E0157C05861564',
                 selector: '0x414bf389 (exactInputSingle)',
                 description: 'Automated micro-DCA token swaps'
+            },
+            {
+                name: 'RedBus Intercity Mobility',
+                address: '0x00000000000000000000000000000000000F6F6F',
+                selector: '0x4b7c89a0 (bookBusTicket)',
+                description: 'Intercity Volvo sleeper and multi-axle bus bookings'
             }
         ],
         allowedRecipients: [
@@ -468,7 +474,8 @@ export class AgentWalletClient {
             '0x00000000000000000000000000000000000C3C3C',
             '0x00000000000000000000000000000000000D4D4D',
             '0x00000000000000000000000000000000000E5E5E',
-            '0xE592427A0AEce92De3Edee1F18E0157C05861564'
+            '0xE592427A0AEce92De3Edee1F18E0157C05861564',
+            '0x00000000000000000000000000000000000F6F6F'
         ]
     };
 

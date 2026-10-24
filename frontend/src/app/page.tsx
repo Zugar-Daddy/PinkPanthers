@@ -5,6 +5,9 @@ import { WalletHeader } from '../components/WalletHeader';
 import { WalletBalancesCard } from '../components/WalletBalancesCard';
 import { AgentKeyPolicyCard } from '../components/AgentKeyPolicyCard';
 import { AgentActionSimulator } from '../components/AgentActionSimulator';
+import { OmniAgentCopilot } from '../components/OmniAgentCopilot';
+import { TicketArtifactModal } from '../components/TicketArtifactModal';
+import { RealWorldArtifact } from '../lib/sandbox/realWorldApis';
 import { ThreatDefensePlayground } from '../components/ThreatDefensePlayground';
 import { UserOpActivityTable } from '../components/UserOpActivityTable';
 import { OwnerApprovalModal } from '../components/OwnerApprovalModal';
@@ -49,6 +52,7 @@ export default function Home() {
     const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
     const [activeApprovalRequest, setActiveApprovalRequest] = useState<QueuedApproval | null>(null);
     const [selectedUserOp, setSelectedUserOp] = useState<UserOperationLog | null>(null);
+    const [activeArtifact, setActiveArtifact] = useState<{ artifact: RealWorldArtifact; userOpHash?: string } | null>(null);
 
     // Threat Defense Logs
     const [threatLogs, setThreatLogs] = useState<{ id: string; time: string; attackType: string; result: string; defenseMechanism: string }[]>([
@@ -266,8 +270,8 @@ export default function Home() {
                                     : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
                             }`}
                         >
-                            <Bot className="w-3.5 h-3.5" />
-                            <span>Action Simulator</span>
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                            <span>AI Copilot</span>
                         </button>
 
                         <button
@@ -329,13 +333,20 @@ export default function Home() {
                 {/* 3. Main Workspace Display */}
                 {activeTab === 'overview' && (
                     <div key="overview" className="space-y-6 tab-panel-enter">
+                        {/* Heroic Omni-Agent Autonomous Command Center */}
+                        <OmniAgentCopilot
+                            wallet={wallet}
+                            onExecuteAction={handleExecuteAction}
+                            onViewArtifact={(artifact, userOpHash) => setActiveArtifact({ artifact, userOpHash })}
+                        />
+
                         {/* 1. Principal & Fleet Banner */}
                         <PrincipalFleetOverview
                             wallet={wallet}
                             onSelectAgent={handleSelectAgent}
                         />
 
-                        {/* 2. Interactive Card + Simulator row */}
+                        {/* 2. Interactive Card + Activity Stream */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             <div className="lg:col-span-6 space-y-6">
                                 <AgentVirtualCard
@@ -350,10 +361,6 @@ export default function Home() {
                             </div>
 
                             <div className="lg:col-span-6 space-y-6">
-                                <AgentActionSimulator
-                                    wallet={wallet}
-                                    onExecuteAction={handleExecuteAction}
-                                />
                                 <LiveActivityStream
                                     wallet={wallet}
                                 />
@@ -396,9 +403,10 @@ export default function Home() {
 
                 {activeTab === 'simulator' && (
                     <div key="simulator" className="max-w-4xl mx-auto space-y-6 tab-panel-enter">
-                        <AgentActionSimulator
+                        <OmniAgentCopilot
                             wallet={wallet}
                             onExecuteAction={handleExecuteAction}
+                            onViewArtifact={(artifact, userOpHash) => setActiveArtifact({ artifact, userOpHash })}
                         />
                         <UserOpActivityTable
                             userOps={wallet.userOps}
@@ -508,6 +516,14 @@ export default function Home() {
                 op={selectedUserOp}
                 onClose={() => setSelectedUserOp(null)}
             />
+
+            {activeArtifact && (
+                <TicketArtifactModal
+                    artifact={activeArtifact.artifact}
+                    userOpHash={activeArtifact.userOpHash}
+                    onClose={() => setActiveArtifact(null)}
+                />
+            )}
         </main>
     );
 }
