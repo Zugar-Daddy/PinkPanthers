@@ -71,9 +71,31 @@ export interface OpenAiInvoice {
     status: 'PAID';
 }
 
+export interface IrctcTrainTicket {
+    type: 'IRCTC';
+    pnr: string;
+    trainNumber: string;
+    trainName: string;
+    sourceStation: string;
+    destStation: string;
+    sourceCity: string;
+    destCity: string;
+    classType: string;
+    coach: string;
+    berth: string;
+    quota: string;
+    departureDate: string;
+    departureTime: string;
+    platform: string;
+    amount: number;
+    passengerName: string;
+    status: 'CNF / CONFIRMED' | 'RAC';
+}
+
 export type RealWorldArtifact = 
     | RedBusTicket 
     | IndigoFlightTicket 
+    | IrctcTrainTicket
     | BlinkitOrder 
     | AwsCloudInvoice 
     | OpenAiInvoice;
@@ -224,6 +246,66 @@ export class RealWorldApiGateway {
             tier: 'Usage Tier 4 Enterprise',
             amount,
             status: 'PAID'
+        };
+    }
+
+    static generateIrctcTicket(
+        source: string = 'New Delhi',
+        destination: string = 'Chandigarh',
+        amount: number = 1450.00,
+        passengerName: string = 'Madhav B. / SafeAgent Passenger'
+    ): IrctcTrainTicket {
+        const pnrPart1 = Math.floor(100 + Math.random() * 900);
+        const pnrPart2 = Math.floor(1000000 + Math.random() * 9000000);
+        const pnr = `${pnrPart1}-${pnrPart2}`;
+
+        const trains = [
+            { num: '20901', name: 'Vande Bharat Express', classType: 'Executive Chair Car (EC)', coach: 'C2', berth: '42 (Window)' },
+            { num: '12952', name: 'New Delhi Rajdhani Express', classType: 'AC 2 Tier (2A)', coach: 'A1', berth: '23 (Lower Berth)' },
+            { num: '12002', name: 'Bhopal Shatabdi Express', classType: 'AC Chair Car (CC)', coach: 'C4', berth: '31 (Aisle)' },
+            { num: '22692', name: 'Bengaluru Rajdhani Express', classType: 'AC 3 Tier (3A)', coach: 'B3', berth: '18 (Side Lower)' },
+            { num: '20608', name: 'Vande Bharat Superfast', classType: 'AC Chair Car (CC)', coach: 'C1', berth: '15 (Window)' }
+        ];
+        const train = trains[Math.floor(Math.random() * trains.length)];
+
+        const getStation = (city: string) => {
+            const c = city.toLowerCase();
+            if (c.includes('delhi')) return 'NDLS - New Delhi Central';
+            if (c.includes('bengaluru') || c.includes('bangalore')) return 'SBC - KSR Bengaluru City';
+            if (c.includes('mumbai') || c.includes('bombay')) return 'MMCT - Mumbai Central';
+            if (c.includes('jaipur')) return 'JP - Jaipur Junction';
+            if (c.includes('chandigarh')) return 'CDG - Chandigarh Junction';
+            if (c.includes('hyderabad')) return 'HYB - Hyderabad Deccan';
+            if (c.includes('chennai') || c.includes('madras')) return 'MAS - Chennai Central';
+            if (c.includes('kolkata') || c.includes('calcutta')) return 'HWH - Howrah Junction';
+            if (c.includes('pune')) return 'PUNE - Pune Junction';
+            if (c.includes('ahmedabad')) return 'ADI - Ahmedabad Junction';
+            return `${city.toUpperCase().slice(0, 3)} - ${city} Junction`;
+        };
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const departureDate = tomorrow.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        return {
+            type: 'IRCTC',
+            pnr,
+            trainNumber: train.num,
+            trainName: train.name,
+            sourceStation: getStation(source),
+            destStation: getStation(destination),
+            sourceCity: source,
+            destCity: destination,
+            classType: amount > 2000 ? 'Executive Chair Car (EC)' : train.classType,
+            coach: train.coach,
+            berth: train.berth,
+            quota: 'General (GN)',
+            departureDate,
+            departureTime: '06:00 AM IST',
+            platform: 'Platform #1',
+            amount,
+            passengerName,
+            status: 'CNF / CONFIRMED'
         };
     }
 }

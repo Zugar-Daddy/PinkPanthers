@@ -49,6 +49,12 @@ export const OmniAgentCopilot: React.FC<OmniAgentCopilotProps> = ({ wallet, onEx
             type: 'in-policy'
         },
         {
+            label: '🚆 Vande Bharat to Chandigarh',
+            amount: '₹1,450',
+            prompt: 'Book Vande Bharat train ticket from Delhi to Chandigarh for ₹1,450',
+            type: 'in-policy'
+        },
+        {
             label: '🚌 RedBus to Hyderabad',
             amount: '₹1,850',
             prompt: 'Book 2 seats on RedBus from Bangalore to Hyderabad for ₹1,850',
@@ -297,6 +303,16 @@ export const OmniAgentCopilot: React.FC<OmniAgentCopilotProps> = ({ wallet, onEx
             functionCalled = `bookBusTicket(uint256 ${amount})`;
             actionDesc = `Intercity luxury sleeper bus booking on RedBus (${source} → ${destination})`;
             artifactGenerator = () => RealWorldApiGateway.generateRedBusTicket(source, destination, amount);
+        } else if (lower.includes('train') || lower.includes('irctc') || lower.includes('railway') || lower.includes('railways') || lower.includes('vande bharat') || lower.includes('rajdhani') || lower.includes('shatabdi') || lower.includes('tatkal')) {
+            targetVendor = 'Travel & Ticket Booking API (IRCTC Railways)';
+            targetAddress = '0x00000000000000000000000000000000000C3C3C';
+            delegatedAgentId = 'concierge-08';
+
+            const { source, destination } = extractCities(query, 'New Delhi', 'Chandigarh');
+            amount = explicitAmount || 1450.00;
+            functionCalled = `bookTicket(uint256 ${amount})`;
+            actionDesc = `IRCTC Express Train Booking (${source} → ${destination})`;
+            artifactGenerator = () => RealWorldApiGateway.generateIrctcTicket(source, destination, amount);
         } else if (lower.includes('aws') || lower.includes('compute') || lower.includes('cloud') || lower.includes('server') || lower.includes('lambda')) {
             targetVendor = 'Cloud Infrastructure API (AWS/Cloudflare)';
             targetAddress = '0x00000000000000000000000000000000000D4D4D';
@@ -410,7 +426,7 @@ export const OmniAgentCopilot: React.FC<OmniAgentCopilotProps> = ({ wallet, onEx
             id: '6',
             label: '6. Real-World E-Ticket & Receipt Issued',
             status: 'completed',
-            detail: `${artifact.type === 'REDBUS' ? 'RedBus M-Ticket' : artifact.type === 'INDIGO' ? 'IndiGo Boarding Pass' : 'Blinkit Delivery Invoice'} generated.`
+            detail: `${artifact.type === 'REDBUS' ? 'RedBus M-Ticket' : artifact.type === 'INDIGO' ? 'IndiGo Boarding Pass' : artifact.type === 'IRCTC' ? 'IRCTC Train Ticket' : 'Blinkit Delivery Invoice'} generated.`
         });
         setCurrentSteps([...steps]);
 

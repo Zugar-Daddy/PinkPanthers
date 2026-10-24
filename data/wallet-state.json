@@ -11,10 +11,10 @@
     "passkeyCredentialId": "credential-p256-apple-secure-enclave",
     "passkeyDeviceName": "TouchID / FaceID (WebAuthn P-256)",
     "totalAgentsCount": 12,
-    "totalFleetSpendToday": 2644750
+    "totalFleetSpendToday": 2664200
   },
   "balances": {
-    "usdc": 1090650,
+    "usdc": 1071200,
     "eth": 0.45,
     "paymasterGasTankINR": 4850
   },
@@ -83,7 +83,7 @@
       "0x00000000000000000000000000000000000F6F6F"
     ]
   },
-  "dailySpent": 29300,
+  "dailySpent": 48750,
   "lastEpochReset": 1729792800000,
   "virtualCard": {
     "cardNumber": "4242 0815 3390 8840",
@@ -93,7 +93,7 @@
     "holder": "CONCIERGE-08 / SAFEAGENT",
     "isFrozen": false,
     "dailyLimit": 50000,
-    "spentToday": 29300,
+    "spentToday": 48750,
     "brand": "VISA BUSINESS"
   },
   "fleet": [
@@ -131,7 +131,7 @@
       "address": "0xAgent8821bA41c8dF291a82E92aC5718a381920B8821",
       "dailyBudget": 50000,
       "maxPerTx": 20000,
-      "spentToday": 29300,
+      "spentToday": 48750,
       "status": "active",
       "assignedCard": "4242 0815 ···· 8840",
       "lastAction": "bookBusTicket(uint256 1850) · RedBus Intercity Mobility (₹1,850)",
@@ -143,7 +143,7 @@
         "holder": "CONCIERGE-08 / SAFEAGENT",
         "isFrozen": false,
         "dailyLimit": 50000,
-        "spentToday": 29300,
+        "spentToday": 48750,
         "brand": "VISA BUSINESS"
       }
     },
@@ -306,6 +306,54 @@
     }
   ],
   "activityStream": [
+    {
+      "id": "stream-1792865556749",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "bookBusTicket",
+      "vendor": "RedBus Intercity Mobility",
+      "amount": 1850,
+      "timeAgo": "now",
+      "timestamp": 1792865556749
+    },
+    {
+      "id": "stream-1792865508845",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "bookBusTicket",
+      "vendor": "RedBus Intercity Mobility",
+      "amount": 1850,
+      "timeAgo": "now",
+      "timestamp": 1792865508845
+    },
+    {
+      "id": "stream-1792865488050",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "bookFlight",
+      "vendor": "Travel & Ticket Booking API (IndiGo)",
+      "amount": 14500,
+      "timeAgo": "now",
+      "timestamp": 1792865488050
+    },
+    {
+      "id": "stream-1792865463548",
+      "agentId": "concierge-08",
+      "agentName": "concierge-08",
+      "category": "ops",
+      "tag": "CO",
+      "action": "bookBusTicket",
+      "vendor": "RedBus Intercity Mobility",
+      "amount": 1250,
+      "timeAgo": "now",
+      "timestamp": 1792865463548
+    },
     {
       "id": "stream-1792864906440",
       "agentId": "concierge-08",
@@ -477,6 +525,98 @@
     }
   ],
   "userOps": [
+    {
+      "id": "op-1792865556749",
+      "userOpHash": "0x703a64...f70b5b",
+      "timestamp": "11:42:36 pm",
+      "targetName": "RedBus Intercity Mobility",
+      "targetAddress": "0x00000000000000000000000000000000000F6F6F",
+      "functionCalled": "bookBusTicket(uint256 1850)",
+      "amount": 1850,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Intercity mobility trip (Jaipur → Lucknow)",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 16,
+        "callData": "0xbookBusT...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792865508845",
+      "userOpHash": "0x86c137...7a03cd",
+      "timestamp": "11:41:48 pm",
+      "targetName": "RedBus Intercity Mobility",
+      "targetAddress": "0x00000000000000000000000000000000000F6F6F",
+      "functionCalled": "bookBusTicket(uint256 1850)",
+      "amount": 1850,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Intercity mobility trip (Jaipur → Lucknow)",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 15,
+        "callData": "0xbookBusT...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792865488050",
+      "userOpHash": "0x63857d...822e3f",
+      "timestamp": "11:41:28 pm",
+      "targetName": "Travel & Ticket Booking API (IndiGo)",
+      "targetAddress": "0x00000000000000000000000000000000000C3C3C",
+      "functionCalled": "bookFlight(uint256 14500)",
+      "amount": 14500,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Corporate domestic flight reservation on IndiGo (Jaipur → Lucknow)",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 14,
+        "callData": "0xbookFlig...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
+    {
+      "id": "op-1792865463540",
+      "userOpHash": "0x51b1bb...f19400",
+      "timestamp": "11:41:03 pm",
+      "targetName": "RedBus Intercity Mobility",
+      "targetAddress": "0x00000000000000000000000000000000000F6F6F",
+      "functionCalled": "bookBusTicket(uint256 1250)",
+      "amount": 1250,
+      "gasSponsored": true,
+      "gasCostUSD": 10,
+      "status": "EXECUTED",
+      "validationResult": "IN_POLICY",
+      "reason": "Autonomous in-policy payment: Intercity luxury sleeper bus booking on RedBus (Jaipur → Lucknow)",
+      "rawUserOp": {
+        "sender": "0x884337bA94D25Ac2c488b394B7f8D44e1D328C39",
+        "nonce": 13,
+        "callData": "0xbookBusT...",
+        "callGasLimit": "0x186a0",
+        "verificationGasLimit": "0x249f0",
+        "paymasterAndData": "0x9999000011112222333344445555666677778888...",
+        "signature": "0xAgentSignatureSecp256k1..."
+      }
+    },
     {
       "id": "op-1792864906440",
       "userOpHash": "0x285451...47e8a0",

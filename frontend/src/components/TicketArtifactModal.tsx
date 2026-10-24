@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Check, Copy, Bus, Plane, ShoppingBag, Cloud, Bot, ExternalLink, ShieldCheck, QrCode } from 'lucide-react';
+import { X, Check, Copy, Bus, Plane, Train, ShoppingBag, Cloud, Bot, ExternalLink, ShieldCheck, QrCode } from 'lucide-react';
 import { RealWorldArtifact } from '../lib/sandbox/realWorldApis';
 import { formatINR } from '../lib/web3/agentWalletClient';
 
@@ -150,6 +150,70 @@ export const TicketArtifactModal: React.FC<TicketArtifactModalProps> = ({ artifa
                         <div className="flex items-center justify-between text-[10px] font-mono text-stone-500 pt-1">
                             <span>Passenger: {artifact.passengerName}</span>
                             <span className="font-semibold text-stone-900">{formatINR(artifact.amount)}</span>
+                        </div>
+                    </div>
+                )}
+
+                {/* 2b. IRCTC Train Ticket */}
+                {artifact.type === 'IRCTC' && (
+                    <div className="bg-gradient-to-br from-blue-50 via-white to-stone-50 border border-blue-200/80 rounded-2xl p-5 shadow-subtle space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-blue-900 text-white flex items-center justify-center shadow-xs">
+                                    <Train className="w-4 h-4 text-amber-300" />
+                                </div>
+                                <div>
+                                    <span className="text-xs font-bold text-blue-950 font-serif tracking-tight">IRCTC Electronic Reservation Slip</span>
+                                    <div className="text-[10px] text-stone-500 font-mono">PNR: <span className="font-semibold text-blue-800">{artifact.pnr}</span></div>
+                                </div>
+                            </div>
+                            <span className="text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                                {artifact.status}
+                            </span>
+                        </div>
+
+                        <div className="bg-white/90 border border-blue-100 rounded-xl p-3.5 space-y-2.5 text-xs">
+                            <div className="flex justify-between items-center pb-2 border-b border-blue-100">
+                                <div>
+                                    <div className="text-[10px] text-stone-400 uppercase font-mono">Train</div>
+                                    <div className="font-bold text-stone-900">{artifact.trainNumber} · {artifact.trainName}</div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[10px] text-stone-400 uppercase font-mono">Class & Quota</div>
+                                    <div className="font-medium text-stone-700 text-[11px]">{artifact.classType} ({artifact.quota})</div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-[11px]">
+                                <div>
+                                    <span className="text-stone-400 text-[10px] uppercase font-mono">From Station</span>
+                                    <div className="font-semibold text-stone-900 truncate" title={artifact.sourceStation}>{artifact.sourceStation}</div>
+                                </div>
+                                <div>
+                                    <span className="text-stone-400 text-[10px] uppercase font-mono">To Station</span>
+                                    <div className="font-semibold text-stone-900 truncate" title={artifact.destStation}>{artifact.destStation}</div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px] border-t border-stone-100">
+                                <div>
+                                    <span className="text-stone-400 text-[10px]">Coach:</span>
+                                    <div className="font-bold text-blue-900">{artifact.coach}</div>
+                                </div>
+                                <div>
+                                    <span className="text-stone-400 text-[10px]">Berth/Seat:</span>
+                                    <div className="font-bold text-stone-900">{artifact.berth}</div>
+                                </div>
+                                <div>
+                                    <span className="text-stone-400 text-[10px]">Departure:</span>
+                                    <div className="font-semibold text-stone-900 text-[10px]">{artifact.departureTime}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-[10px] font-mono text-stone-500 pt-1">
+                            <span>Passenger: {artifact.passengerName}</span>
+                            <span className="font-semibold text-emerald-700 text-xs">{formatINR(artifact.amount)}</span>
                         </div>
                     </div>
                 )}
