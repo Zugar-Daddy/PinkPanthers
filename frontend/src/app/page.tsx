@@ -18,10 +18,12 @@ import { McpIntegrationModal } from '../components/McpIntegrationModal';
 import { LiveActivityStream } from '../components/LiveActivityStream';
 import { InteractiveCliTerminal } from '../components/InteractiveCliTerminal';
 
-import { agentWalletClient, QueuedApproval, UserOperationLog } from '../lib/web3/agentWalletClient';
-import { LayoutGrid, Bot, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users } from 'lucide-react';
+import { Phase2HijackRecovery } from '../components/Phase2HijackRecovery';
 
-type ActiveTab = 'overview' | 'fleet' | 'card' | 'simulator' | 'stream' | 'cli' | 'threats';
+import { agentWalletClient, QueuedApproval, UserOperationLog } from '../lib/web3/agentWalletClient';
+import { LayoutGrid, Bot, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users, Skull } from 'lucide-react';
+
+type ActiveTab = 'overview' | 'fleet' | 'card' | 'simulator' | 'stream' | 'cli' | 'threats' | 'phase2';
 
 export default function Home() {
     // Wallet Client Instance
@@ -294,6 +296,18 @@ export default function Home() {
                             <span>Threat Defense</span>
                         </button>
 
+                        <button
+                            onClick={() => setActiveTab('phase2')}
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 transition-all ${
+                                activeTab === 'phase2'
+                                    ? 'bg-stone-900 text-white shadow-xs'
+                                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/70'
+                            }`}
+                        >
+                            <Skull className="w-3.5 h-3.5 text-rose-500" />
+                            <span>Hijack & Recovery</span>
+                        </button>
+
                     </div>
 
                     <div className="hidden sm:flex items-center gap-2 text-xs font-mono font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3.5 py-2 rounded-xl shadow-xs">
@@ -412,6 +426,12 @@ export default function Home() {
                             onTriggerExpired={handleTriggerExpired}
                             threatLogs={threatLogs}
                         />
+                    </div>
+                )}
+
+                {activeTab === 'phase2' && (
+                    <div key="phase2" className="max-w-6xl mx-auto space-y-6 tab-panel-enter">
+                        <Phase2HijackRecovery wallet={wallet} />
                     </div>
                 )}
 
