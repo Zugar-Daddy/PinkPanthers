@@ -10,10 +10,10 @@ export async function GET() {
 }
 export async function POST(req: NextRequest) {
     try {
-        const { token } = await req.json();
-        const { fingerprint, ...receipt } = executeSimulation(token);
+        const { token, ownerProof } = await req.json();
+        const { fingerprint, ...receipt } = executeSimulation(token, ownerProof);
         return NextResponse.json({ receipt }, { headers: { 'Cache-Control': 'no-store' } });
     } catch (error: any) {
-        return NextResponse.json({ error: error?.message || 'Simulated transaction failed' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+        return NextResponse.json({ error: error?.message || 'Simulated transaction failed', ...(error?.code === 'OWNER_APPROVAL_REQUIRED' ? { code: error.code, review: error.review } : {}) }, { status: error?.code === 'OWNER_APPROVAL_REQUIRED' ? 409 : 400, headers: { 'Cache-Control': 'no-store' } });
     }
 }

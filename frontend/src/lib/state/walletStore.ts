@@ -3,6 +3,9 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 import type { SimulationReceipt } from './copilotTransactions';
 import type { PaymasterState } from '../payroll/types';
+import type { BillingState } from '../billing/plans';
+import { consumeOwnerApproval } from '../auth/ownerApproval';
+import type { OwnerSecurity } from '../auth/types';
 
 export interface CardDetails {
     cardNumber: string;
@@ -33,6 +36,8 @@ export interface FleetAgentState {
 }
 
 export interface WalletState {
+    ownerSecurity?: OwnerSecurity;
+    billing?: BillingState;
     paymaster?: PaymasterState;
     simulatedTransactions?: SimulationReceipt[];
     smartAccountAddress: string;
@@ -150,6 +155,12 @@ export function readWalletState(): WalletState {
     const filePath = getDataPath();
     const raw = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(raw);
+}
+
+/** Never expose pending verification ceremonies or approval hashes in wallet API responses. */
+export function publicWalletState(state: WalletState): Omit<WalletState, 'ownerSecurity'> {
+    const { ownerSecurity, ...visible } = state;
+    return visible;
 }
 
 export function writeWalletState(state: WalletState): void {
@@ -400,10 +411,12 @@ function switchActiveAgentUnlocked(agentId: string): WalletState {
     return state;
 }
 
-function updateCardLimitUnlocked(limit: number, agentId?: string): void {
+function updateCardLimitUnlocked(limit: number, agentId?: string, ownerProof?: string): void {
     if (!Number.isFinite(limit) || limit < 0) throw new Error('Invalid card limit');
     const state = readWalletState();
     const targetId = agentId || state.activeAgent.id;
+    if (targetId !== state.activeAgent.id) throw new Error('Selected agent changed. Reopen card settings.');
+    consumeOwnerApproval(state, ownerProof, { kind: 'card_limit', agentId: targetId, limit });
     const ag = state.fleet.find(a => a.id === targetId);
 
     if (ag) {
@@ -419,10 +432,11 @@ function updateCardLimitUnlocked(limit: number, agentId?: string): void {
     writeWalletState(state);
 }
 
-function approveQueuedActionUnlocked(id: string): boolean {
+function approveQueuedActionUnlocked(id: string, ownerProof?: string): boolean {
     const state = readWalletState();
     const req = state.queuedApprovals.find(q => q.id === id);
     if (!req || req.status !== 'PENDING' || !Number.isFinite(req.amount) || req.amount <= 0 || req.amount > state.balances.usdc) return false;
+    consumeOwnerApproval(state, ownerProof, { kind: 'queued_approval', id, amount: req.amount, recipient: req.targetAddress, agent: req.agent, action: req.actionName });
     req.status = 'APPROVED';
 
     state.balances.usdc -= req.amount;
@@ -452,7 +466,7 @@ function approveQueuedActionUnlocked(id: string): boolean {
         gasCostUSD: 10.00,
         status: 'EXECUTED',
         validationResult: 'OUT_OF_POLICY',
-        reason: `Owner approved local simulation; no blockchain transaction was submitted`,
+        reason: `Owner passkey verified this one-time exception; standing policy unchanged. No blockchain transaction was submitted`,
         rawUserOp: {
             sender: state.smartAccountAddress,
             nonce: state.userOps.length + 1,

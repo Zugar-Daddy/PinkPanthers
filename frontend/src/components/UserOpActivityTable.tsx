@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Activity, Fuel, CheckCircle2, ShieldAlert, ArrowUpRight, Code, Eye } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Activity, Fuel, Code, Download, Loader2 } from 'lucide-react';
 import { UserOperationLog, formatINR } from '../lib/web3/agentWalletClient';
 
 interface UserOpActivityTableProps {
@@ -10,6 +10,25 @@ interface UserOpActivityTableProps {
 }
 
 export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOps, onInspectUserOp }) => {
+    const [exporting, setExporting] = useState(false);
+    const [exportError, setExportError] = useState('');
+    const pendingExport = useRef(false);
+    const downloadPdf = async () => {
+        if (pendingExport.current) return;
+        pendingExport.current = true; setExporting(true); setExportError('');
+        try {
+            const response = await fetch('/api/wallet/history/pdf', { cache: 'no-store' });
+            if (!response.ok || !response.headers.get('content-type')?.includes('application/pdf')) throw new Error('Unable to download activity history. Please retry.');
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = response.headers.get('content-disposition')?.match(/filename="([^"]+)"/)?.[1] || 'PinkPanthers-activity.pdf';
+            document.body.appendChild(anchor); anchor.click(); anchor.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (error: any) { setExportError(error?.message || 'PDF download failed'); }
+        finally { pendingExport.current = false; setExporting(false); }
+    };
     return (
         <div className="bg-white border border-stone-200/90 rounded-2xl p-6 shadow-card hover:shadow-card-hover space-y-4 transition-all duration-200">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-stone-200/80">
@@ -99,6 +118,15 @@ export const UserOpActivityTable: React.FC<UserOpActivityTableProps> = ({ userOp
                         </div>
                     );
                 })}
+            </div>
+            <div className="border-t border-stone-200/80 pt-4 space-y-2">
+                <button type="button" onClick={() => void downloadPdf()} disabled={exporting} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#123b32] px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 disabled:opacity-50 sm:w-auto">
+                    {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                    {exporting ? 'Generating PDF…' : 'Download activity PDF'}
+                </button>
+                <p className="text-xs text-stone-500">Exports all saved operation history, including amounts, actions, timestamps and results.</p>
+                {exporting && <p role="status" className="sr-only">Generating your activity report.</p>}
+                {exportError && <p role="alert" className="text-sm text-rose-700">{exportError}</p>}
             </div>
         </div>
     );

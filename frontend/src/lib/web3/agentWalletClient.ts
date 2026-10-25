@@ -414,6 +414,7 @@ export class AgentWalletClient {
     public usdcBalance: number = 1250000.00;
     public ethBalance: number = 0.45;
     public paymasterGasTankUSD: number = 4850.00; // Gas Tank in INR
+    public get paymasterTankINR(): number { return this.paymasterGasTankUSD; }
 
     // 24-Hour Policy Spending Accounting
     public dailySpent: number = 2450.00;
@@ -645,21 +646,14 @@ export class AgentWalletClient {
     /**
      * Update Card Daily Limit for the active agent
      */
-    updateCardLimit(limit: number) {
-        this.virtualCard.dailyLimit = limit;
-        this.policy.dailyBudget = limit;
-        const activeAg = this.fleet.find(a => a.id === this.activeAgentId);
-        if (activeAg) {
-            activeAg.dailyBudget = limit;
-            if (activeAg.cardDetails) activeAg.cardDetails.dailyLimit = limit;
-        }
-        if (typeof window !== 'undefined') {
-            fetch('/api/wallet/state', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'update_card_limit', payload: { limit, agentId: this.activeAgentId } })
-            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
-        }
+    async updateCardLimit(limit: number, ownerProof: string, agentId: string): Promise<void> {
+        const response = await fetch('/api/wallet/state', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'update_card_limit', payload: { limit, agentId, ownerProof } })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Card limit was not changed');
+        this._applyState(result.state);
     }
 
     /**
@@ -805,13 +799,13 @@ export class AgentWalletClient {
     /**
      * Admin Biometric Passkey Approval
      */
-    async approveQueued(id: string): Promise<boolean> {
+    async approveQueued(id: string, ownerProof: string): Promise<boolean> {
         if (typeof window === 'undefined') return false;
         try {
             const response = await fetch('/api/wallet/state', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'approve_queued', payload: { id } })
+                body: JSON.stringify({ action: 'approve_queued', payload: { id, ownerProof } })
             });
             const result = await response.json();
             if (!response.ok || !result.success) return false;
@@ -836,30 +830,14 @@ export class AgentWalletClient {
         }
     }
 
-    issueSubKey(durationHours: number, dailyBudget: number, maxPerTx: number) {
-        this.sessionActive = true;
-        this.sessionExpiresAt = Date.now() + durationHours * 3600 * 1000;
-        this.policy.dailyBudget = dailyBudget;
-        this.policy.maxPerTx = maxPerTx;
-        this.policy.sessionExpiryHours = durationHours;
-        this.dailySpent = 0;
-        const activeAg = this.fleet.find(a => a.id === this.activeAgentId);
-        if (activeAg) {
-            activeAg.dailyBudget = dailyBudget;
-            activeAg.maxPerTx = maxPerTx;
-            activeAg.spentToday = 0;
-            if (activeAg.cardDetails) {
-                activeAg.cardDetails.dailyLimit = dailyBudget;
-                activeAg.cardDetails.spentToday = 0;
-            }
-        }
-        if (typeof window !== 'undefined') {
-            fetch('/api/wallet/state', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'update_policy', payload: { dailyBudget, maxPerTx, sessionExpiryHours: durationHours } })
-            }).then(r => r.json()).then(d => { if (d.success && d.state) this._applyState(d.state); }).catch(() => {});
-        }
+    async issueSubKey(durationHours: number, dailyBudget: number, maxPerTx: number, ownerProof: string, agentId: string): Promise<void> {
+        const response = await fetch('/api/wallet/state', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'update_policy', payload: { agentId, dailyBudget, maxPerTx, sessionExpiryHours: durationHours, ownerProof } })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Policy update failed');
+        this._applyState(result.state);
     }
 
     revokeSubKey() {

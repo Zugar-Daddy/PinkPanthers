@@ -19,6 +19,7 @@ function load(relativePath, env) {
         require(name) {
             if (name === 'next/server') return { NextResponse: Response };
             if (name === './walletStore') return {};
+            if (name.startsWith('.')) return load(path.join(path.dirname(relativePath), name + '.ts'), env);
             return require(name);
         }
     }, { filename: relativePath });

@@ -135,21 +135,21 @@ const request = (query, extra = {}) => ({ json: async () => ({ query, requestId:
             [s => { s.fleet.find(a => a.id === s.activeAgent.id).status = 'paused'; }, /session/]
         ]) {
             fresh(); const quote = make(); change(mutate); const balance = read().balances.usdc;
-            const failure = await execute(quote.token); assert.equal(failure.status, 400); assert.match(failure.body.error, error);
+            const failure = await execute(quote.token); assert.equal(failure.status, failure.body.code === 'OWNER_APPROVAL_REQUIRED' ? 409 : 400); assert.match(failure.body.error, error);
             assert.equal(read().balances.usdc, balance); assert.equal(read().simulatedTransactions.length, 0);
         }
         fresh(); const firstQuote = make(); await execute(firstQuote.token);
         const changed = make(200); assert.match((await execute(changed.token)).body.error, /different terms/); assert.equal(read().balances.usdc, 9900);
         // Separate Node processes exercise the real filesystem lock, not just sequential JS calls.
         fresh();
-        const library = path.join(temporary, 'lib'); fs.mkdirSync(library);
-        for (const name of ['walletStore', 'copilotTransactions']) {
-            const code = ts.transpileModule(fs.readFileSync(path.join(root, `src/lib/state/${name}.ts`), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
+        const library = path.join(temporary, 'lib'); fs.mkdirSync(path.join(library, 'state'), { recursive: true }); fs.mkdirSync(path.join(library, 'auth'));
+        for (const name of ['state/walletStore', 'state/copilotTransactions', 'auth/ownerApproval']) {
+            const code = ts.transpileModule(fs.readFileSync(path.join(root, `src/lib/${name}.ts`), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
             fs.writeFileSync(path.join(library, `${name}.js`), code);
         }
         const concurrentA = make(100, 'command-concurrent00000001');
         const concurrentB = make(200, 'command-concurrent00000002');
-        const program = `require(${JSON.stringify(path.join(library, 'copilotTransactions.js'))}).executeSimulation(process.argv[1])`;
+        const program = `require(${JSON.stringify(path.join(library, 'state/copilotTransactions.js'))}).executeSimulation(process.argv[1])`;
         await Promise.all([concurrentA, concurrentA, concurrentB].map(quote => runFile(process.execPath, ['-e', program, quote.token], { cwd: working, env: { WALLET_ADMIN_TOKEN: 'test-secret-never-used-in-production-123456789' } })));
         assert.equal(read().balances.usdc, 9700); assert.equal(read().simulatedTransactions.length, 2);
         fresh(); const oldAgent = make(); change(s => { s.activeAgent.id = 'another-agent'; }); assert.match((await execute(oldAgent.token)).body.error, /session/);

@@ -2,12 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { WalletHeader } from '../components/WalletHeader';
+import type { OwnerIntent } from '../lib/auth/types';
+import { CostTransparencyPanel } from '../components/CostTransparencyPanel';
+import { BusinessModelPanel } from '../components/BusinessModelPanel';
 import { DashboardOverview } from '../components/DashboardOverview';
 import { AgentKeyPolicyCard } from '../components/AgentKeyPolicyCard';
 import { AgentActionSimulator } from '../components/AgentActionSimulator';
 import { LiveOmniAgentCopilot } from '../components/LiveOmniAgentCopilot';
 import { ThreatDefensePlayground } from '../components/ThreatDefensePlayground';
 import { UserOpActivityTable } from '../components/UserOpActivityTable';
+import { OwnerVerificationModal } from '../components/OwnerVerificationModal';
 import { OwnerApprovalModal } from '../components/OwnerApprovalModal';
 import { PolicyConfigModal } from '../components/PolicyConfigModal';
 import { UserOpInspectorModal } from '../components/UserOpInspectorModal';
@@ -23,15 +27,17 @@ import { InteractiveCliTerminal } from '../components/InteractiveCliTerminal';
 import { Phase2HijackRecovery } from '../components/Phase2HijackRecovery';
 
 import { agentWalletClient, QueuedApproval, UserOperationLog, formatINR } from '../lib/web3/agentWalletClient';
-import { LayoutGrid, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users, LifeBuoy, Play } from 'lucide-react';
+import { LayoutGrid, CreditCard, Terminal, ShieldAlert, Activity, Sparkles, Users, LifeBuoy, Play, PieChart, Coins } from 'lucide-react';
 
-type ActiveTab = 'overview' | 'fleet' | 'card' | 'lab' | 'simulator' | 'stream' | 'cli' | 'threats' | 'phase2';
+type ActiveTab = 'overview' | 'fleet' | 'card' | 'lab' | 'simulator' | 'stream' | 'cli' | 'threats' | 'phase2' | 'transparency' | 'pricing';
 
 const navigation = [
     { id: 'overview', label: 'Overview', icon: LayoutGrid, group: 'Workspace' },
     { id: 'fleet', label: 'Agents', icon: Users, group: 'Workspace' },
     { id: 'card', label: 'Cards & policy', icon: CreditCard, group: 'Workspace' },
     { id: 'stream', label: 'Activity', icon: Activity, group: 'Workspace' },
+    { id: 'transparency', label: 'Cost transparency', icon: PieChart, group: 'Workspace' },
+    { id: 'pricing', label: 'Business & plans', icon: Coins, group: 'Workspace' },
     { id: 'lab', label: 'Simulate', icon: Play, group: 'Tools' },
     { id: 'simulator', label: 'Copilot', icon: Sparkles, group: 'Tools' },
     { id: 'threats', label: 'Security tests', icon: ShieldAlert, group: 'Tools' },
@@ -40,6 +46,8 @@ const navigation = [
 ] as const;
 
 const sectionIntro: Record<ActiveTab, { title: string; description: string }> = {
+    transparency: { title: 'Cost transparency', description: 'Understand platform fees, network sponsorship and external surcharges.' },
+    pricing: { title: 'Business model & plans', description: 'Explore hybrid subscription tiers and refill simulated gas credits.' },
     overview: { title: 'Treasury overview', description: 'Manage agent access, spending, and approvals in one place.' },
     fleet: { title: 'Agents', description: 'See who is active and switch between agents.' },
     card: { title: 'Cards & policy', description: 'Review card controls and spending limits.' },
@@ -71,6 +79,7 @@ export default function Home() {
     const [paymasterOpen, setPaymasterOpen] = useState(false);
 
     // Modals
+    const [cardLimitIntent, setCardLimitIntent] = useState<Extract<OwnerIntent, { kind: 'card_limit' }> | null>(null);
     const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
     const [isInboxModalOpen, setIsInboxModalOpen] = useState(false);
     const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
@@ -101,8 +110,7 @@ export default function Home() {
     };
 
     const handleUpdateCardLimit = (limit: number) => {
-        wallet.updateCardLimit(limit);
-        forceUpdate();
+        setCardLimitIntent({ kind: 'card_limit', agentId: wallet.activeAgentId, limit });
     };
 
     // Handle Agent Action Dispatch
@@ -122,8 +130,8 @@ export default function Home() {
     };
 
     // Owner Passkey Approval Handlers
-    const handleApproveRequest = async (id: string) => {
-        const approved = await wallet.approveQueued(id);
+    const handleApproveRequest = async (id: string, proof: string) => {
+        const approved = await wallet.approveQueued(id, proof);
         if (approved) setActiveApprovalRequest(null);
         forceUpdate();
         return approved;
@@ -136,8 +144,8 @@ export default function Home() {
     };
 
     // Policy Updates
-    const handleUpdatePolicy = (dailyBudget: number, maxPerTx: number, durationHours: number) => {
-        wallet.issueSubKey(durationHours, dailyBudget, maxPerTx);
+    const handleUpdatePolicy = async (intent: Extract<OwnerIntent, { kind: 'policy_update' }>, proof: string) => {
+        await wallet.issueSubKey(intent.sessionExpiryHours, intent.dailyBudget, intent.maxPerTx, proof, intent.agentId);
         forceUpdate();
     };
 
@@ -231,7 +239,7 @@ export default function Home() {
     return (
         <main className="min-h-screen flex flex-col bg-[#faf9f6] text-stone-900 selection:bg-[#123b32] selection:text-white">
             <div className="border-b border-amber-200 bg-amber-50 px-5 py-2 text-center text-xs text-amber-900">
-                Demo workspace · Balances and actions are simulated; no blockchain transaction or biometric verification occurs.
+                Demo workspace · Balances and payments are simulated. Owner approvals use device passkeys; no blockchain transaction occurs.
             </div>
             {/* Top Navigation */}
             <WalletHeader
@@ -272,6 +280,9 @@ export default function Home() {
                         </div>
                         <span className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600">{activeTab === 'simulator' ? 'Live listings · simulated wallet' : `Selected: ${wallet.agentName}`}</span>
                     </div>
+
+                    {activeTab === 'transparency' && <CostTransparencyPanel />}
+                    {activeTab === 'pricing' && <BusinessModelPanel wallet={wallet} />}
 
                     {activeTab === 'overview' && (
                         <div className="space-y-6 tab-panel-enter">
@@ -340,6 +351,17 @@ export default function Home() {
             </div>
 
             {/* Modals */}
+            {cardLimitIntent && <OwnerVerificationModal
+                intent={cardLimitIntent}
+                title="Verify card policy change"
+                details={[`Agent: ${cardLimitIntent.agentId}`, `Daily card limit: ${formatINR(cardLimitIntent.limit)}`, 'Existing spending is preserved. This also updates the agent daily budget.']}
+                onClose={() => setCardLimitIntent(null)}
+                onVerified={async proof => {
+                    await wallet.updateCardLimit(cardLimitIntent.limit, proof, cardLimitIntent.agentId);
+                    setCardLimitIntent(null);
+                    forceUpdate();
+                }}
+            />}
             <OwnerApprovalModal
                 request={activeApprovalRequest}
                 onApprove={handleApproveRequest}

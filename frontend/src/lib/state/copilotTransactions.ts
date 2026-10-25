@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
 import { readWalletState, withWalletStateLock, writeWalletState, WalletState } from './walletStore';
+import { consumeOwnerApproval } from '../auth/ownerApproval';
 
 export type TransactionQuote = {
     id: string; kind: 'PURCHASE' | 'TRANSFER'; agentId: string; title: string; recipient: string;
@@ -8,6 +9,7 @@ export type TransactionQuote = {
 };
 export type SimulationReceipt = TransactionQuote & {
     status: 'SIMULATED'; completedAt: string; balanceAfter: number; fingerprint: string;
+    ownerOverride?: boolean;
 };
 const TTL = 5 * 60 * 1000;
 const devSecrets = globalThis as typeof globalThis & { __safeAgentDevSigningSecret?: string };
@@ -45,7 +47,7 @@ function readQuote(token: unknown): TransactionQuote {
 }
 
 /** A local ledger entry only: never sends money, merchant orders, or blockchain calls. */
-export function executeSimulation(token: unknown): SimulationReceipt {
+export function executeSimulation(token: unknown, ownerProof?: string): SimulationReceipt {
     const quote = readQuote(token);
     // Exclude validity window: retries may refresh a quote, but may never change its financial terms.
     const { expiresAt, researchedAt, ...terms } = quote;
@@ -69,8 +71,15 @@ export function executeSimulation(token: unknown): SimulationReceipt {
         const amount = quote.amountMinor / 100;
         const limits = [agent.maxPerTx, state.policy.maxPerTx, agent.dailyBudget, state.policy.dailyBudget, card.dailyLimit, agent.spentToday, card.spentToday];
         if (limits.some(value => !Number.isFinite(value) || value < 0)) throw new Error('Wallet spending policy is invalid');
-        if (amount > Math.min(agent.maxPerTx, state.policy.maxPerTx)) throw new Error('Transaction exceeds the per-transaction limit. Update the agent policy to authorize this amount.');
-        if (Math.round(agent.spentToday * 100) + quote.amountMinor > Math.round(Math.min(agent.dailyBudget, state.policy.dailyBudget) * 100) || Math.round(card.spentToday * 100) + quote.amountMinor > Math.round(card.dailyLimit * 100)) throw new Error('Transaction exceeds the remaining daily budget or card limit');
+        const violation = amount > Math.min(agent.maxPerTx, state.policy.maxPerTx) ? 'Transaction exceeds the per-transaction limit.' :
+            Math.round(agent.spentToday * 100) + quote.amountMinor > Math.round(Math.min(agent.dailyBudget, state.policy.dailyBudget) * 100) || Math.round(card.spentToday * 100) + quote.amountMinor > Math.round(card.dailyLimit * 100) ? 'Transaction exceeds the remaining daily budget or card limit.' : null;
+        if (violation) {
+            if (!ownerProof) {
+                const error = Object.assign(new Error(`${violation} Verify as owner to approve this transaction once.`), { code: 'OWNER_APPROVAL_REQUIRED', review: { title: quote.title, recipient: quote.recipient, amount, agentId: quote.agentId, reason: violation } });
+                throw error;
+            }
+            consumeOwnerApproval(state, ownerProof, { kind: 'transaction_override', token: token as string });
+        }
         state.balances.usdc = (balance - quote.amountMinor) / 100;
         agent.spentToday = (Math.round(agent.spentToday * 100) + quote.amountMinor) / 100;
         card.spentToday = (Math.round(card.spentToday * 100) + quote.amountMinor) / 100;
@@ -78,13 +87,13 @@ export function executeSimulation(token: unknown): SimulationReceipt {
         state.virtualCard.spentToday = card.spentToday;
         state.principal.totalFleetSpendToday = (Math.round(state.principal.totalFleetSpendToday * 100) + quote.amountMinor) / 100;
         agent.lastAction = `Simulated ${quote.kind.toLowerCase()} · ${quote.title}`;
-        const receipt: SimulationReceipt = { ...quote, status: 'SIMULATED', completedAt: new Date().toISOString(), balanceAfter: state.balances.usdc, fingerprint };
+        const receipt: SimulationReceipt = { ...quote, status: 'SIMULATED', completedAt: new Date().toISOString(), balanceAfter: state.balances.usdc, fingerprint, ...(violation ? { ownerOverride: true } : {}) };
         (state.simulatedTransactions ||= []).unshift(receipt);
         state.userOps.unshift({
             id: quote.id, userOpHash: quote.id, timestamp: receipt.completedAt, targetName: quote.title,
             targetAddress: quote.sourceUrl || quote.recipient, functionCalled: quote.kind === 'PURCHASE' ? 'simulatedPurchase()' : 'simulatedTransfer()',
-            amount, gasSponsored: false, gasCostUSD: 0, status: 'EXECUTED', validationResult: 'IN_POLICY',
-            reason: `Simulation only: ${quote.quantity} × ${quote.title}. No real order, booking, or funds transfer. Receipt ${quote.id}.`,
+            amount, gasSponsored: false, gasCostUSD: 0, status: 'EXECUTED', validationResult: violation ? 'OUT_OF_POLICY' : 'IN_POLICY',
+            reason: `${violation ? 'Owner passkey authorized a one-time spending-limit override; standing policy unchanged. ' : ''}Simulation only: ${quote.quantity} × ${quote.title}. No real order, booking, or funds transfer. Receipt ${quote.id}.`,
             rawUserOp: { sender: state.smartAccountAddress, nonce: state.userOps.length + 1, callData: '0x', callGasLimit: '0x0', verificationGasLimit: '0x0', paymasterAndData: '0x', signature: '0x' }
         });
         state.activityStream.unshift({ id: quote.id, agentId: agent.id, agentName: agent.name, category: agent.category, tag: agent.tag,

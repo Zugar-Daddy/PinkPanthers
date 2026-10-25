@@ -3,9 +3,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ExternalLink, Search, Sparkles } from 'lucide-react';
 import { AgentWalletClient } from '../lib/web3/agentWalletClient';
+import { OwnerVerificationModal } from './OwnerVerificationModal';
 
 type Transaction = { token: string; quote: { id: string } };
-type Receipt = { id: string; kind: string; title: string; recipient: string; amountMinor: number; balanceAfter: number; completedAt: string };
+type Receipt = { id: string; kind: string; title: string; recipient: string; amountMinor: number; balanceAfter: number; completedAt: string; ownerOverride?: boolean };
 type Listing = { title: string; merchant: string; price: number | null; currency: string | null; priceEvidence: string | null; url: string; sourceTitle: string; transaction?: Transaction };
 type Plan = { action: 'RESEARCH' | 'TRANSFER' | 'CARD_FREEZE' | 'CARD_UNFREEZE' | 'UNSUPPORTED'; summary: string; agentId?: string; options: Listing[]; missingDetails: string[]; researchedAt: string | null; cached?: boolean; autoExecute?: boolean; transaction?: Transaction };
 
@@ -35,6 +36,7 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
     const [receipt, setReceipt] = useState<Receipt | null>(null);
     const [receipts, setReceipts] = useState<Receipt[]>([]);
     const [retryTransaction, setRetryTransaction] = useState<Transaction | null>(null);
+    const [ownerApproval, setOwnerApproval] = useState<{ transaction: Transaction; details: string[] } | null>(null);
     const [stage, setStage] = useState('');
     const busy = useRef(false);
     const sessionNeedsRenewal = !wallet.sessionActive || !Number.isFinite(wallet.sessionExpiresAt) || wallet.sessionExpiresAt <= Date.now() || error.includes('Agent session expired or inactive');
@@ -55,12 +57,13 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
         try { sessionStorage.setItem('copilot-simulation-command', JSON.stringify(command.current)); } catch { /* In-memory retry still works. */ }
         return command.current!.id;
     }
-    const execute = async (transaction: Transaction) => {
+    const execute = async (transaction: Transaction, ownerProof?: string) => {
         setStage('Completing simulated transaction…'); setError(''); setRetryTransaction(transaction);
-        const response = await fetch('/api/copilot/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: transaction.token }) });
+        const response = await fetch('/api/copilot/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: transaction.token, ownerProof }) });
         const result = await response.json();
+        if (result.code === 'OWNER_APPROVAL_REQUIRED') setOwnerApproval({ transaction, details: [result.review.title, `Recipient: ${result.review.recipient}`, `Amount: ${money(result.review.amount)}`, `Agent: ${result.review.agentId}`, result.review.reason, 'Approve only this simulated transaction. Your standing policy stays unchanged.'] });
         if (!response.ok) throw new Error(result.error || 'Simulated transaction failed');
-        setReceipt(result.receipt); setRetryTransaction(null);
+        setReceipt(result.receipt); setRetryTransaction(null); setOwnerApproval(null);
         setNotice('Completed using your simulated wallet. No real order, booking, or funds transfer was made.');
         await wallet.syncFromServer(); await loadReceipts();
     };
@@ -86,7 +89,7 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
     function newRequest() {
         command.current = null;
         try { sessionStorage.removeItem('copilot-simulation-command'); } catch { /* Storage is optional. */ }
-        setPlan(null); setReceipt(null); setQuery(''); setError(''); setNotice(''); setRetryTransaction(null);
+        setOwnerApproval(null); setPlan(null); setReceipt(null); setQuery(''); setError(''); setNotice(''); setRetryTransaction(null);
     }
     const pendingLookup = useRef<AbortController | null>(null);
     useEffect(() => () => { const pending = pendingLookup.current; pendingLookup.current = null; pending?.abort(); }, []);
@@ -97,7 +100,7 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
         busy.current = true;
         const controller = new AbortController();
         pendingLookup.current = controller;
-        setQuery(text); setLoading(true); setStage('Preparing your request…'); setError(''); setNotice(''); setRetryTransaction(null);
+        setOwnerApproval(null); setQuery(text); setLoading(true); setStage('Preparing your request…'); setError(''); setNotice(''); setRetryTransaction(null);
         if (!refresh) { setPlan(null); setReceipt(null); }
         try {
             const response = await fetch('/api/copilot/plan', { method: 'POST', signal: controller.signal, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: text, refresh, requestId: requestId(text) }) });
@@ -132,6 +135,12 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
     };
 
     return <section className="min-w-0 rounded-[24px] border border-stone-200/90 bg-white p-5 shadow-card space-y-5 font-sans sm:p-8">
+        {ownerApproval && <OwnerVerificationModal intent={{ kind: 'transaction_override', token: ownerApproval.transaction.token }} title="Approve this spending-limit exception" details={ownerApproval.details} onClose={() => setOwnerApproval(null)} onVerified={async proof => {
+            if (busy.current) throw new Error('Another copilot action is still running. Try again.');
+            busy.current = true; setLoading(true);
+            try { await execute(ownerApproval.transaction, proof); }
+            finally { busy.current = false; setLoading(false); }
+        }} />}
         <div className="flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800"><Sparkles className="h-5 w-5" /></div>
             <div className="min-w-0"><h2 className="text-xl font-serif font-medium text-stone-950">Ask your copilot</h2>
@@ -155,6 +164,7 @@ export function LiveOmniAgentCopilot({ wallet }: { wallet: AgentWalletClient }) 
         {retryTransaction && !loading && <button type="button" onClick={() => void buy(retryTransaction)} className="rounded-lg border border-stone-300 px-4 py-2 text-sm">Retry same simulated transaction</button>}
         {receipt && <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-2 text-sm text-emerald-950">
             <h3 className="font-semibold">Simulated {receipt.kind === 'PURCHASE' ? 'purchase' : 'transfer'} completed</h3>
+            {receipt.ownerOverride && <p className="text-xs font-medium">Owner verified · One-time policy exception · Standing limits unchanged</p>}
             <p>{receipt.title}</p><p className="break-all">Recipient: {receipt.recipient}</p>
             <p>Deducted: <strong>{money(receipt.amountMinor / 100)}</strong> · Balance after transaction: <strong>{money(receipt.balanceAfter)}</strong></p>
             <p className="break-all text-xs">Receipt {receipt.id} · {new Date(receipt.completedAt).toLocaleString()}</p>

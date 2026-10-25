@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ShieldAlert, Fingerprint, X, Check, AlertTriangle, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldAlert, Fingerprint, X, AlertTriangle } from 'lucide-react';
+import { OwnerVerificationModal } from './OwnerVerificationModal';
 import { QueuedApproval, formatINR } from '../lib/web3/agentWalletClient';
 
 interface OwnerApprovalModalProps {
     request: QueuedApproval | null;
-    onApprove: (id: string) => Promise<boolean>;
+    onApprove: (id: string, proof: string) => Promise<boolean>;
     onReject: (id: string) => void;
     onClose: () => void;
 }
@@ -17,27 +18,27 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
     onReject,
     onClose
 }) => {
-    const [isAuthenticating, setIsAuthenticating] = useState(false);
-    const [authSuccess, setAuthSuccess] = useState(false);
-    const [authError, setAuthError] = useState(false);
-
+    const [verifying, setVerifying] = useState(false);
+    useEffect(() => { setVerifying(false); }, [request?.id]);
     if (!request) return null;
-
-    const handlePasskeyAuth = async () => {
-        setIsAuthenticating(true);
-        setAuthError(false);
-        const approved = await onApprove(request.id);
-        setIsAuthenticating(false);
-        if (!approved) {
-            setAuthError(true);
-            return;
-        }
-        setAuthSuccess(true);
-        setTimeout(() => {
-            setAuthSuccess(false);
+    if (verifying) return <OwnerVerificationModal
+        intent={{ kind: 'queued_approval', id: request.id, amount: request.amount, recipient: request.targetAddress, agent: request.agent, action: request.actionName }}
+        title="Approve this policy exception"
+        details={[
+            `${request.actionName} · ${request.targetName}`,
+            `Recipient: ${request.targetAddress}`,
+            `Amount: ${formatINR(request.amount)}`,
+            `Agent: ${request.agent}`,
+            request.reason,
+            'This approval applies to this request only. Standing policy stays unchanged.'
+        ]}
+        onClose={() => setVerifying(false)}
+        onVerified={async proof => {
+            if (!await onApprove(request.id, proof)) throw new Error('Approval failed. The request may have changed or the wallet balance is insufficient.');
+            setVerifying(false);
             onClose();
-        }, 600);
-    };
+        }}
+    />;
 
     return (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -95,29 +96,11 @@ export const OwnerApprovalModal: React.FC<OwnerApprovalModalProps> = ({
 
                 {/* Passkey Biometric Button */}
                 <div className="space-y-2">
-                    {authError && <p className="text-xs text-rose-700">Approval failed. The request is still pending.</p>}
                     <button
-                        onClick={handlePasskeyAuth}
-                        disabled={isAuthenticating || authSuccess}
-                        className={`w-full py-3 rounded-xl font-medium text-xs tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all ${
-                            authSuccess
-                                ? 'bg-emerald-800 text-white'
-                                : 'bg-stone-900 hover:bg-stone-800 text-white'
-                        }`}
+                        onClick={() => setVerifying(true)}
+                        className="w-full py-3 rounded-xl font-medium text-xs tracking-wide flex items-center justify-center gap-2 shadow-sm transition-all bg-stone-900 hover:bg-stone-800 text-white"
                     >
-                        {authSuccess ? (
-                            <>
-                                <Check className="w-4 h-4 text-emerald-300" /> Local simulation approved
-                            </>
-                        ) : isAuthenticating ? (
-                            <>
-                                <Fingerprint className="w-4 h-4 animate-spin text-stone-300" /> Recording approval...
-                            </>
-                        ) : (
-                            <>
-                                <Fingerprint className="w-4 h-4 text-stone-300" /> Approve local simulation
-                            </>
-                        )}
+                        <Fingerprint className="w-4 h-4 text-stone-300" /> Verify & approve once
                     </button>
 
                     <button

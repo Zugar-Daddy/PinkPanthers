@@ -125,8 +125,8 @@ const clone = value => JSON.parse(JSON.stringify(value));
         fresh(); const manual = clone(c); manual.autoPay = false; store.savePaymaster(manual, 0);
         const ready = await run(); assert.equal(ready.body.run.status, 'READY'); assert.equal(read().balances.usdc, 2000000);
         const library = path.join(tmp, 'lib');
-        fs.mkdirSync(path.join(library, 'payroll'), { recursive: true }); fs.mkdirSync(path.join(library, 'state'));
-        for (const name of ['payroll/store', 'payroll/policy', 'payroll/types', 'state/walletStore']) {
+        fs.mkdirSync(path.join(library, 'payroll'), { recursive: true }); fs.mkdirSync(path.join(library, 'state')); fs.mkdirSync(path.join(library, 'auth'));
+        for (const name of ['payroll/store', 'payroll/policy', 'payroll/types', 'state/walletStore', 'auth/ownerApproval']) {
             const code = ts.transpileModule(fs.readFileSync(path.join(root, `src/lib/${name}.ts`), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
             fs.writeFileSync(path.join(library, `${name}.js`), code);
         }

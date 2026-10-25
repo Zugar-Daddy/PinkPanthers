@@ -359,3 +359,36 @@ PinkPathers/
   <b>SafeAgent Treasury · Built for Track 02: Web3 & Blockchain (W3-02) · Hackathon 2026</b>  
   <i>Letting AI Agents Pay Safely with Cryptographic Guarantees</i>
 </div>
+
+
+### Operation history PDF export
+
+Use **Download activity PDF** below any Operation history panel to download the complete saved operation list. The report includes actions, recorded timestamps, destinations, amounts, statuses, validation results, reasons, references, and estimated gas information. It paginates automatically and distinguishes simulated, blocked and queued records. Export is read-only and uses the existing authenticated wallet API; no external service or PDF runtime is required.
+
+Amounts use `INR`. Latin characters use standard PDF fonts; other scripts are preserved explicitly as `[U+code]`. Raw signatures and credentials are not included. Run `npm run test:activity-pdf` in `frontend` for pagination, complete-history, character-escaping and endpoint checks.
+
+
+### Cost transparency and business plans
+
+The **Cost transparency** and **Business & plans** tabs use an ivory, emerald, yellow and mint Neo-Brutalist design. The cost ledger has interactive payment-rail and FX assumptions, a budget-scaled waterfall, and a gas anomaly detector with normal (<15 Gwei), elevated (15–50 Gwei) and congested (>50 Gwei) states. All fiat, FX, L2 execution and blob INR ranges are illustrative, not live tariffs or universal regulatory mandates. L1 gas price is not a blob-price or per-operation quote.
+
+Live gas uses Ethereum mainnet `eth_chainId` and `eth_gasPrice`, checks chain ID 1, caches for 15 seconds and polls every 30 seconds while the cost panel is open. The default public metadata feed is `https://ethereum-rpc.publicnode.com`; set server-only `ETHEREUM_RPC_URL` to use your own provider. RPC requests share a five-second deadline. Missing connectivity shows an unavailable state, with an explicitly labelled interactive scenario mode. No network failures are replaced with invented live prices. The panel explains the actual paymaster quota/reservation limits; it does not alter contracts or automatically retry operations.
+
+Starter and Growth pricing follows the requested monthly and ten-month annual prices (two months free, approximately 16.7% savings). Annual unit economics retain twelve monthly gas allowances, scale gateway allocation with the invoice, and calculate platform contribution as the remainder. Enterprise features, auto-refill mandates and the SLA are proposed contract offerings, not activated integrations. Plan selection persists as a demo preference without charges, gas-credit grants or fleet-limit enforcement.
+
+**Top-Up Gas Tank via UPI** opens a simulated checkout for ₹1,000 / ₹5,000 / ₹10,000, with zero illustrative UPI surcharge and 15 estimated UserOperations per rupee (excluding congestion overhead). The server atomically credits `balances.paymasterGasTankINR`, stores a receipt, and adds inbox/activity records. Stable request IDs prevent duplicate credits across retries, concurrent workers and restarts. The client exposes `wallet.paymasterTankINR` as an alias of the existing gas-tank property so all existing dashboard displays stay in sync. This does not charge Razorpay, debit treasury cash or send an on-chain deposit.
+
+Run `npm run test:billing` to verify pricing math, thresholds, live-feed validation/timeouts, plan persistence and refill idempotency using isolated fixtures.
+
+
+### Device verification for policy changes and copilot exceptions
+
+**Specify policy → Verify & save policy** now requires a registered owner device passkey before the server saves limits or session duration. Card daily-limit changes and the existing queued-approval screen use the same verification. Policy saves preserve spending counters and only update the client after server success.
+
+An out-of-policy copilot purchase or transfer opens an owner review dialog directly in Copilot. Verify the recipient and amount, then choose **Verify & authorize**. The signed approval permits that transaction once, without increasing the agent's standing limits. The receipt and operation history record the owner exception. Active-session, card-freeze, wallet-balance, quote-expiry and signature checks still apply. All payments remain simulated INR ledger entries; there is no merchant checkout, bank transfer or on-chain transaction.
+
+On first use, enter the existing dashboard owner password (`WALLET_ADMIN_TOKEN` in `frontend/.env.local`, at least 32 characters) to register a platform passkey, then verify again for the pending action. Production Basic authentication can also supply the setup password. Use a passkey-capable browser on HTTPS or localhost, and keep using the same hostname (`localhost` and `127.0.0.1` are different). Optionally pin the deployed origin with server-only `WEBAUTHN_ORIGIN`. The OS selects Touch ID, Face ID, Windows Hello or a device PIN; biometric-only authentication cannot be guaranteed by WebAuthn. No biometric data or private key is sent to the application.
+
+The server verifies ES256 signatures, RP ID, origin, challenge, user presence and user verification. Two-minute challenges are single-use. Approval proofs expire after 60 seconds, bind to the exact action details, and are consumed atomically with the wallet mutation. Registration requires the owner password; being on the dashboard alone does not confer ownership. Public credential metadata is stored in the private local wallet-state file. Losing the registered passkey currently requires administrator recovery; the simulated guardian-recovery screen does not reset this credential.
+
+Run `npm run test:owner-verification` in `frontend` for registration, signature/UV/origin validation, intent binding, replay/expiry, protected policy and card updates, queued approvals and copilot exceptions against an isolated wallet fixture. These tests use cryptographically signed test authenticator responses; the native device prompt must be checked on the owner's browser.

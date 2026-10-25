@@ -8,8 +8,11 @@
     "test:live-copilot": "node test/liveCopilot.test.js",
     "test:transactions": "node test/copilotTransactions.test.js",
     "test:paymaster": "node test/paymaster.test.js",
+    "test:activity-pdf": "node test/activityPdf.test.js",
+    "test:billing": "node test/billing.test.js && node test/gasFeed.test.js",
     "test:local-auth": "node test/localAuth.test.js",
-    "start": "next start -p 3000"
+    "start": "next start -p 3000",
+    "test:owner-verification": "node test/ownerVerification.test.js"
   },
   "dependencies": {
     "next": "14.2.5",

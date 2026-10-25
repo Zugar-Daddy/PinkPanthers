@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react';
 import { X, Sliders, Key, Fingerprint, Trash2, Check, Shield } from 'lucide-react';
+import { OwnerVerificationModal } from './OwnerVerificationModal';
+import type { OwnerIntent } from '../lib/auth/types';
 import { AgentWalletClient, formatINR } from '../lib/web3/agentWalletClient';
 
 interface PolicyConfigModalProps {
     wallet: AgentWalletClient;
     isOpen: boolean;
     onClose: () => void;
-    onUpdatePolicy: (dailyBudget: number, maxPerTx: number, durationHours: number) => void;
+    onUpdatePolicy: (intent: Extract<OwnerIntent, { kind: 'policy_update' }>, proof: string) => Promise<void>;
     onRevokeKey: () => void;
 }
 
@@ -23,10 +25,13 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
     const [maxPerTx, setMaxPerTx] = useState(wallet.policy.maxPerTx);
     const [durationHours, setDurationHours] = useState(wallet.policy.sessionExpiryHours);
     const [isSaved, setIsSaved] = useState(false);
+    const [pendingPolicy, setPendingPolicy] = useState<Extract<OwnerIntent, { kind: 'policy_update' }> | null>(null);
+    const [error, setError] = useState('');
 
     // Sync state whenever modal opens or active agent / policy changes
     React.useEffect(() => {
         if (isOpen) {
+            setIsSaved(false); setError(''); setPendingPolicy(null);
             setDailyBudget(wallet.policy.dailyBudget);
             setMaxPerTx(wallet.policy.maxPerTx);
             setDurationHours(wallet.policy.sessionExpiryHours);
@@ -39,16 +44,18 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
     const maxSliderDailyBudget = Math.max(500000, dailyBudget * 1.5);
 
     const handleSave = () => {
-        onUpdatePolicy(dailyBudget, maxPerTx, durationHours);
-        setIsSaved(true);
-        setTimeout(() => {
-            setIsSaved(false);
-            onClose();
-        }, 600);
+        setError('');
+        if (![dailyBudget, maxPerTx, durationHours].every(n => Number.isFinite(n) && n > 0) || maxPerTx > dailyBudget) { setError('The per-transaction cap must not exceed the daily budget.'); return; }
+        setPendingPolicy({ kind: 'policy_update', agentId: wallet.activeAgentId, dailyBudget, maxPerTx, sessionExpiryHours: durationHours });
     };
 
     return (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+            {pendingPolicy && <OwnerVerificationModal intent={pendingPolicy} title="Authorize spending policy changes" details={[
+                `Agent: ${pendingPolicy.agentId}`, `Per-transaction cap: ${formatINR(pendingPolicy.maxPerTx)}`,
+                `Daily budget: ${formatINR(pendingPolicy.dailyBudget)}`, `Session duration: ${pendingPolicy.sessionExpiryHours} hours`,
+                'Existing spending totals will be preserved.'
+            ]} onClose={() => setPendingPolicy(null)} onVerified={async proof => { await onUpdatePolicy(pendingPolicy, proof); setPendingPolicy(null); setIsSaved(true); onClose(); }} />}
             <div className="bg-white border border-stone-200/90 rounded-2xl max-w-lg w-full p-6 shadow-modal relative">
                 
                 <div className="flex items-center justify-between gap-3 pb-3.5 mb-5 border-b border-stone-200/80">
@@ -160,6 +167,7 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                     </div>
                 </div>
 
+                {error && <p role="alert" className="mb-3 text-sm text-rose-700">{error}</p>}
                 {/* Buttons */}
                 <div className="flex items-center justify-between gap-3">
                     <button
@@ -177,8 +185,8 @@ export const PolicyConfigModal: React.FC<PolicyConfigModalProps> = ({
                         onClick={handleSave}
                         className="flex-1 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition"
                     >
-                        <Check className="w-4 h-4 text-emerald-300" />
-                        <span>{isSaved ? 'Policy updated' : 'Save policy'}</span>
+                        <Fingerprint className="w-4 h-4 text-emerald-300" />
+                        <span>{isSaved ? 'Policy updated' : 'Verify & save policy'}</span>
                     </button>
                 </div>
 
